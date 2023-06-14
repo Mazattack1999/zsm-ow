@@ -349,6 +349,7 @@ variables
 		90: waypoint
 		91: testTarget
 		92: canTeleport
+		93: defaultOutlineColor
 }
 
 subroutines
@@ -6244,25 +6245,29 @@ rule("mutations")
 			If(Event Player.mutationValue == 1);
 				Event Player.movementSpeed *= Workshop Setting Real(Custom String("Mutations"), Custom String("Speed Scalar"), 1.500, 0, 10, 0);
 				Set Move Speed(Event Player, Event Player.movementSpeed * 100);
-				Start Forcing Player Outlines(Event Player, All Players(All Teams), True, Custom Color(116, 7, 120, 255), Default);
+				Event Player.defaultOutlineColor = Custom Color(116, 7, 120, 255);
+				Start Forcing Player Outlines(Event Player, All Players(All Teams), True, Event Player.defaultOutlineColor, Default);
 				Start Forcing Dummy Bot Name(Event Player, Custom String("SPEED"));
 			"Size Growth"
 			Else If(Event Player.mutationValue == 2);
 				Event Player.size *= Workshop Setting Real(Custom String("Mutations"), Custom String("Size Growth Scalar"), 1.500, 1, 20, 1);
 				Event Player.health *= Event Player.size;
-				Start Forcing Player Outlines(Event Player, All Players(All Teams), True, Color(Violet), Default);
+				Event Player.defaultOutlineColor = Color(Violet);
+				Start Forcing Player Outlines(Event Player, All Players(All Teams), True, Event Player.defaultOutlineColor, Default);
 				Start Forcing Dummy Bot Name(Event Player, Custom String("XL"));
 			"Size Reduction"
 			Else If(Event Player.mutationValue == 3);
 				Event Player.size *= Workshop Setting Real(Custom String("Mutations"), Custom String("Size Reduction Scalar"), 0.600, 0.100, 1, 2);
 				Event Player.health *= Event Player.size;
-				Start Forcing Player Outlines(Event Player, All Players(All Teams), True, Color(Rose), Default);
+				Event Player.defaultOutlineColor = Color(Rose);
+				Start Forcing Player Outlines(Event Player, All Players(All Teams), True, Event Player.defaultOutlineColor, Default);
 				Start Forcing Dummy Bot Name(Event Player, Custom String("XS"));
 			"Radioactive"
 			Else If(Event Player.mutationValue == 4);
 				Event Player.biteDuration *= Workshop Setting Real(Custom String("Mutations"), Custom String("Radioactivity Damage Scalar"), 2, 1,
 					5, 3);
-				Start Forcing Player Outlines(Event Player, All Players(All Teams), True, Color(Lime Green), Default);
+				Event Player.defaultOutlineColor = Color(Lime Green);
+				Start Forcing Player Outlines(Event Player, All Players(All Teams), True, Event Player.defaultOutlineColor, Default);
 				Start Forcing Dummy Bot Name(Event Player, Custom String("Radioactive"));
 			"Heavy"
 			Else If(Event Player.mutationValue == 5);
@@ -6274,11 +6279,13 @@ rule("mutations")
 				Set Move Speed(Event Player, 100 * Event Player.movementSpeed);
 				"Scale health"
 				Event Player.health /= Event Player.knockbackRecieved;
-				Start Forcing Player Outlines(Event Player, All Players(All Teams), True, Color(Black), Default);
+				Event Player.defaultOutlineColor = Color(Black);
+				Start Forcing Player Outlines(Event Player, All Players(All Teams), True, Event Player.defaultOutlineColor, Default);
 				Start Forcing Dummy Bot Name(Event Player, Custom String("Heavy"));
 			End;
 		Else;
 			Event Player.mutationValue = 0;
+			Event Player.defaultOutlineColor = Null;
 			Stop Forcing Player Outlines(Event Player, All Players(All Teams));
 			Stop Forcing Dummy Bot Name(Event Player);
 		End;
