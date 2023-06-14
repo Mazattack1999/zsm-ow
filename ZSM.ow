@@ -1043,7 +1043,7 @@ rule("setZombieMode")
 			Global.botSpawnRates = Array(0, 0, 0, 0, 50, 0, 0, 0, 0, 50, 0, 0, 0, 0, 0);
 		End;
 		"TESTING ONLY"
-		disabled Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100);
+		Global.botSpawnRates = Array(80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20);
 	}
 }
 
@@ -5192,7 +5192,7 @@ rule("BOT INITIALIZATION")
 		"Damage over time duration"
 		Chase Player Variable At Rate(Event Player, damageOverTimeDuration, -1, 0.950, None);
 		"Bot target warning icon (flashing)"
-		Create Icon(Filtered Array(Event Player.botTarget, !Is In View Angle(Current Array Element, Position Of(Event Player), 55)),
+		Create Icon(Filtered Array(Event Player.botTarget, !Event Player.botTarget.blinded && !Is In View Angle(Current Array Element, Position Of(Event Player), 55)),
 			Event Player, Warning, Visible To Position and Color, Round To Integer(Total Time Elapsed * (Distance Between(Position Of(
 			Event Player), Position Of(Local Player)) > 10 ? 4 : 8), Up) % 2 == 0 ? Color(Red) : Color(Yellow), True);
 		Wait Until(Has Spawned(Event Player), 2);
@@ -8317,9 +8317,14 @@ rule("ILLUISONIST (SOMBRA) ACTIVATES INVISIBILITY ILLUSION")
 		Event Player.botTempValue = True;
 		Wait Until(Event Player.botTarget != Null || !Is Using Ability 1(Event Player), 9999);
 		While(Is Using Ability 1(Event Player));
+			Event Player.botSpecialPotentialTargets.blinded = False;
 			Event Player.botSpecialPotentialTargets = Event Player.lastTarget;
+			Event Player.botSpecialPotentialTargets.blinded = True;
+			Event Player.botSpecialPotentialTargets.updateOutlines = True;
 			Wait Until(!Is Using Ability 1(Event Player), 3);
 		End;
+		Event Player.botSpecialPotentialTargets.blinded = False;
+		Event Player.botSpecialPotentialTargets.updateOutlines = True;
 		Event Player.botTempValue = False;
 		Set Ability Cooldown(Event Player, Button(Ability 1), 2);
 	}
@@ -8361,9 +8366,11 @@ rule("ILLUISONIST USES EMP")
 		"Restore normal damage"
 		Event Player.damageDealt = Global.damageDealt[Index Of Array Value(Global.botHeros, Hero Of(Event Player))] / 100;
 		Set Damage Dealt(Event Player, Event Player.damageDealt * 100);
-		Start Forcing Player Outlines(Event Player, Event Player.botSpecialPotentialTargets, False, Color(Purple), Default);
+		Event Player.botSpecialPotentialTargets.blinded = True;
+		Event Player.botSpecialPotentialTargets.updateOutlines = True;
 		Wait Until(Is Dead(Event Player), 10);
-		Stop Forcing Player Outlines(Event Player, Event Player.botSpecialPotentialTargets);
+		Event Player.botSpecialPotentialTargets.blinded = False;
+		Event Player.botSpecialPotentialTargets.updateOutlines = True;
 		Event Player.botTempValue = False;
 		Event Player.botSpecialPotentialTargets = Empty Array;
 		Wait(5, Ignore Condition);
