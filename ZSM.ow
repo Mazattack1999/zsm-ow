@@ -350,6 +350,9 @@ variables
 		91: testTarget
 		92: canTeleport
 		93: defaultOutlineColor
+		94: outlineCount
+		95: blinded
+		96: updateOutlines
 }
 
 subroutines
@@ -4518,6 +4521,7 @@ rule("PLAYER INITIALIZATION")
 		Event Player.movementSpeed = 1;
 		Set Move Speed(Event Player, Event Player.movementSpeed * 100);
 		Event Player.attached = False;
+		Event Player.blinded = False;
 		Disable Messages(Event Player);
 		Disable Game Mode In-World UI(Event Player);
 		Disable Game Mode HUD(Event Player);
@@ -4639,6 +4643,41 @@ rule("EFFECTS/TEXTS")
 			Normalized Health(Event Player) > 0.330 ? Color(Yellow) : (Normalized Health(Event Player) > 0 ? Color(Orange) : Color(Red)))),
 			Color(Red), Event Player.infectionLvl >= 1 ? Color(Lime Green) : (Event Player.infectionLvl < 0 ? Color(Blue) : Color(Yellow)),
 			Visible To Sort Order String and Color, Default Visibility);
+	}
+}
+
+rule("UPDATE BOT OUTLINE COLORS AND VISIBILITY")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.updateOutlines == True;
+	}
+
+	actions
+	{
+		Event Player.updateOutlines = False;
+		Event Player.potentialTargets = All Living Players(Team 2);
+		If(Event Player.blinded);
+			Start Forcing Player Outlines(Event Player.potentialTargets, Event Player, False, Color(White), Default);
+		Else;
+			For Player Variable(Event Player, outlineCount, 0, Count Of(Event Player.potentialTargets), 1);
+				Event Player.botTarget = Event Player.potentialTargets[Event Player.outlineCount];
+				If(Event Player.botTarget.defaultOutlineColor);
+					Start Forcing Player Outlines(Event Player.botTarget, Event Player, True, Event Player.botTarget.defaultOutlineColor, Default);
+				Else;
+					Stop Forcing Player Outlines(Event Player.botTarget, Event Player);
+				End;
+			End;
+		End;
+		Wait(0.016, Ignore Condition);
+		Loop If Condition Is True;
 	}
 }
 
@@ -6245,29 +6284,30 @@ rule("mutations")
 			If(Event Player.mutationValue == 1);
 				Event Player.movementSpeed *= Workshop Setting Real(Custom String("Mutations"), Custom String("Speed Scalar"), 1.500, 0, 10, 0);
 				Set Move Speed(Event Player, Event Player.movementSpeed * 100);
-				Event Player.defaultOutlineColor = Custom Color(116, 7, 120, 255);
-				Start Forcing Player Outlines(Event Player, All Players(All Teams), True, Event Player.defaultOutlineColor, Default);
+				disabled Event Player.defaultOutlineColor = Custom Color(116, 7, 120, 255);
+				Event Player.defaultOutlineColor = Color(Purple);
+				disabled Start Forcing Player Outlines(Event Player, All Players(All Teams), True, Event Player.defaultOutlineColor, Default);
 				Start Forcing Dummy Bot Name(Event Player, Custom String("SPEED"));
 			"Size Growth"
 			Else If(Event Player.mutationValue == 2);
 				Event Player.size *= Workshop Setting Real(Custom String("Mutations"), Custom String("Size Growth Scalar"), 1.500, 1, 20, 1);
 				Event Player.health *= Event Player.size;
 				Event Player.defaultOutlineColor = Color(Violet);
-				Start Forcing Player Outlines(Event Player, All Players(All Teams), True, Event Player.defaultOutlineColor, Default);
+				disabled Start Forcing Player Outlines(Event Player, All Players(All Teams), True, Event Player.defaultOutlineColor, Default);
 				Start Forcing Dummy Bot Name(Event Player, Custom String("XL"));
 			"Size Reduction"
 			Else If(Event Player.mutationValue == 3);
 				Event Player.size *= Workshop Setting Real(Custom String("Mutations"), Custom String("Size Reduction Scalar"), 0.600, 0.100, 1, 2);
 				Event Player.health *= Event Player.size;
 				Event Player.defaultOutlineColor = Color(Rose);
-				Start Forcing Player Outlines(Event Player, All Players(All Teams), True, Event Player.defaultOutlineColor, Default);
+				disabled Start Forcing Player Outlines(Event Player, All Players(All Teams), True, Event Player.defaultOutlineColor, Default);
 				Start Forcing Dummy Bot Name(Event Player, Custom String("XS"));
 			"Radioactive"
 			Else If(Event Player.mutationValue == 4);
 				Event Player.biteDuration *= Workshop Setting Real(Custom String("Mutations"), Custom String("Radioactivity Damage Scalar"), 2, 1,
 					5, 3);
 				Event Player.defaultOutlineColor = Color(Lime Green);
-				Start Forcing Player Outlines(Event Player, All Players(All Teams), True, Event Player.defaultOutlineColor, Default);
+				disabled Start Forcing Player Outlines(Event Player, All Players(All Teams), True, Event Player.defaultOutlineColor, Default);
 				Start Forcing Dummy Bot Name(Event Player, Custom String("Radioactive"));
 			"Heavy"
 			Else If(Event Player.mutationValue == 5);
@@ -6280,15 +6320,16 @@ rule("mutations")
 				"Scale health"
 				Event Player.health /= Event Player.knockbackRecieved;
 				Event Player.defaultOutlineColor = Color(Black);
-				Start Forcing Player Outlines(Event Player, All Players(All Teams), True, Event Player.defaultOutlineColor, Default);
+				disabled Start Forcing Player Outlines(Event Player, All Players(All Teams), True, Event Player.defaultOutlineColor, Default);
 				Start Forcing Dummy Bot Name(Event Player, Custom String("Heavy"));
 			End;
 		Else;
 			Event Player.mutationValue = 0;
 			Event Player.defaultOutlineColor = Null;
-			Stop Forcing Player Outlines(Event Player, All Players(All Teams));
+			disabled Stop Forcing Player Outlines(Event Player, All Players(All Teams));
 			Stop Forcing Dummy Bot Name(Event Player);
 		End;
+		All Players(Team 1).updateOutlines = True;
 	}
 }
 
