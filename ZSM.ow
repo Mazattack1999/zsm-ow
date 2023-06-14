@@ -45,6 +45,9 @@ settings
 			{
 				Busan Downtown Lunar New Year
 				Busan Sanctuary Lunar New Year
+				Lijiang Control Center
+				Lijiang Garden
+				Lijiang Night Market
 				Oasis City Center
 				Oasis Gardens
 				Oasis University
@@ -59,8 +62,7 @@ settings
 
 			enabled maps
 			{
-				Antarctic Peninsula 972777519512068153
-				Busan 972777519512068153 972777519512068154
+				Busan 972777519512068194 972777519512068153 972777519512068154
 				Oasis 972777519512068292 972777519512068153 972777519512068154
 			}
 		}
@@ -107,7 +109,7 @@ settings
 				Castillo 972777519512063901
 				Château Guillard 972777519512063901
 				Château Guillard Halloween 972777519512063901
-				Ecopoint: Antarctica 972777519512064577 972777519512063901
+				Ecopoint: Antarctica 972777519512063901
 				Ecopoint: Antarctica Winter 972777519512063901
 				Kanezaka 972777519512063901
 				Malevento 972777519512063901
@@ -871,8 +873,7 @@ rule("VARIABLE ASSIGNMENT")
 		Global.uniqueSkinCap = Workshop Setting Integer(Custom String("General"), Custom String("Maximum Number of Unique Hero Skins"), 10,
 			1, 11, 0);
 		Global.objectiveComplete = False;
-		Global.numberOfBots = Workshop Setting Integer(Custom String("General"), Custom String(
-			"Number of zombies"), 6, 1, 23, 1);
+		Global.numberOfBots = Workshop Setting Integer(Custom String("General"), Custom String("Number of zombies"), 6, 1, 23, 1);
 	}
 }
 
@@ -1121,7 +1122,8 @@ rule("setDifficulty")
 			"Bot bite durations"
 			Global.biteDurations = Array(2, 2, 2.500, 2.500, 0, 1.500, 3.500, 2, 2, 1.500, 1, 1, 0, 0, 3);
 			"Bot throttle speeds"
-			Global.throttleSpeeds = Array(0.550, 0.600, 0.750, 0.400, 0.500, 0.600, 0.300, 0.550, 0.450, 0.500, 0.750, 0.550, 0.400, 0.500, 0.3);
+			Global.throttleSpeeds = Array(0.550, 0.600, 0.750, 0.400, 0.500, 0.600, 0.300, 0.550, 0.450, 0.500, 0.750, 0.550, 0.400, 0.500,
+				0.300);
 			"Bot damage dealt"
 			Global.damageDealt = Array(8.500, 7.500, 1, 1, 50, 75, 1, 25, 1, 50, 1, 50, 75, 50, 5);
 		"Difficulty: Normal"
@@ -1134,7 +1136,7 @@ rule("setDifficulty")
 			"Bot bite durations"
 			Global.biteDurations = Array(2, 2, 2.500, 2.500, 0, 1.500, 3.500, 2, 2, 1.500, 1, 1, 0, 0, 3);
 			"Bot throttle speeds"
-			Global.throttleSpeeds = Array(0.850, 0.900, 1, 0.600, 0.700, 0.800, 0.400, 0.750, 0.700, 0.650, 0.900, 0.800, 0.650, 0.700, 0.35);
+			Global.throttleSpeeds = Array(0.850, 0.900, 1, 0.600, 0.700, 0.800, 0.400, 0.750, 0.700, 0.650, 0.900, 0.800, 0.650, 0.700, 0.350);
 			"Bot damage dealt"
 			Global.damageDealt = Array(8.500, 7.500, 1, 1, 50, 75, 1, 25, 1, 50, 1, 50, 75, 50, 5);
 		"Difficulty: Expert"
@@ -1147,7 +1149,7 @@ rule("setDifficulty")
 			"Bot bite durations"
 			Global.biteDurations = Array(3, 3, 3, 3, 0, 1.500, 4, 2, 2, 2, 1, 1.500, 0, 0, 3);
 			"Bot throttle speeds"
-			Global.throttleSpeeds = Array(0.850, 0.900, 1, 0.600, 0.700, 0.800, 0.400, 0.750, 0.700, 0.650, 0.900, 0.800, 0.650, 0.700, 0.35);
+			Global.throttleSpeeds = Array(0.850, 0.900, 1, 0.600, 0.700, 0.800, 0.400, 0.750, 0.700, 0.650, 0.900, 0.800, 0.650, 0.700, 0.350);
 			"Bot damage dealt"
 			Global.damageDealt = Array(125, 125, 50, 50, 150, 175, 50, 150, 50, 150, 1, 90, 75, 100, 75);
 		"Difficulty: Legendary"
@@ -1160,7 +1162,7 @@ rule("setDifficulty")
 			"Bot bite durations"
 			Global.biteDurations = Array(3, 3, 3, 3, 0, 1.500, 4, 2, 2, 2, 1, 1.500, 0, 0, 3);
 			"Bot throttle speeds"
-			Global.throttleSpeeds = Array(0.900, 0.950, 1, 0.750, 0.850, 0.900, 0.700, 0.800, 0.800, 0.750, 0.900, 0.800, 0.650, 0.700, 0.5);
+			Global.throttleSpeeds = Array(0.900, 0.950, 1, 0.750, 0.850, 0.900, 0.700, 0.800, 0.800, 0.750, 0.900, 0.800, 0.650, 0.700, 0.500);
 			"Bot damage dealt"
 			Global.damageDealt = Array(150, 150, 100, 100, 200, 225, 100, 200, 100, 175, 50, 175, 100, 150, 150);
 		"Difficulty: Insanity"
@@ -6135,16 +6137,24 @@ rule("botEntityManagement")
 				Modify Player Variable(Event Player, generalPlayerBotEntities, Append To Array, Last Created Entity);
 			Else If(Hero Of(Event Player) == Hero(Sombra));
 				"Near fog visual"
-				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, Event Player.botTempValue), Bad Aura, Color(Gray), Eye Position(Local Player) + (Facing Direction Of(Local Player) * (6.75 + Evaluate Once(Random Real(-0.5, 0.5)))), 200, Visible To Position and Radius);
+				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, Event Player.botTempValue), Bad Aura, Color(Gray),
+					Eye Position(Local Player) + Facing Direction Of(Local Player) * (6.750 + Evaluate Once(Random Real(-0.500, 0.500))), 200,
+					Visible To Position and Radius);
 				Modify Player Variable(Event Player, generalPlayerBotEntities, Append To Array, Last Created Entity);
 				"Mid Range fog visual"
-				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, Event Player.botTempValue), Bad Aura, Color(Purple), Eye Position(Local Player) + (Facing Direction Of(Local Player) * (20 + Evaluate Once(Random Real(-0.5, 0.5)))), 200, Visible To Position and Radius);
+				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, Event Player.botTempValue), Bad Aura, Color(Purple),
+					Eye Position(Local Player) + Facing Direction Of(Local Player) * (20 + Evaluate Once(Random Real(-0.500, 0.500))), 200,
+					Visible To Position and Radius);
 				Modify Player Variable(Event Player, generalPlayerBotEntities, Append To Array, Last Created Entity);
 				"Mid Range fog visual"
-				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, Event Player.botTempValue), Bad Aura, Color(Purple), Eye Position(Local Player) + (Facing Direction Of(Local Player) * (30 + Evaluate Once(Random Real(-0.5, 0.5)))), 200, Visible To Position and Radius);
+				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, Event Player.botTempValue), Bad Aura, Color(Purple),
+					Eye Position(Local Player) + Facing Direction Of(Local Player) * (30 + Evaluate Once(Random Real(-0.500, 0.500))), 200,
+					Visible To Position and Radius);
 				Modify Player Variable(Event Player, generalPlayerBotEntities, Append To Array, Last Created Entity);
 				"Illusion aura"
-				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, Event Player.botTempValue && Is Using Ability 1(Event Player)), Good Aura, Color(Purple), Eye Position(Event Player), 0.25 * Event Player.size, Visible To Position and Radius);
+				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, Event Player.botTempValue && Is Using Ability 1(
+					Event Player)), Good Aura, Color(Purple), Eye Position(Event Player), 0.250 * Event Player.size,
+					Visible To Position and Radius);
 				Modify Player Variable(Event Player, generalPlayerBotEntities, Append To Array, Last Created Entity);
 			End;
 		End;
@@ -8244,7 +8254,8 @@ rule("ILLUISONIST (SOMBRA) ACTIVATES INVISIBILITY ILLUSION")
 		Event Player.initializing != True;
 		Event Player.teleporting != True;
 		Ability Cooldown(Event Player, Button(Ability 1)) <= 0;
-		(Event Player.botTarget == Null || Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget)) > 3 * Event Player.size) == True;
+		(Event Player.botTarget == Null || Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget))
+			> 3 * Event Player.size) == True;
 		Array Contains(Global.bosses, Event Player) != True;
 	}
 
@@ -8253,7 +8264,7 @@ rule("ILLUISONIST (SOMBRA) ACTIVATES INVISIBILITY ILLUSION")
 		Wait(1, Abort When False);
 		While(!Is Using Ability 1(Event Player));
 			Press Button(Event Player, Button(Ability 1));
-			Wait Until(Is Using Ability 1(Event Player), 0.5);
+			Wait Until(Is Using Ability 1(Event Player), 0.500);
 		End;
 		Event Player.botTempValue = True;
 		Wait Until(Event Player.botTarget != Null || !Is Using Ability 1(Event Player), 9999);
@@ -8290,7 +8301,7 @@ rule("ILLUISONIST USES EMP")
 		Apply Impulse(Event Player, Vector(0, 1, 0), 4 * Event Player.size, To World, Cancel Contrary Motion);
 		Wait(0.125, Ignore Condition);
 		Wait Until(Y Component Of(Velocity Of(Event Player)) <= 0, 5);
-		Event Player.damageDealt = 0.01;
+		Event Player.damageDealt = 0.010;
 		Set Damage Dealt(Event Player, Event Player.damageDealt * 100);
 		While(Ultimate Charge Percent(Event Player) >= 100);
 			Press Button(Event Player, Button(Ultimate));
@@ -8298,7 +8309,7 @@ rule("ILLUISONIST USES EMP")
 		End;
 		Event Player.botTempValue = True;
 		"EMP Cast"
-		Wait(0.36, Ignore Condition);
+		Wait(0.360, Ignore Condition);
 		"Restore normal damage"
 		Event Player.damageDealt = Global.damageDealt[Index Of Array Value(Global.botHeros, Hero Of(Event Player))] / 100;
 		Set Damage Dealt(Event Player, Event Player.damageDealt * 100);
