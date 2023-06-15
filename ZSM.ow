@@ -4676,7 +4676,7 @@ rule("UPDATE BOT OUTLINE COLORS AND VISIBILITY")
 				End;
 			End;
 		End;
-		Wait(0.016, Ignore Condition);
+		Wait(0.25, Ignore Condition);
 		Loop If Condition Is True;
 	}
 }
