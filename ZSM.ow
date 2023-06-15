@@ -6318,12 +6318,17 @@ rule("mutations")
 				Event Player.defaultOutlineColor = Color(Black);
 				Start Forcing Dummy Bot Name(Event Player, Custom String("Heavy"));
 			End;
+			"Mutation outline for non-blinded players"
+			Start Forcing Player Outlines(Event Player, Filtered Array(All Players(Team 1), !Current Array Element.blinded), True, Event Player.defaultOutlineColor, Default);
 		Else;
 			Event Player.mutationValue = 0;
 			Event Player.defaultOutlineColor = Null;
+			"Default ouline for non-blinded players"
+			Stop Forcing Player Outlines(Event Player, Filtered Array(All Players(Team 1), !Current Array Element.blinded));
 			Stop Forcing Dummy Bot Name(Event Player);
 		End;
-		All Players(Team 1).updateOutlines = True;
+		"Disable outline for blinded players"
+		Start Forcing Player Outlines(Event Player, Filtered Array(All Players(Team 1), Current Array Element.blinded), False, Color(White), Default);
 	}
 }
 
