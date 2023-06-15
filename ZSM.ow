@@ -1043,7 +1043,7 @@ rule("setZombieMode")
 			Global.botSpawnRates = Array(0, 0, 0, 0, 50, 0, 0, 0, 0, 50, 0, 0, 0, 0, 0);
 		End;
 		"TESTING ONLY"
-		Global.botSpawnRates = Array(80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20);
+		disabled Global.botSpawnRates = Array(80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20);
 	}
 }
 
@@ -6286,28 +6286,24 @@ rule("mutations")
 				Set Move Speed(Event Player, Event Player.movementSpeed * 100);
 				disabled Event Player.defaultOutlineColor = Custom Color(116, 7, 120, 255);
 				Event Player.defaultOutlineColor = Color(Purple);
-				disabled Start Forcing Player Outlines(Event Player, All Players(All Teams), True, Event Player.defaultOutlineColor, Default);
 				Start Forcing Dummy Bot Name(Event Player, Custom String("SPEED"));
 			"Size Growth"
 			Else If(Event Player.mutationValue == 2);
 				Event Player.size *= Workshop Setting Real(Custom String("Mutations"), Custom String("Size Growth Scalar"), 1.500, 1, 20, 1);
 				Event Player.health *= Event Player.size;
 				Event Player.defaultOutlineColor = Color(Violet);
-				disabled Start Forcing Player Outlines(Event Player, All Players(All Teams), True, Event Player.defaultOutlineColor, Default);
 				Start Forcing Dummy Bot Name(Event Player, Custom String("XL"));
 			"Size Reduction"
 			Else If(Event Player.mutationValue == 3);
 				Event Player.size *= Workshop Setting Real(Custom String("Mutations"), Custom String("Size Reduction Scalar"), 0.600, 0.100, 1, 2);
 				Event Player.health *= Event Player.size;
 				Event Player.defaultOutlineColor = Color(Rose);
-				disabled Start Forcing Player Outlines(Event Player, All Players(All Teams), True, Event Player.defaultOutlineColor, Default);
 				Start Forcing Dummy Bot Name(Event Player, Custom String("XS"));
 			"Radioactive"
 			Else If(Event Player.mutationValue == 4);
 				Event Player.biteDuration *= Workshop Setting Real(Custom String("Mutations"), Custom String("Radioactivity Damage Scalar"), 2, 1,
 					5, 3);
 				Event Player.defaultOutlineColor = Color(Lime Green);
-				disabled Start Forcing Player Outlines(Event Player, All Players(All Teams), True, Event Player.defaultOutlineColor, Default);
 				Start Forcing Dummy Bot Name(Event Player, Custom String("Radioactive"));
 			"Heavy"
 			Else If(Event Player.mutationValue == 5);
@@ -6320,13 +6316,11 @@ rule("mutations")
 				"Scale health"
 				Event Player.health /= Event Player.knockbackRecieved;
 				Event Player.defaultOutlineColor = Color(Black);
-				disabled Start Forcing Player Outlines(Event Player, All Players(All Teams), True, Event Player.defaultOutlineColor, Default);
 				Start Forcing Dummy Bot Name(Event Player, Custom String("Heavy"));
 			End;
 		Else;
 			Event Player.mutationValue = 0;
 			Event Player.defaultOutlineColor = Null;
-			disabled Stop Forcing Player Outlines(Event Player, All Players(All Teams));
 			Stop Forcing Dummy Bot Name(Event Player);
 		End;
 		All Players(Team 1).updateOutlines = True;
@@ -8314,6 +8308,8 @@ rule("ILLUISONIST (SOMBRA) ACTIVATES INVISIBILITY ILLUSION")
 			Press Button(Event Player, Button(Ability 1));
 			Wait Until(Is Using Ability 1(Event Player), 0.500);
 		End;
+		Event Player.movementSpeed /= 1.6;
+		Set Move Speed(Event Player, Event Player.movementSpeed * 100);
 		Event Player.botTempValue = True;
 		Wait Until(Event Player.botTarget != Null || !Is Using Ability 1(Event Player), 9999);
 		While(Is Using Ability 1(Event Player));
@@ -8321,8 +8317,10 @@ rule("ILLUISONIST (SOMBRA) ACTIVATES INVISIBILITY ILLUSION")
 			Event Player.botSpecialPotentialTargets = Event Player.lastTarget;
 			Event Player.botSpecialPotentialTargets.blinded = True;
 			Event Player.botSpecialPotentialTargets.updateOutlines = True;
-			Wait Until(!Is Using Ability 1(Event Player), 3);
+			Wait Until(!Is Using Ability 1(Event Player) || !Event Player.botSpecialPotentialTargets.blinded, 3);
 		End;
+		Event Player.movementSpeed *= 1.6;
+		Set Move Speed(Event Player, Event Player.movementSpeed * 100);
 		Event Player.botSpecialPotentialTargets.blinded = False;
 		Event Player.botSpecialPotentialTargets.updateOutlines = True;
 		Event Player.botTempValue = False;
@@ -8366,9 +8364,13 @@ rule("ILLUISONIST USES EMP")
 		"Restore normal damage"
 		Event Player.damageDealt = Global.damageDealt[Index Of Array Value(Global.botHeros, Hero Of(Event Player))] / 100;
 		Set Damage Dealt(Event Player, Event Player.damageDealt * 100);
-		Event Player.botSpecialPotentialTargets.blinded = True;
-		Event Player.botSpecialPotentialTargets.updateOutlines = True;
-		Wait Until(Is Dead(Event Player), 10);
+		Event Player.pForceFieldCount2_bCount1 = 0;
+		While(Is Alive(Event Player) && Event Player.pForceFieldCount2_bCount1 < 10);
+			Event Player.botSpecialPotentialTargets.blinded = True;
+			Event Player.botSpecialPotentialTargets.updateOutlines = True;
+			Wait(0.5, Ignore Condition);
+			Event Player.pForceFieldCount2_bCount1 += 0.5;
+		End;
 		Event Player.botSpecialPotentialTargets.blinded = False;
 		Event Player.botSpecialPotentialTargets.updateOutlines = True;
 		Event Player.botTempValue = False;
