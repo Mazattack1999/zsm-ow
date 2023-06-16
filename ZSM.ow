@@ -1043,7 +1043,7 @@ rule("setZombieMode")
 			Global.botSpawnRates = Array(0, 0, 0, 0, 50, 0, 0, 0, 0, 50, 0, 0, 0, 0, 0);
 		End;
 		"TESTING ONLY"
-		disabled Global.botSpawnRates = Array(80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20);
+		Global.botSpawnRates = Array(80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20);
 	}
 }
 
@@ -4702,6 +4702,7 @@ rule("PLAYER GETS DOWNED")
 		Stop All Damage Over Time(Event Player);
 		Event Player.infectionLvl = 0;
 		Event Player.infected = False;
+		Event Player.blinded = False;
 		Filtered Array(All Players(Team 2), Current Array Element.botTarget == Event Player).botTarget = Null;
 		Modify Player Variable(Filtered Array(All Players(All Teams), Array Contains(Current Array Element.potentialTargets,
 			Event Player)), potentialTargets, Remove From Array By Value, Event Player);
@@ -8318,8 +8319,11 @@ rule("ILLUISONIST (SOMBRA) ACTIVATES INVISIBILITY ILLUSION")
 		Event Player.botTempValue = True;
 		Wait Until(Event Player.botTarget != Null || !Is Using Ability 1(Event Player), 9999);
 		While(Is Using Ability 1(Event Player));
-			Event Player.botSpecialPotentialTargets.blinded = False;
-			Event Player.botSpecialPotentialTargets = Event Player.lastTarget;
+			If(Event Player.botSpecialPotentialTargets != Event Player.lastTarget);
+				Event Player.botSpecialPotentialTargets.blinded = False;
+				Event Player.botSpecialPotentialTargets.updateOutlines = True;
+				Event Player.botSpecialPotentialTargets = Event Player.lastTarget;
+			End;
 			Event Player.botSpecialPotentialTargets.blinded = True;
 			Event Player.botSpecialPotentialTargets.updateOutlines = True;
 			Wait Until(!Is Using Ability 1(Event Player) || !Event Player.botSpecialPotentialTargets.blinded, 3);
