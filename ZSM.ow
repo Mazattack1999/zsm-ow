@@ -3882,7 +3882,9 @@ rule("SURVIVOR FOLLOW TARGET")
 		Global.survivorToRescue.botFollowTarget = Null;
 		Global.survivorToRescue.potentialTargets = Empty Array;
 		If(Health(Global.survivorToRescue) <= 1);
+			Set Status(Global.survivorToRescue, Null, Knocked Down, 9999);
 			Wait Until(Normalized Health(Global.survivorToRescue) > 0.300, 20);
+			Clear Status(Global.survivorToRescue, Knocked Down);
 			Loop If Condition Is True;
 		End;
 	}
@@ -3973,14 +3975,14 @@ rule("PLAYER SAYS GROUP UP TO SURVIVOR")
 	{
 		Global.objectiveTypes[0] == 5;
 		Global.survivorToRescue.botFollowTarget != Null;
-		Is True For Any(Global.survivorToRescue.potentialTargets, Is Button Held(Current Array Element, Button(Melee))) == True;
+		Is True For Any(Global.survivorToRescue.potentialTargets, Is Communicating(Current Array Element, Group Up)) == True;
 	}
 
 	actions
 	{
 		Wait(1, Abort When False);
 		Global.survivorToRescue.botFollowTarget = First Of(Sorted Array(Filtered Array(Global.survivorToRescue.potentialTargets,
-			Is Button Held(Current Array Element, Button(Melee))), Distance Between(Position Of(Current Array Element), Last Of(
+			Is Communicating(Current Array Element, Group Up)), Distance Between(Position Of(Current Array Element), Last Of(
 			Global.survivorToRescue.path))));
 		Global.survivorToRescue.path = Empty Array;
 		Communicate(Global.survivorToRescue, On My Way);
