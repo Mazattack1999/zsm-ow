@@ -1395,11 +1395,8 @@ rule("EFFECTS/TEXTS")
 		Create HUD Text(All Players(All Teams), Null, Null, Round To Integer(Total Time Elapsed * 0.200, Up) % 2 == 0 ? Custom String(
 			"Game Code: MPJFR") : Custom String("Game Mode Creator: Mazattack#1183"), Right, 0, Color(White), Color(White), Color(Blue),
 			Visible To and String, Visible Always);
-		"Workshop.codes Promo"
-		Create In-World Text(Filtered Array(All Players(All Teams), First Of(Current Array Element.playerMenuStatus) < 2), Custom String(
-			"workshop.codes/MPJFR"), Global.startCamPos + Direction From Angles(Horizontal Angle From Direction(Direction Towards(
-			Global.startCamPos, Global.startPos)), 30), 3, Do Not Clip, Visible To Position String and Color, Color(Orange),
-			Visible Never);
+		"Workshop.codes/Github Promo"
+		Create In-World Text(Filtered Array(All Players(All Teams), First Of(Current Array Element.playerMenuStatus) < 2), Round To Integer(Total Time Elapsed * 0.200, Up) % 2 == 0 ? Custom String("workshop.codes/MPJFR") : Custom String("github.com/Mazattack1999/zsm-ow"), Global.startCamPos + Direction From Angles(Horizontal Angle From Direction(Direction Towards(Global.startCamPos, Global.startPos)), 30), 3, Do Not Clip, Visible To Position String and Color, Round To Integer(Total Time Elapsed * 0.200, Up) % 2 == 0 ? Color (Orange) : Color(Green), Visible Never);
 		"Words of encouragement"
 		Create In-World Text(All Players(All Teams), Custom String("Words of Encouragement: {0}", Random Value In Array(
 			Global.wordsOfEncouragement)), Global.startCamPos + Direction From Angles(Horizontal Angle From Direction(Direction Towards(
