@@ -433,7 +433,7 @@ rule("Fix bot health")
 	}
 }
 
-disabled rule("interact test")
+rule("interact test")
 {
 	event
 	{
@@ -451,13 +451,13 @@ disabled rule("interact test")
 		disabled Set Damage Dealt(Host Player, 1000);
 		Set Ultimate Charge(Host Player, 100);
 		Set Status(All Players(Team 1), Null, Unkillable, 9999);
-		disabled Teleport(Remove From Array(All Players(Team 1), Host Player), Vector(Random Real(-100, 100), -100, Random Real(-100, 100)));
+		Teleport(Remove From Array(All Players(Team 1), Host Player), Position Of(Host Player));
 		If(Global.objectiveTypes[0] == 1);
 			Global.objectiveCaptureValue = 99.900;
 		Else If(Global.objectiveTypes[0] == 2);
 			Global.objectiveCaptureValue = 249;
 		Else;
-			Global.objectiveCaptureValue = 99;
+			disabled Global.objectiveCaptureValue = 99;
 		End;
 		If(Is Button Held(Host Player, Button(Primary Fire)));
 			All Players(Team 1).currentPowerUp = 5;
@@ -2770,7 +2770,7 @@ rule("globalObjectiveEntityManagement")
 		"Bosses"
 		Else If(Global.objectiveValue == 3);
 			"Boss health progress bar"
-			Create Progress Bar HUD Text(Filtered Array(All Players(All Teams), Count Of(Global.bosses) > 0), Health(First Of(Global.bosses))
+			Create Progress Bar HUD Text(Filtered Array(All Players(All Teams), Count Of(Global.bosses) > 0), First Of(Global.bosses).bossHealth
 				/ First Of(Global.bosses).health * 100, Custom String("Boss Health {0}", Hero Icon String(Hero Of(First Of(Global.bosses)))),
 				Top, 2, Color(Red), Color(Red), Visible To and Values, Default Visibility);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Text ID);
@@ -2900,8 +2900,8 @@ rule("globalObjectiveEntityManagement")
 		"Zombie Egg"
 		Else If(Global.objectiveValue == 7);
 			"Zombie Egg Progress Bar"
-			Create Progress Bar HUD Text(Filtered Array(All Players(All Teams), First Of(Global.bosses) != Null), Health(First Of(
-				Global.bosses)) / First Of(Global.bosses).health * 100, Custom String("Zombie Egg Health"), Top, 2, Color(Lime Green), Color(
+			Create Progress Bar HUD Text(Filtered Array(All Players(All Teams), First Of(Global.bosses) != Null), First Of(
+				Global.bosses).bossHealth / First Of(Global.bosses).health * 100, Custom String("Zombie Egg Health"), Top, 2, Color(Lime Green), Color(
 				Lime Green), Visible To and Values, Default Visibility);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Text ID);
 			"Objectives Remaining Hud Text"
@@ -2924,12 +2924,6 @@ rule("globalObjectiveEntityManagement")
 			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 			"Egg toxic gas visual (stationary)"
 			Create Effect(All Players(All Teams), Cloud, Color(Lime Green), First Of(Global.objectivePositions) + Vector(0, -1, 0),
-				Global.objectiveRad, Visible To Position and Radius);
-			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
-			"Egg toxic gas visual (variable height)"
-			Create Effect(All Players(All Teams), Cloud, Color(Lime Green), Vector(X Component Of(First Of(Global.objectivePositions)), Min(
-				Y Component Of(First Of(Global.objectivePositions)), Max(Y Component Of(First Of(Global.objectivePositions))
-				- Global.objectiveRad, Y Component Of(Position Of(Local Player)) + 1)), Z Component Of(First Of(Global.objectivePositions))),
 				Global.objectiveRad, Visible To Position and Radius);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 		"Satellite Uplink"
@@ -4203,9 +4197,7 @@ rule("TELEPORT BOTS TO THE EGG")
 
 	actions
 	{
-		Wait(0.250, Ignore Condition);
-		Filtered Array(All Players(Team 2), Current Array Element.reviveTimer >= 0.100).customTelePos = Vector(500, 900, 500);
-		Filtered Array(All Players(Team 2), Current Array Element.reviveTimer > 1).reviveTimer = 1;
+		Wait(0.25, Ignore Condition);
 		Global.survivorToRescue = Filtered Array(Remove From Array(All Living Players(Team 2), First Of(Global.bosses)),
 			!Current Array Element.teleporting && !Current Array Element.successfullyTeleported);
 		"Only teleport bots and play effect if there are bots to teleport"
@@ -4216,6 +4208,7 @@ rule("TELEPORT BOTS TO THE EGG")
 				Current Array Element), Direction Towards(Eye Position(Current Array Element), First Of(Global.objectivePositions)))));
 			Global.survivorToRescue.successfullyTeleported = True;
 			Global.survivorToRescue.reviveTimer = 1;
+			Global.survivorToRescue.customTelePos = Vector(500, 900, 500);
 			Set Status(Global.survivorToRescue, Null, Rooted, 2);
 			Teleport(Global.survivorToRescue, Vector(500, 500, 500));
 			For Global Variable(count1, 0, Count Of(Global.survivorToRescue), 1);
@@ -4223,13 +4216,6 @@ rule("TELEPORT BOTS TO THE EGG")
 				Clear Status(Global.count2, Rooted);
 				Teleport(Global.count2, First Of(Global.objectivePositions));
 				Play Effect(All Players(All Teams), Bad Explosion, Color(Lime Green), First Of(Global.objectivePositions), 3);
-				"If target player is above egg or far away from egg"
-				If(Y Component Of(Position Of(Global.testPos2)) > Y Component Of(First Of(Global.objectivePositions)) + 3 || Distance Between(
-					Position Of(Global.testPos2), First Of(Global.objectivePositions)) > 25);
-					Apply Impulse(Global.count2, Direction Towards(First Of(Global.objectivePositions), Position Of(Global.testPos2) + Vector(0, 10,
-						0)), Min(40, Distance Between(First Of(Global.objectivePositions), Position Of(Global.testPos2)) * 1.500), To World,
-						Cancel Contrary Motion);
-				End;
 				Wait(0.250, Ignore Condition);
 			End;
 		End;
@@ -4239,34 +4225,6 @@ rule("TELEPORT BOTS TO THE EGG")
 			Filtered Array(All Players(Team 2), Current Array Element.customTelePos != Null).customTelePos = Null;
 			Global.customTelePositions = Empty Array;
 		End;
-	}
-}
-
-rule("ZOMBIE EGG DAMAGES PLAYERS THAT ARE CLOSE TO IT")
-{
-	event
-	{
-		Ongoing - Global;
-	}
-
-	conditions
-	{
-		Global.objectiveTypes[0] == 7;
-		First Of(Global.bosses) != Null;
-	}
-
-	actions
-	{
-		"Damage players"
-		Start Damage Over Time(Filtered Array(Global.playerTargetList, Distance Between(Position Of(Current Array Element), Vector(
-			X Component Of(First Of(Global.objectivePositions)), Y Component Of(Position Of(Current Array Element)), Z Component Of(
-			First Of(Global.objectivePositions)))) < Global.objectiveRad && Y Component Of(First Of(Global.objectivePositions))
-			> Y Component Of(Position Of(Current Array Element))), Null, 1, 10);
-		"Heal zombies"
-		Start Heal Over Time(Filtered Array(Remove From Array(All Living Players(Team 2), Global.bosses), Distance Between(Position Of(
-			Current Array Element), First Of(Global.objectivePositions)) < Global.objectiveRad), Null, 1, 20);
-		Wait(1, Ignore Condition);
-		Loop If Condition Is True;
 	}
 }
 
@@ -4373,7 +4331,12 @@ rule("PLAYERS REPAIR TERMINALS")
 			If(Global.objectiveCaptureValue[Global.objectiveCount1] < 100);
 				If(Is True For Any(Global.playersOnObjective, Distance Between(Global.objectiveResourcePositions[Global.objectiveCount1],
 					Position Of(Current Array Element)) < Global.objectiveRad));
-					"Divide total percentage by time to fix multiplied by tick rate"
+					If(Count Of(Filtered Array(Global.playersOnObjective, Distance Between(Global.objectiveResourcePositions[Global.objectiveCount1],
+					Position Of(Current Array Element)) < Global.objectiveRad)) > 1);
+						"2 or more players on the terminal"
+						Global.objectiveCaptureValue[Global.objectiveCount1] += 0.21;
+					End;
+					"Base Repair Speed"
 					Global.objectiveCaptureValue[Global.objectiveCount1] += 0.900;
 					"If terminal is repaired"
 					If(Global.objectiveCaptureValue[Global.objectiveCount1] >= 100);
