@@ -433,7 +433,7 @@ rule("Fix bot health")
 	}
 }
 
-rule("interact test")
+disabled rule("interact test")
 {
 	event
 	{
