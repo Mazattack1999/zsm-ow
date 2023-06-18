@@ -448,7 +448,7 @@ disabled rule("interact test")
 	actions
 	{
 		Heal(Host Player, Null, 100000);
-		disabled Set Damage Dealt(Host Player, 1000);
+		Set Damage Dealt(Host Player, 1000);
 		Set Ultimate Charge(Host Player, 100);
 		Set Status(All Players(Team 1), Null, Unkillable, 9999);
 		Teleport(Remove From Array(All Players(Team 1), Host Player), Position Of(Host Player));
@@ -457,7 +457,7 @@ disabled rule("interact test")
 		Else If(Global.objectiveTypes[0] == 2);
 			Global.objectiveCaptureValue = 249;
 		Else;
-			disabled Global.objectiveCaptureValue = 99;
+			Global.objectiveCaptureValue = 99;
 		End;
 		If(Is Button Held(Host Player, Button(Primary Fire)));
 			All Players(Team 1).currentPowerUp = 5;
@@ -4162,22 +4162,12 @@ rule("BOT BECOMES ZOMBIE EGG")
 		Start Scaling Player(Event Player, Event Player.size, False);
 		Set Player Health(Event Player, Max Health(Event Player));
 		While(!Global.objectiveComplete);
-			If(!Is Using Ability 1(Event Player));
+			If(!Is Using Ability 1(Event Player) && Is Alive(Event Player));
 				Press Button(Event Player, Button(Ability 1));
 				Wait(0.250, Ignore Condition);
 			End;
 			Wait Until(Global.objectiveComplete || !Is Using Ability 1(Event Player), 99999);
 		End;
-		Enable Movement Collision With Environment(Event Player);
-		Stop Forcing Player Position(Event Player);
-		Event Player.specialThrottling = False;
-		Wait Until(First Of(Global.bosses) == Event Player, 3);
-		Loop If Condition Is True;
-		Abort If(First Of(Global.bosses) == Event Player);
-		Teleport(Event Player, Vector(500, 500, 500));
-		Wait(0.250, Ignore Condition);
-		Start Rule(botRespawnInitialization, Restart Rule);
-		Resurrect(Event Player);
 	}
 }
 
