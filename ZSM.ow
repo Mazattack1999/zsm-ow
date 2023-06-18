@@ -353,6 +353,7 @@ variables
 		94: outlineCount
 		95: blinded
 		96: updateOutlines
+		97: afk
 }
 
 subroutines
@@ -4474,6 +4475,7 @@ rule("PLAYER INITIALIZATION")
 		Set Move Speed(Event Player, Event Player.movementSpeed * 100);
 		Event Player.attached = False;
 		Event Player.blinded = False;
+		Event Player.afk = False;
 		Disable Messages(Event Player);
 		Disable Game Mode In-World UI(Event Player);
 		Disable Game Mode HUD(Event Player);
@@ -4583,7 +4585,7 @@ rule("EFFECTS/TEXTS")
 		Create Effect(Filtered Array(All Players(All Teams), Event Player.reviving), Ring, Color(Yellow), Position Of(Event Player),
 			Global.reviveRadius, Visible To Position and Radius);
 		"Health Hud text"
-		Create HUD Text(Filtered Array(All Players(All Teams), Event Player.deathTimer > 0), Custom String("{0}{1}: {2}", Event Player,
+		Create HUD Text(Filtered Array(All Players(All Teams), Event Player.deathTimer > 0 && !Event Player.afk), Custom String("{0}{1}: {2}", Event Player,
 			Hero Icon String(Hero Of(Event Player)), Is Alive(Event Player) ? Custom String("{0}%", Round To Integer(Normalized Health(
 			Event Player) * 100, Up)) : Custom String("DOWN")), Is Dead(Event Player) && !Event Player.reviving ? Custom String(
 			"Revive: {0}s", Round To Integer(Event Player.deathTimer, Up)) : Custom String(""),
@@ -4851,32 +4853,40 @@ rule("PLAYER AFK")
 	conditions
 	{
 		Global.specialGameModeSetup != True;
-		Workshop Setting Toggle(Custom String("General"), Custom String("Kill players who are AFK"), True, 3) == True;
+		Workshop Setting Toggle(Custom String("General"), Custom String("Allow players to go AFK"), True, 3) == True;
 		Event Player.playerActiveStatus == True;
 		Throttle Of(Event Player) == Vector(0, 0, 0);
 		Is Dummy Bot(Event Player) == False;
 		Is Alive(Event Player) == True;
 		Is Firing Primary(Event Player) == False;
 		Is Firing Secondary(Event Player) == False;
+		Array Contains(Global.playersOnObjective, Event Player) != True;
 	}
 
 	actions
 	{
-		Wait(50, Abort When False);
-		Big Message(Event Player, Custom String("You will be killed for inactivity in 10 seconds"));
-		Wait(5, Abort When False);
-		Big Message(Event Player, Custom String("You will be killed for inactivity in 5 seconds"));
-		Wait(5, Abort When False);
-		Big Message(Event Player, Custom String("You have been inactive for 60 seconds"));
-		Small Message(Remove From Array(All Players(All Teams), Event Player), Custom String("{0} {1} was killed for inactivity",
-			Event Player, Hero Icon String(Hero Of(Event Player))));
-		Event Player.playerActiveStatus = False;
-		Event Player.deathTimer = 0;
-		"0) Downed/Dead status, 1) Death timer, 2) Revive timer, 3) Revive start time, 4) Downed position"
-		Global.globalPlayerStats[Event Player.userIndex] = Array(2, Event Player.deathTimer, Event Player.reviveTimer,
-			Event Player.reviveStartTime, Vector(0, -100, 0));
-		Teleport(Event Player, Vector(0, -100, 0));
-		Set Invisible(Event Player, All);
+		If(!Event Player.afk);
+			Wait(30, Abort When False);
+			Small Message(Remove From Array(All Players(All Teams), Event Player), Custom String("{0} {1} is afk",
+				Event Player, Hero Icon String(Hero Of(Event Player))));
+			Small Message(Event Player, Custom String("You are afk", Event Player, Hero Icon String(Hero Of(Event Player))));
+			Event Player.afk = True;
+			Set Invisible(Event Player, All);
+			Modify Global Variable(playerTargetList, Remove From Array By Value, Event Player);
+			Set Status(Event Player, Null, Phased Out, 9999);
+		Else;
+			Wait(1, Ignore Condition); 
+		End;
+		Loop If Condition Is True;
+		If(Event Player.afk);
+			Event Player.afk = False;
+			Set Invisible(Event Player, None);
+			Small Message(Remove From Array(All Players(All Teams), Event Player), Custom String("{0} {1} is no longer afk",
+				Event Player, Hero Icon String(Hero Of(Event Player))));
+			Small Message(Event Player, Custom String("You are no longer afk", Event Player, Hero Icon String(Hero Of(Event Player))));
+			Clear Status(Event Player, Phased Out);
+		End;
+
 	}
 }
 
@@ -4981,6 +4991,7 @@ rule("PLAYER TARGET (ADD)")
 	conditions
 	{
 		Global.gameStatus == True;
+		Event Player.afk != True;
 		Has Spawned(Event Player) == True;
 		Is Alive(Event Player) == True;
 		Array Contains(Global.playerTargetList, Event Player) == False;
