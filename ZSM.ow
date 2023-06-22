@@ -1044,7 +1044,7 @@ rule("setZombieMode")
 			Global.botSpawnRates = Array(0, 0, 0, 0, 50, 0, 0, 0, 0, 50, 0, 0, 0, 0, 0);
 		End;
 		"TESTING ONLY"
-		disabled Global.botSpawnRates = Array(80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20);
+		disabled Global.botSpawnRates = Array(0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	}
 }
 
@@ -1130,7 +1130,7 @@ rule("setDifficulty")
 			Global.throttleSpeeds = Array(0.550, 0.600, 0.750, 0.400, 0.500, 0.600, 0.300, 0.550, 0.450, 0.500, 0.750, 0.550, 0.400, 0.500,
 				0.300);
 			"Bot damage dealt"
-			Global.damageDealt = Array(8.500, 7.500, 1, 1, 50, 75, 1, 25, 1, 50, 1, 50, 75, 50, 5);
+			Global.damageDealt = Array(8.500, 60, 1, 1, 50, 75, 1, 25, 1, 50, 1, 50, 75, 50, 5);
 		"Difficulty: Normal"
 		Else If(Global.difficultySetting == 2);
 			Global.startTime = 600;
@@ -1143,7 +1143,7 @@ rule("setDifficulty")
 			"Bot throttle speeds"
 			Global.throttleSpeeds = Array(0.850, 0.900, 1, 0.600, 0.700, 0.800, 0.400, 0.750, 0.700, 0.650, 0.900, 0.800, 0.650, 0.700, 0.350);
 			"Bot damage dealt"
-			Global.damageDealt = Array(8.500, 7.500, 1, 1, 50, 75, 1, 25, 1, 50, 1, 50, 75, 50, 5);
+			Global.damageDealt = Array(8.500, 60, 1, 1, 50, 75, 1, 25, 1, 50, 1, 50, 75, 50, 5);
 		"Difficulty: Expert"
 		Else If(Global.difficultySetting == 3);
 			Global.startTime = 450;
