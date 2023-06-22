@@ -452,7 +452,7 @@ disabled rule("interact test")
 		Set Damage Dealt(Host Player, 1000);
 		Set Ultimate Charge(Host Player, 100);
 		Set Status(All Players(Team 1), Null, Unkillable, 9999);
-		Teleport(Remove From Array(All Players(Team 1), Host Player), Position Of(Host Player));
+		Teleport(Remove From Array(All Players(Team 1), Host Player), First Of(Global.objectivePositions));
 		If(Global.objectiveTypes[0] == 1);
 			Global.objectiveCaptureValue = 99.900;
 		Else If(Global.objectiveTypes[0] == 2);
@@ -3099,7 +3099,7 @@ rule("WIN/LOSS CONDITIONS")
 		Global.objectiveComplete == False;
 		Global.gameStatus == True;
 		((Count Of(Global.objectivePositions) == 1 && Count Of(Global.playersOnObjective) == Count Of(Filtered Array(All Players(Team 1),
-			Has Spawned(Current Array Element) && Current Array Element.deathTimer > 0))) || (Count Of(Global.playerTargetList) == 0))
+			Has Spawned(Current Array Element) && Current Array Element.deathTimer > 0 && !Current Array Element.afk))) || (Count Of(Global.playerTargetList) == 0))
 			== True;
 	}
 
