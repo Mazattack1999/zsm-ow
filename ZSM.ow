@@ -1358,16 +1358,24 @@ rule("GLOBAL MENU INITIALIZATION")
 			Start Forcing Player Position(First Of(All Players(Team 2)), Global.startPos + Vector(0, 15, 0), True);
 			Start Facing(All Players(Team 2), Vector(0, 0, 1), 100000, To World, Direction and Turn Rate);
 		Else;
-			Global.startPos = Objective Position(Random Integer(0, Current Game Mode != Game Mode(Assault) ? 2 : 1));
-			Global.startCamPos = Global.startPos + Vector(0, 1.500, 0) + Direction From Angles(Horizontal Angle From Direction(
-				Direction Towards(Global.startPos, Objective Position(0))), Current Game Mode != Game Mode(Assault) ? 2 : 1)
-				* Global.startCamDistance;
-			While(!Is In Line of Sight(Global.startCamPos + Vector(0, -0.750, 0), Global.startPos + Vector(0, 0.750, 0),
-				Barriers Do Not Block LOS));
+			While(Global.startPos == Null);
 				Global.startPos = Objective Position(Random Integer(0, Current Game Mode != Game Mode(Assault) ? 2 : 1));
-				Global.startCamPos = Global.startPos + Vector(0, 1.500, 0) + Direction From Angles(Horizontal Angle From Direction(
-					Direction Towards(Global.startPos, Objective Position(0))), Current Game Mode != Game Mode(Assault) ? 2 : 1)
-					* Global.startCamDistance;
+				disabled Global.startPos = Objective Position(2);
+				Global.startCamPos = Global.startPos + Vector(0, 1.500, 0) + Direction From Angles(Random Real(0, 360), 0) * Global.startCamDistance;
+				Global.startCamPos = Ray Cast Hit Position(Global.startCamPos, Global.startCamPos - Vector(0, 5, 0), Null, Null, False) + Vector(0, 1.5, 0);
+				Global.startPos = Vector(X Component Of(Global.startPos), Y Component Of(Global.startCamPos) - 1.5, Z Component Of(Global.startPos));
+				Global.startPos = Ray Cast Hit Position(Global.startPos + Vector(0, 0.1, 0), Global.startPos - Vector(0, 5, 0), Null, Null, False);
+				Global.startPos = Ray Cast Hit Position(Global.startCamPos - Vector(0, 0.75, 0), Global.startPos + Vector(0, 0.75, 0), Null, Null, False) - Vector(0, 0.75, 0);
+				Global.startCamPos = Global.startPos + Vector(0, 1.5, 0) + Direction From Angles(Horizontal Angle From Direction(Direction Towards(Global.startPos, Global.startCamPos)), 0) * Global.startCamDistance;
+				"Line of Sight Checks for each player position"
+				For Global Variable(count1, -20, 21, 40 / (Number Of Slots(Team 1) - 1));
+					If(!Is In Line of Sight(Global.startCamPos, Global.startCamPos + Vector(0, -0.75, 0) + Direction From Angles(Horizontal Angle From Direction(Direction Towards(Global.startCamPos, Global.startPos)) + Global.count1, 0) * (Global.startCamDistance),
+					Barriers Do Not Block LOS) || !Is In Line of Sight(Global.startCamPos + Vector(0, -0.75, 0) + Direction From Angles(Horizontal Angle From Direction(Direction Towards(Global.startCamPos, Global.startPos)) + Global.count1, 0) * (Global.startCamDistance), Global.startCamPos,
+					Barriers Do Not Block LOS));
+						Global.startPos = Null;
+						Break;
+					End;
+				End;
 				Wait(0.016, Ignore Condition);
 			End;
 		End;
@@ -1794,7 +1802,7 @@ rule("PLAYER MENU INITIALIZATION")
 		End;
 		Event Player.startPos = Global.startCamPos + Vector(0, -1.500, 0) + Direction From Angles(Horizontal Angle From Direction(
 			Direction Towards(Global.startCamPos, Global.startPos)) + Global.startMenuSpacingAngle + Slot Of(Event Player) * (
-			Global.startMenuSpacingAngle * -2 / (Number Of Slots(Team 1) > 1 ? Number Of Slots(Team 1) - 1 : 1)), 0)
+			Global.startMenuSpacingAngle * -2 / Max(Number Of Slots(Team 1) - 1, 1)), 0)
 			* Global.startCamDistance;
 		If(!Global.specialGameMode);
 			Event Player.startPos = Ray Cast Hit Position(Event Player.startPos + Vector(0, 3, 0), Event Player.startPos, All Players(
