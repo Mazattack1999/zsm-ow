@@ -513,11 +513,12 @@ rule("SPAWN BOTS")
 	{
 		Global.gameStatus == True;
 		Server Load Average <= Workshop Setting Integer(Custom String("General"), Custom String(
-			"Spawn Zombies When Server Load Average is Less Than"), 180, 100, 255, 2);
+			"Spawn Zombies When Server Load Average is Less Than"), 200, 100, 255, 2);
 		Number Of Players(Team 2) < Global.numberOfBots;
 		Number Of Players(All Teams) < 24;
 		((Count Of(Global.spawnTimes) > 0 && First Of(Global.spawnTimes) <= 0) || (Count Of(Global.spawnTimes) + Number Of Players(Team 2)
 			< Global.numberOfBots)) == True;
+		Is True For All(All Living Players(Team 2), !Current Array Element.teleporting) == True;
 	}
 
 	actions
@@ -5254,12 +5255,14 @@ rule("BOT DIES")
 			If(Event Player.reviveTimer <= 0);
 				Event Player.reviveTimer = 1 + (Match Time + Global.matchEndTime) / 60;
 			End;
-			Modify Global Variable(spawnTimes, Append To Array, Event Player.reviveTimer);
 			If(Event Player.customTelePos);
 				Modify Global Variable(customTelePositions, Append To Array, Event Player.customTelePos);
 			End;
 			Wait(1, Ignore Condition);
 			Wait Until(Event Player.damageOverTimeDuration <= 0, 10);
+			If(Count Of(Global.spawnTimes) < Global.numberOfBots);
+				Modify Global Variable(spawnTimes, Append To Array, Event Player.reviveTimer);
+			End;
 			Call Subroutine(updateBotSpawnPoints);
 			Destroy Dummy Bot(Team 2, Slot Of(Event Player));
 			Abort;
