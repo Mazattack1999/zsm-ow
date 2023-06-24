@@ -518,7 +518,7 @@ rule("SPAWN BOTS")
 		Number Of Players(All Teams) < 24;
 		((Count Of(Global.spawnTimes) > 0 && First Of(Global.spawnTimes) <= 0) || (Count Of(Global.spawnTimes) + Number Of Players(Team 2)
 			< Global.numberOfBots)) == True;
-		Is True For All(All Living Players(Team 2), !Current Array Element.teleporting) == True;
+		Count Of(Filtered Array(All Living Players(Team 2), Current Array Element.teleporting)) < 2;
 	}
 
 	actions
@@ -1045,7 +1045,7 @@ rule("setZombieMode")
 			Global.botSpawnRates = Array(0, 0, 0, 0, 50, 0, 0, 0, 0, 50, 0, 0, 0, 0, 0);
 		End;
 		"TESTING ONLY"
-		disabled Global.botSpawnRates = Array(0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		disabled Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100);
 	}
 }
 
@@ -2636,7 +2636,7 @@ rule("objectivesManagement")
 			Else If(First Of(Global.objectiveTypes) == 7);
 				Global.objectiveDescription = Custom String("Destroy the egg");
 				Global.objectiveSpawnRoomControl = True;
-				Global.objectiveRad = 12;
+				Global.objectiveRad = 0;
 				Big Message(All Players(All Teams), Custom String("Destroy the{0} zombie egg!", Count Of(Global.objectivePositions)
 					== 2 ? Custom String(" final") : Custom String("")));
 			Else If(First Of(Global.objectiveTypes) == 8);
@@ -3447,6 +3447,10 @@ rule("BOSS HEALTH CONTROL (ALL BOSS OBJECTIVES)")
 		Else;
 			Event Player.bossHealth = Health(Event Player);
 		End;
+		"Zombie Egg objective radius control"
+		If(First Of(Global.objectiveTypes) == 7);
+			Global.objectiveRad = 25 * ((Event Player.health - Event Player.bossHealth) / Event Player.health);
+		End;
 	}
 }
 
@@ -4165,6 +4169,8 @@ rule("BOT BECOMES ZOMBIE EGG")
 		Set Invisible(Event Player, All);
 		Start Forcing Player Position(Event Player, First Of(Global.objectivePositions) + Vector(0, -2.500, 0), False);
 		Start Modifying Hero Voice Lines(Event Player, 0.500, False);
+		"Reduce damage taken by bots close to zombie egg"
+		Start Damage Modification(Filtered Array(All Players(Team 2), !Array Contains(Global.bosses, Current Array Element) && Distance Between(Position Of(Current Array Element), First Of(Global.objectivePositions)) < Global.objectiveRad), All Players(Team 1), 30, Receivers And Damagers);
 		Disable Movement Collision With Environment(Event Player, True);
 		Event Player.health = 15000;
 		Event Player.bossHealth = Event Player.health;
@@ -4201,25 +4207,18 @@ rule("TELEPORT BOTS TO THE EGG")
 	{
 		Wait(0.25, Ignore Condition);
 		Global.survivorToRescue = Filtered Array(Remove From Array(All Living Players(Team 2), First Of(Global.bosses)),
-			!Current Array Element.teleporting && !Current Array Element.successfullyTeleported);
+				!Current Array Element.teleporting && !Current Array Element.successfullyTeleported);
 		"Only teleport bots and play effect if there are bots to teleport"
 		If(Count Of(Global.survivorToRescue) > 0);
 			"Player whose reticle is closest to the egg"
-			Global.testPos2 = First Of(Sorted Array(Filtered Array(Global.playerTargetList, Distance Between(Position Of(
+			disabled Global.testPos2 = First Of(Sorted Array(Filtered Array(Global.playerTargetList, Distance Between(Position Of(
 				Current Array Element), First Of(Global.objectivePositions)) < 40), Angle Between Vectors(Facing Direction Of(
 				Current Array Element), Direction Towards(Eye Position(Current Array Element), First Of(Global.objectivePositions)))));
 			Global.survivorToRescue.successfullyTeleported = True;
 			Global.survivorToRescue.reviveTimer = 1;
 			Global.survivorToRescue.customTelePos = Vector(500, 900, 500);
-			Set Status(Global.survivorToRescue, Null, Rooted, 2);
-			Teleport(Global.survivorToRescue, Vector(500, 500, 500));
-			For Global Variable(count1, 0, Count Of(Global.survivorToRescue), 1);
-				Global.count2 = Global.survivorToRescue[Global.count1];
-				Clear Status(Global.count2, Rooted);
-				Teleport(Global.count2, First Of(Global.objectivePositions));
-				Play Effect(All Players(All Teams), Bad Explosion, Color(Lime Green), First Of(Global.objectivePositions), 3);
-				Wait(0.250, Ignore Condition);
-			End;
+			Teleport(Global.survivorToRescue, First Of(Global.objectivePositions));
+			Play Effect(All Players(All Teams), Bad Explosion, Color(Lime Green), First Of(Global.objectivePositions), 3);
 		End;
 		Loop If Condition Is True;
 		If(Is True For All(Global.playerTargetList, Distance Between(Position Of(Current Array Element), First Of(
@@ -4336,10 +4335,10 @@ rule("PLAYERS REPAIR TERMINALS")
 					If(Count Of(Filtered Array(Global.playersOnObjective, Distance Between(Global.objectiveResourcePositions[Global.objectiveCount1],
 					Position Of(Current Array Element)) < Global.objectiveRad)) > 1);
 						"2 or more players on the terminal"
-						Global.objectiveCaptureValue[Global.objectiveCount1] += 0.21;
+						Global.objectiveCaptureValue[Global.objectiveCount1] += 0.35;
 					End;
 					"Base Repair Speed"
-					Global.objectiveCaptureValue[Global.objectiveCount1] += 0.900;
+					Global.objectiveCaptureValue[Global.objectiveCount1] += 0.9;
 					"If terminal is repaired"
 					If(Global.objectiveCaptureValue[Global.objectiveCount1] >= 100);
 						Global.objectiveCaptureValue[Global.objectiveCount1] = 100;
@@ -8293,14 +8292,14 @@ rule("ILLUISONIST (SOMBRA) ACTIVATES INVISIBILITY ILLUSION")
 		Event Player.botTempValue = True;
 		Wait Until(Event Player.botTarget != Null || !Is Using Ability 1(Event Player), 9999);
 		While(Is Using Ability 1(Event Player));
-			If(Event Player.botSpecialPotentialTargets != Event Player.lastTarget);
+			If(Event Player.botSpecialPotentialTargets != Filtered Array(Global.playerTargetList, Distance Between(Position Of(Event Player), Position Of(Current Array Element)) < 30 * Event Player.size));
 				Event Player.botSpecialPotentialTargets.blinded = False;
 				Event Player.botSpecialPotentialTargets.updateOutlines = True;
-				Event Player.botSpecialPotentialTargets = Event Player.lastTarget;
+				Event Player.botSpecialPotentialTargets = Filtered Array(Global.playerTargetList, Distance Between(Position Of(Event Player), Position Of(Current Array Element)) < 30 * Event Player.size);
 			End;
 			Event Player.botSpecialPotentialTargets.blinded = True;
 			Event Player.botSpecialPotentialTargets.updateOutlines = True;
-			Wait Until(!Is Using Ability 1(Event Player) || !Event Player.botSpecialPotentialTargets.blinded, 3);
+			Wait Until(!Is Using Ability 1(Event Player) || Is True For Any(Event Player.botSpecialPotentialTargets, !Current Array Element.blinded), 3);
 		End;
 		Event Player.movementSpeed *= 1.6;
 		Set Move Speed(Event Player, Event Player.movementSpeed * 100);
