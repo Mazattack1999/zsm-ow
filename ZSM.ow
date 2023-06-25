@@ -2,7 +2,14 @@ settings
 {
 	main
 	{
-		Description: "Fight against an endless horde of zombies while completing various objectives. \r\n		Use power ups found in supply drops while you fight off the horde. \r\n		Get to the extraction point and watch the map get nuked. Don't leave anyone behind! \r\n\r\n		(Original Creator: Mazattack#1183) [Game Code: MPJFR] https://workshop.codes/MPJFR"
+		Description: "Fight against an endless horde of zombies while completing various objectives.
+		Use power ups found in supply drops while you fight off the horde. 	
+		Get to the extraction point and watch the map get nuked.
+		Don't leave anyone behind!
+		
+		(Original Creator: Mazattack#1183) [Game Code: MPJFR] 
+		https://workshop.codes/MPJFR
+		Github: github.com/Mazattack1999/zsm-ow"
 		Mode Name: "Zombie Survival Missions"
 	}
 
@@ -4863,6 +4870,7 @@ rule("PLAYER AFK")
 		Global.specialGameModeSetup != True;
 		Workshop Setting Toggle(Custom String("General"), Custom String("Allow players to go AFK"), True, 3) == True;
 		Event Player.playerActiveStatus == True;
+		Event Player.attached != True;
 		Throttle Of(Event Player) == Vector(0, 0, 0);
 		Is Dummy Bot(Event Player) == False;
 		Is Alive(Event Player) == True;
@@ -4883,7 +4891,7 @@ rule("PLAYER AFK")
 			Modify Global Variable(playerTargetList, Remove From Array By Value, Event Player);
 			Set Status(Event Player, Null, Phased Out, 9999);
 		Else;
-			Wait(1, Ignore Condition); 
+			Wait Until(Is Firing Primary(Event Player) || Is Firing Secondary(Event Player), 1);
 		End;
 		Loop If Condition Is True;
 		If(Event Player.afk);
