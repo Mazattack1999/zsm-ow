@@ -653,8 +653,8 @@ rule("SKIP ASSEMBLING HEROES")
 			Custom String("New Blood"), True, 2)), Array(Null, Workshop Setting Toggle(Custom String("Available Zombie Modes"),
 			Custom String("What'll it be?"), True, 3)), Array(Null, Workshop Setting Toggle(Custom String("Available Zombie Modes"),
 			Custom String("Tanks, A Lot!"), True, 4)), Array(Null, Workshop Setting Toggle(Custom String("Available Zombie Modes"),
-			Custom String("Dinner Rush!"), True, 5)), Array(Null, Workshop Setting Toggle(Custom String("Available Zombie Modes"),
-			Custom String("Ham N' Hammer!"), True, 6)));
+			Custom String("Thanks, But No Tanks"), True, 5)), Array(Null, Workshop Setting Toggle(Custom String("Available Zombie Modes"),
+			Custom String("Dinner Rush!"), True, 6)));
 		Call Subroutine(setAvailableObjectives);
 		"Set/Reset to default 0"
 		Global.difficultySetting = 0;
@@ -1042,14 +1042,14 @@ rule("setZombieMode")
 		Else If(Global.zombieSetting == 5);
 			"Bot respawn probablities"
 			Global.botSpawnRates = Array(0, 0, 0, 15, 10, 0, 0, 25, 0, 20, 0, 15, 0, 15, 0);
-		"Dinner Rush!"
+		"Thanks, But No Tanks"
 		Else If(Global.zombieSetting == 6);
 			"Bot respawn probablities"
-			Global.botSpawnRates = Array(0, 0, 30, 0, 0, 13, 12, 10, 0, 10, 15, 5, 5, 0, 0);
-		"Ham N' Hammer"
+			Global.botSpawnRates = Array(60, 12, 6, 0, 0, 5, 4, 0, 3, 0, 3, 0, 4, 0, 3);
+		"Dinner Rush!"
 		Else If(Global.zombieSetting == 7);
 			"Bot respawn probablities"
-			Global.botSpawnRates = Array(0, 0, 0, 0, 50, 0, 0, 0, 0, 50, 0, 0, 0, 0, 0);
+			Global.botSpawnRates = Array(0, 0, 30, 0, 0, 13, 12, 10, 0, 10, 15, 5, 5, 0, 0);
 		End;
 		"TESTING ONLY"
 		disabled Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100);
@@ -1493,17 +1493,16 @@ rule("EFFECTS/TEXTS")
 			"Zombie Mode: Tanks, A Lot!"), Custom String("Only tank zombies will spawn"), Global.voting ? Custom String(
 			"Change Vote (Press [{0}])", Input Binding String(Button(Ability 1))) : Custom String(""), Left, 1, Color(Turquoise), Color(
 			Turquoise), Color(Turquoise), Visible To and String, Default Visibility);
-		"Vote zombie mode text: Dinner Rush!"
+		"Vote zombie mode text: Thanks, But No Tanks!"
 		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[3] == 6), Custom String(
+			"Zombie Mode: Thanks, But No Tanks!"), Custom String("Only squishy zombies will spawn"), Global.voting ? Custom String("Change Vote (Press [{0}])",
+			Input Binding String(Button(Ability 1))) : Custom String(""), Left, 1, Color(Violet), Color(Violet), Color(Violet),
+			Visible To and String, Default Visibility);
+		"Vote zombie mode text: Dinner Rush!"
+		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[3] == 7), Custom String(
 			"Zombie Mode: Dinner Rush!"), Custom String("Only zombies with mobility abilities will spawn"), Global.voting ? Custom String(
 			"Change Vote (Press [{0}])", Input Binding String(Button(Ability 1))) : Custom String(""), Left, 1, Color(Blue), Color(Blue),
 			Color(Blue), Visible To and String, Default Visibility);
-		"Vote zombie mode text: Ham N' Hammer!"
-		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[3] == 7), Custom String(
-			"Zombie Mode: Ham N' Hammer!"), Custom String("Only Reinhardt {0} and Wrecking Ball {1} zombies will spawn", Hero Icon String(
-			Hero(Reinhardt)), Hero Icon String(Hero(Wrecking Ball))), Global.voting ? Custom String("Change Vote (Press [{0}])",
-			Input Binding String(Button(Ability 1))) : Custom String(""), Left, 1, Color(Gray), Color(Gray), Color(Gray),
-			Visible To and String, Default Visibility);
 		"Vote objective type text: No preference"
 		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 0), Custom String(
 			"Objective Type: No Preference"), Null, Custom String("Change Vote (Press [{0}])", Input Binding String(Button(Ability 2))),
