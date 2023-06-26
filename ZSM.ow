@@ -520,7 +520,7 @@ rule("SPAWN BOTS")
 	{
 		Global.gameStatus == True;
 		Server Load Average <= Workshop Setting Integer(Custom String("General"), Custom String(
-			"Spawn Zombies When Server Load Average is Less Than"), 200, 100, 255, 2);
+			"Spawn Zombies When Server Load Average is Less Than"), 180, 100, 255, 2);
 		Number Of Players(Team 2) < Global.numberOfBots;
 		Number Of Players(All Teams) < 24;
 		((Count Of(Global.spawnTimes) > 0 && First Of(Global.spawnTimes) <= 0) || (Count Of(Global.spawnTimes) + Number Of Players(Team 2)
