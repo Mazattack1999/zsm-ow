@@ -2,14 +2,7 @@ settings
 {
 	main
 	{
-		Description: "Fight against an endless horde of zombies while completing various objectives.
-		Use power ups found in supply drops while you fight off the horde. 	
-		Get to the extraction point and watch the map get nuked.
-		Don't leave anyone behind!
-		
-		(Original Creator: Mazattack#1183) [Game Code: MPJFR] 
-		https://workshop.codes/MPJFR
-		Github: github.com/Mazattack1999/zsm-ow"
+		Description: "Fight against an endless horde of zombies while completing various objectives.\r\n		Use power ups found in supply drops while you fight off the horde. 	\r\n		Get to the extraction point and watch the map get nuked.\r\n		Don't leave anyone behind!\r\n		\r\n		(Original Creator: Mazattack#1183) [Game Code: MPJFR] \r\n		https://workshop.codes/MPJFR\r\n		Github: github.com/Mazattack1999/zsm-ow"
 		Mode Name: "Zombie Survival Missions"
 	}
 
@@ -269,6 +262,7 @@ variables
 		98: currentBotHeroList
 		99: botCurrentSpawnRate
 		100: botRespawnCount
+		101: botSpawnPointTimers
 
 	player:
 		0: averagePlayersPos
@@ -525,7 +519,6 @@ rule("SPAWN BOTS")
 		Number Of Players(All Teams) < 24;
 		((Count Of(Global.spawnTimes) > 0 && First Of(Global.spawnTimes) <= 0) || (Count Of(Global.spawnTimes) + Number Of Players(Team 2)
 			< Global.numberOfBots)) == True;
-		Count Of(Filtered Array(All Living Players(Team 2), Current Array Element.teleporting)) < 2;
 	}
 
 	actions
@@ -586,13 +579,17 @@ rule("SPAWN TIME CONTROL")
 
 	conditions
 	{
-		Count Of(Global.spawnTimes) > 0;
-		disabled Is True For All(Global.spawnTimes, Current Array Element > 0) == True;
+		(Count Of(Global.spawnTimes) > 0 || Global.botSpawnPointTimers > 0) == True;
 	}
 
 	actions
 	{
-		Global.spawnTimes = Sorted Array(Mapped Array(Global.spawnTimes, Current Array Element - 1), Current Array Element);
+		If(Count Of(Global.spawnTimes) > 0);
+			Global.spawnTimes = Sorted Array(Mapped Array(Global.spawnTimes, Current Array Element - 1), Current Array Element);
+		End;
+		If(Count Of(Global.botSpawnPointTimers) > 0);
+			Global.botSpawnPointTimers = Mapped Array(Global.botSpawnPointTimers, Max(0, Current Array Element - 0.250));
+		End;
 		Wait(1, Ignore Condition);
 		Loop If Condition Is True;
 	}
@@ -851,6 +848,7 @@ rule("VARIABLE ASSIGNMENT")
 		Global.objectiveEntities = Empty Array;
 		Global.botSpawnPoints = Empty Array;
 		Global.waypoints = Empty Array;
+		Global.botSpawnPointTimers = Empty Array;
 		Global.bosses = Empty Array;
 		Global.healthpackPositions = Empty Array;
 		Global.overtime = False;
@@ -1369,17 +1367,25 @@ rule("GLOBAL MENU INITIALIZATION")
 			While(Global.startPos == Null);
 				Global.startPos = Objective Position(Random Integer(0, Current Game Mode != Game Mode(Assault) ? 2 : 1));
 				disabled Global.startPos = Objective Position(2);
-				Global.startCamPos = Global.startPos + Vector(0, 1.500, 0) + Direction From Angles(Random Real(0, 360), 0) * Global.startCamDistance;
-				Global.startCamPos = Ray Cast Hit Position(Global.startCamPos, Global.startCamPos - Vector(0, 5, 0), Null, Null, False) + Vector(0, 1.5, 0);
-				Global.startPos = Vector(X Component Of(Global.startPos), Y Component Of(Global.startCamPos) - 1.5, Z Component Of(Global.startPos));
-				Global.startPos = Ray Cast Hit Position(Global.startPos + Vector(0, 0.1, 0), Global.startPos - Vector(0, 5, 0), Null, Null, False);
-				Global.startPos = Ray Cast Hit Position(Global.startCamPos - Vector(0, 0.75, 0), Global.startPos + Vector(0, 0.75, 0), Null, Null, False) - Vector(0, 0.75, 0);
-				Global.startCamPos = Global.startPos + Vector(0, 1.5, 0) + Direction From Angles(Horizontal Angle From Direction(Direction Towards(Global.startPos, Global.startCamPos)), 0) * Global.startCamDistance;
+				Global.startCamPos = Global.startPos + Vector(0, 1.500, 0) + Direction From Angles(Random Real(0, 360), 0)
+					* Global.startCamDistance;
+				Global.startCamPos = Ray Cast Hit Position(Global.startCamPos, Global.startCamPos - Vector(0, 5, 0), Null, Null, False) + Vector(0,
+					1.500, 0);
+				Global.startPos = Vector(X Component Of(Global.startPos), Y Component Of(Global.startCamPos) - 1.500, Z Component Of(
+					Global.startPos));
+				Global.startPos = Ray Cast Hit Position(Global.startPos + Vector(0, 0.100, 0), Global.startPos - Vector(0, 5, 0), Null, Null,
+					False);
+				Global.startPos = Ray Cast Hit Position(Global.startCamPos - Vector(0, 0.750, 0), Global.startPos + Vector(0, 0.750, 0), Null,
+					Null, False) - Vector(0, 0.750, 0);
+				Global.startCamPos = Global.startPos + Vector(0, 1.500, 0) + Direction From Angles(Horizontal Angle From Direction(
+					Direction Towards(Global.startPos, Global.startCamPos)), 0) * Global.startCamDistance;
 				"Line of Sight Checks for each player position"
 				For Global Variable(count1, -20, 21, 40 / (Number Of Slots(Team 1) - 1));
-					If(!Is In Line of Sight(Global.startCamPos, Global.startCamPos + Vector(0, -0.75, 0) + Direction From Angles(Horizontal Angle From Direction(Direction Towards(Global.startCamPos, Global.startPos)) + Global.count1, 0) * (Global.startCamDistance),
-					Barriers Do Not Block LOS) || !Is In Line of Sight(Global.startCamPos + Vector(0, -0.75, 0) + Direction From Angles(Horizontal Angle From Direction(Direction Towards(Global.startCamPos, Global.startPos)) + Global.count1, 0) * (Global.startCamDistance), Global.startCamPos,
-					Barriers Do Not Block LOS));
+					If(!Is In Line of Sight(Global.startCamPos, Global.startCamPos + Vector(0, -0.750, 0) + Direction From Angles(
+						Horizontal Angle From Direction(Direction Towards(Global.startCamPos, Global.startPos)) + Global.count1, 0)
+						* Global.startCamDistance, Barriers Do Not Block LOS) || !Is In Line of Sight(Global.startCamPos + Vector(0, -0.750, 0)
+						+ Direction From Angles(Horizontal Angle From Direction(Direction Towards(Global.startCamPos, Global.startPos))
+						+ Global.count1, 0) * Global.startCamDistance, Global.startCamPos, Barriers Do Not Block LOS));
 						Global.startPos = Null;
 						Break;
 					End;
@@ -1413,7 +1419,11 @@ rule("EFFECTS/TEXTS")
 			"Game Code: MPJFR") : Custom String("Game Mode Creator: Mazattack#1183"), Right, 0, Color(White), Color(White), Color(Blue),
 			Visible To and String, Visible Always);
 		"Workshop.codes/Github Promo"
-		Create In-World Text(Filtered Array(All Players(All Teams), First Of(Current Array Element.playerMenuStatus) < 2), Round To Integer(Total Time Elapsed * 0.200, Up) % 2 == 0 ? Custom String("workshop.codes/MPJFR") : Custom String("github.com/Mazattack1999/zsm-ow"), Global.startCamPos + Direction From Angles(Horizontal Angle From Direction(Direction Towards(Global.startCamPos, Global.startPos)), 30), 3, Do Not Clip, Visible To Position String and Color, Round To Integer(Total Time Elapsed * 0.200, Up) % 2 == 0 ? Color (Orange) : Color(Green), Visible Never);
+		Create In-World Text(Filtered Array(All Players(All Teams), First Of(Current Array Element.playerMenuStatus) < 2),
+			Round To Integer(Total Time Elapsed * 0.200, Up) % 2 == 0 ? Custom String("workshop.codes/MPJFR") : Custom String(
+			"github.com/Mazattack1999/zsm-ow"), Global.startCamPos + Direction From Angles(Horizontal Angle From Direction(
+			Direction Towards(Global.startCamPos, Global.startPos)), 30), 3, Do Not Clip, Visible To Position String and Color,
+			Round To Integer(Total Time Elapsed * 0.200, Up) % 2 == 0 ? Color(Orange) : Color(Green), Visible Never);
 		"Words of encouragement"
 		Create In-World Text(All Players(All Teams), Custom String("Words of Encouragement: {0}", Random Value In Array(
 			Global.wordsOfEncouragement)), Global.startCamPos + Direction From Angles(Horizontal Angle From Direction(Direction Towards(
@@ -1495,9 +1505,9 @@ rule("EFFECTS/TEXTS")
 			Turquoise), Color(Turquoise), Visible To and String, Default Visibility);
 		"Vote zombie mode text: Thanks, But No Tanks!"
 		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[3] == 6), Custom String(
-			"Zombie Mode: Thanks, But No Tanks!"), Custom String("Only squishy zombies will spawn"), Global.voting ? Custom String("Change Vote (Press [{0}])",
-			Input Binding String(Button(Ability 1))) : Custom String(""), Left, 1, Color(Violet), Color(Violet), Color(Violet),
-			Visible To and String, Default Visibility);
+			"Zombie Mode: Thanks, But No Tanks!"), Custom String("Only squishy zombies will spawn"), Global.voting ? Custom String(
+			"Change Vote (Press [{0}])", Input Binding String(Button(Ability 1))) : Custom String(""), Left, 1, Color(Violet), Color(
+			Violet), Color(Violet), Visible To and String, Default Visibility);
 		"Vote zombie mode text: Dinner Rush!"
 		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[3] == 7), Custom String(
 			"Zombie Mode: Dinner Rush!"), Custom String("Only zombies with mobility abilities will spawn"), Global.voting ? Custom String(
@@ -1809,8 +1819,7 @@ rule("PLAYER MENU INITIALIZATION")
 		End;
 		Event Player.startPos = Global.startCamPos + Vector(0, -1.500, 0) + Direction From Angles(Horizontal Angle From Direction(
 			Direction Towards(Global.startCamPos, Global.startPos)) + Global.startMenuSpacingAngle + Slot Of(Event Player) * (
-			Global.startMenuSpacingAngle * -2 / Max(Number Of Slots(Team 1) - 1, 1)), 0)
-			* Global.startCamDistance;
+			Global.startMenuSpacingAngle * -2 / Max(Number Of Slots(Team 1) - 1, 1)), 0) * Global.startCamDistance;
 		If(!Global.specialGameMode);
 			Event Player.startPos = Ray Cast Hit Position(Event Player.startPos + Vector(0, 3, 0), Event Player.startPos, All Players(
 				All Teams), All Players(All Teams), False);
@@ -2786,9 +2795,9 @@ rule("globalObjectiveEntityManagement")
 		"Bosses"
 		Else If(Global.objectiveValue == 3);
 			"Boss health progress bar"
-			Create Progress Bar HUD Text(Filtered Array(All Players(All Teams), Count Of(Global.bosses) > 0), First Of(Global.bosses).bossHealth
-				/ First Of(Global.bosses).health * 100, Custom String("Boss Health {0}", Hero Icon String(Hero Of(First Of(Global.bosses)))),
-				Top, 2, Color(Red), Color(Red), Visible To and Values, Default Visibility);
+			Create Progress Bar HUD Text(Filtered Array(All Players(All Teams), Count Of(Global.bosses) > 0), First Of(Global.bosses)
+				.bossHealth / First Of(Global.bosses).health * 100, Custom String("Boss Health {0}", Hero Icon String(Hero Of(First Of(
+				Global.bosses)))), Top, 2, Color(Red), Color(Red), Visible To and Values, Default Visibility);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Text ID);
 			"Objectives remaining hud text"
 			Create HUD Text(All Players(All Teams), Null, Global.objectiveTypeSetting != 3 ? Custom String("Objectives Remaining: {0}",
@@ -2916,8 +2925,8 @@ rule("globalObjectiveEntityManagement")
 		"Zombie Egg"
 		Else If(Global.objectiveValue == 7);
 			"Zombie Egg Progress Bar"
-			Create Progress Bar HUD Text(Filtered Array(All Players(All Teams), First Of(Global.bosses) != Null), First Of(
-				Global.bosses).bossHealth / First Of(Global.bosses).health * 100, Custom String("Zombie Egg Health"), Top, 2, Color(Lime Green), Color(
+			Create Progress Bar HUD Text(Filtered Array(All Players(All Teams), First Of(Global.bosses) != Null), First Of(Global.bosses)
+				.bossHealth / First Of(Global.bosses).health * 100, Custom String("Zombie Egg Health"), Top, 2, Color(Lime Green), Color(
 				Lime Green), Visible To and Values, Default Visibility);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Text ID);
 			"Objectives Remaining Hud Text"
@@ -3114,8 +3123,8 @@ rule("WIN/LOSS CONDITIONS")
 		Global.objectiveComplete == False;
 		Global.gameStatus == True;
 		((Count Of(Global.objectivePositions) == 1 && Count Of(Global.playersOnObjective) == Count Of(Filtered Array(All Players(Team 1),
-			Has Spawned(Current Array Element) && Current Array Element.deathTimer > 0 && !Current Array Element.afk))) || (Count Of(Global.playerTargetList) == 0))
-			== True;
+			Has Spawned(Current Array Element) && Current Array Element.deathTimer > 0 && !Current Array Element.afk))) || (Count Of(
+			Global.playerTargetList) == 0)) == True;
 	}
 
 	actions
@@ -4176,7 +4185,9 @@ rule("BOT BECOMES ZOMBIE EGG")
 		Start Forcing Player Position(Event Player, First Of(Global.objectivePositions) + Vector(0, -2.500, 0), False);
 		Start Modifying Hero Voice Lines(Event Player, 0.500, False);
 		"Reduce damage taken by bots close to zombie egg"
-		Start Damage Modification(Filtered Array(All Players(Team 2), !Array Contains(Global.bosses, Current Array Element) && Distance Between(Position Of(Current Array Element), First Of(Global.objectivePositions)) < Global.objectiveRad), All Players(Team 1), 30, Receivers And Damagers);
+		Start Damage Modification(Filtered Array(All Players(Team 2), !Array Contains(Global.bosses, Current Array Element)
+			&& Distance Between(Position Of(Current Array Element), First Of(Global.objectivePositions)) < Global.objectiveRad),
+			All Players(Team 1), 30, Receivers and Damagers);
 		Disable Movement Collision With Environment(Event Player, True);
 		Event Player.health = 15000;
 		Event Player.bossHealth = Event Player.health;
@@ -4211,9 +4222,9 @@ rule("TELEPORT BOTS TO THE EGG")
 
 	actions
 	{
-		Wait(0.25, Ignore Condition);
+		Wait(0.250, Ignore Condition);
 		Global.survivorToRescue = Filtered Array(Remove From Array(All Living Players(Team 2), First Of(Global.bosses)),
-				!Current Array Element.teleporting && !Current Array Element.successfullyTeleported);
+			!Current Array Element.teleporting && !Current Array Element.successfullyTeleported);
 		"Only teleport bots and play effect if there are bots to teleport"
 		If(Count Of(Global.survivorToRescue) > 0);
 			"Player whose reticle is closest to the egg"
@@ -4339,12 +4350,12 @@ rule("PLAYERS REPAIR TERMINALS")
 				If(Is True For Any(Global.playersOnObjective, Distance Between(Global.objectiveResourcePositions[Global.objectiveCount1],
 					Position Of(Current Array Element)) < Global.objectiveRad));
 					If(Count Of(Filtered Array(Global.playersOnObjective, Distance Between(Global.objectiveResourcePositions[Global.objectiveCount1],
-					Position Of(Current Array Element)) < Global.objectiveRad)) > 1);
+						Position Of(Current Array Element)) < Global.objectiveRad)) > 1);
 						"2 or more players on the terminal"
-						Global.objectiveCaptureValue[Global.objectiveCount1] += 0.35;
+						Global.objectiveCaptureValue[Global.objectiveCount1] += 0.350;
 					End;
 					"Base Repair Speed"
-					Global.objectiveCaptureValue[Global.objectiveCount1] += 0.9;
+					Global.objectiveCaptureValue[Global.objectiveCount1] += 0.900;
 					"If terminal is repaired"
 					If(Global.objectiveCaptureValue[Global.objectiveCount1] >= 100);
 						Global.objectiveCaptureValue[Global.objectiveCount1] = 100;
@@ -4599,10 +4610,10 @@ rule("EFFECTS/TEXTS")
 		Create Effect(Filtered Array(All Players(All Teams), Event Player.reviving), Ring, Color(Yellow), Position Of(Event Player),
 			Global.reviveRadius, Visible To Position and Radius);
 		"Health Hud text"
-		Create HUD Text(Filtered Array(All Players(All Teams), Event Player.deathTimer > 0 && !Event Player.afk), Custom String("{0}{1}: {2}", Event Player,
-			Hero Icon String(Hero Of(Event Player)), Is Alive(Event Player) ? Custom String("{0}%", Round To Integer(Normalized Health(
-			Event Player) * 100, Up)) : Custom String("DOWN")), Is Dead(Event Player) && !Event Player.reviving ? Custom String(
-			"Revive: {0}s", Round To Integer(Event Player.deathTimer, Up)) : Custom String(""),
+		Create HUD Text(Filtered Array(All Players(All Teams), Event Player.deathTimer > 0 && !Event Player.afk), Custom String(
+			"{0}{1}: {2}", Event Player, Hero Icon String(Hero Of(Event Player)), Is Alive(Event Player) ? Custom String("{0}%",
+			Round To Integer(Normalized Health(Event Player) * 100, Up)) : Custom String("DOWN")), Is Dead(Event Player)
+			&& !Event Player.reviving ? Custom String("Revive: {0}s", Round To Integer(Event Player.deathTimer, Up)) : Custom String(""),
 			Event Player.infectionLvl >= 1 ? Custom String("Infection Level: {0}", Round To Integer(Event Player.infectionLvl, Down)) : (
 			Event Player.infectionLvl < 0 ? Custom String("Vaccine Level: {0}", Absolute Value(Round To Integer(Event Player.infectionLvl,
 			Down))) : (Event Player.reviving ? Custom String("Reviving: {0}s", Round To Integer(Event Player.reviveTimer, Up))
@@ -4644,7 +4655,7 @@ rule("UPDATE BOT OUTLINE COLORS AND VISIBILITY")
 				End;
 			End;
 		End;
-		Wait(0.25, Ignore Condition);
+		Wait(0.250, Ignore Condition);
 		Loop If Condition Is True;
 	}
 }
@@ -4882,8 +4893,8 @@ rule("PLAYER AFK")
 	{
 		If(!Event Player.afk);
 			Wait(30, Abort When False);
-			Small Message(Remove From Array(All Players(All Teams), Event Player), Custom String("{0} {1} is afk",
-				Event Player, Hero Icon String(Hero Of(Event Player))));
+			Small Message(Remove From Array(All Players(All Teams), Event Player), Custom String("{0} {1} is afk", Event Player,
+				Hero Icon String(Hero Of(Event Player))));
 			Small Message(Event Player, Custom String("You are afk", Event Player, Hero Icon String(Hero Of(Event Player))));
 			Event Player.afk = True;
 			Set Invisible(Event Player, All);
@@ -4896,12 +4907,11 @@ rule("PLAYER AFK")
 		If(Event Player.afk);
 			Event Player.afk = False;
 			Set Invisible(Event Player, None);
-			Small Message(Remove From Array(All Players(All Teams), Event Player), Custom String("{0} {1} is no longer afk",
-				Event Player, Hero Icon String(Hero Of(Event Player))));
+			Small Message(Remove From Array(All Players(All Teams), Event Player), Custom String("{0} {1} is no longer afk", Event Player,
+				Hero Icon String(Hero Of(Event Player))));
 			Small Message(Event Player, Custom String("You are no longer afk", Event Player, Hero Icon String(Hero Of(Event Player))));
 			Clear Status(Event Player, Phased Out);
 		End;
-
 	}
 }
 
@@ -5171,9 +5181,10 @@ rule("BOT INITIALIZATION")
 		"Damage over time duration"
 		Chase Player Variable At Rate(Event Player, damageOverTimeDuration, -1, 0.950, None);
 		"Bot target warning icon (flashing)"
-		Create Icon(Filtered Array(Event Player.botTarget, !Event Player.botTarget.blinded && !Is In View Angle(Current Array Element, Position Of(Event Player), 55)),
-			Event Player, Warning, Visible To Position and Color, Round To Integer(Total Time Elapsed * (Distance Between(Position Of(
-			Event Player), Position Of(Local Player)) > 10 ? 4 : 8), Up) % 2 == 0 ? Color(Red) : Color(Yellow), True);
+		Create Icon(Filtered Array(Event Player.botTarget, !Event Player.botTarget.blinded && !Is In View Angle(Current Array Element,
+			Position Of(Event Player), 55)), Event Player, Warning, Visible To Position and Color, Round To Integer(Total Time Elapsed * (
+			Distance Between(Position Of(Event Player), Position Of(Local Player)) > 10 ? 4 : 8), Up) % 2 == 0 ? Color(Red) : Color(
+			Yellow), True);
 		Wait Until(Has Spawned(Event Player), 2);
 		Set Max Health(Event Player, 1);
 		"Bot Health Pool"
@@ -5827,9 +5838,13 @@ rule("teleportBots")
 					Current Array Element)) > Global.botMaxTeleportRange[1]));
 					Event Player.filteredBotSpawnPointGrid = Filtered Array(Global.botSpawnPoints, Distance Between(Current Array Element,
 						Event Player.averagePlayersPos) < Global.botMaxTeleportRange[1]);
+					Event Player.filteredBotSpawnPointGrid = Filtered Array(Event Player.filteredBotSpawnPointGrid,
+						Global.botSpawnPointTimers[Index Of Array Value(Global.botSpawnPoints, Current Array Element)] < 1 * Count Of(
+						Event Player.filteredBotSpawnPointGrid));
 					"Bots utilize saved spawn points"
 					If(Count Of(Global.botSpawnPoints) > 0 && Count Of(Event Player.filteredBotSpawnPointGrid) > 0);
 						Event Player.telePos = Random Value In Array(Event Player.filteredBotSpawnPointGrid);
+						Global.botSpawnPointTimers[Index Of Array Value(Global.botSpawnPoints, Event Player.telePos)] += 1;
 						Break;
 					Else;
 						Event Player.telePos = Nearest Walkable Position(Event Player.averagePlayersPos + Direction From Angles(Random Real(0, 360),
@@ -5846,6 +5861,8 @@ rule("teleportBots")
 				"Teleport was unsuccessful due to line of sight and view angle"
 				Else If(Array Contains(Global.botSpawnPoints, Event Player.telePos));
 					Modify Global Variable(waypoints, Remove From Array By Index, Index Of Array Value(Global.botSpawnPoints, Event Player.telePos));
+					Modify Global Variable(botSpawnPointTimers, Remove From Array By Index, Index Of Array Value(Global.botSpawnPoints,
+						Event Player.telePos));
 					Modify Global Variable(botSpawnPoints, Remove From Array By Value, Event Player.telePos);
 					Teleport(Event Player, Vector(500, 50, 500));
 				End;
@@ -5993,8 +6010,11 @@ rule("updateBotSpawnPoints")
 			Event Player.telePos));
 			Modify Global Variable(botSpawnPoints, Append To Array, Event Player.telePos);
 			Modify Global Variable(waypoints, Append To Array, Event Player.waypoint);
+			Modify Global Variable(botSpawnPointTimers, Append To Array, 0);
 		Else If(!Event Player.successfullyTeleported && Array Contains(Global.botSpawnPoints, Event Player.telePos));
 			Modify Global Variable(waypoints, Remove From Array By Index, Index Of Array Value(Global.botSpawnPoints, Event Player.telePos));
+			Modify Global Variable(botSpawnPointTimers, Remove From Array By Index, Index Of Array Value(Global.botSpawnPoints,
+				Event Player.telePos));
 			Modify Global Variable(botSpawnPoints, Remove From Array By Value, Event Player.telePos);
 		End;
 	}
@@ -6300,7 +6320,8 @@ rule("mutations")
 				Start Forcing Dummy Bot Name(Event Player, Custom String("Heavy"));
 			End;
 			"Mutation outline for non-blinded players"
-			Start Forcing Player Outlines(Event Player, Filtered Array(All Players(Team 1), !Current Array Element.blinded), True, Event Player.defaultOutlineColor, Default);
+			Start Forcing Player Outlines(Event Player, Filtered Array(All Players(Team 1), !Current Array Element.blinded), True,
+				Event Player.defaultOutlineColor, Default);
 		Else;
 			Event Player.mutationValue = 0;
 			Event Player.defaultOutlineColor = Null;
@@ -6309,7 +6330,8 @@ rule("mutations")
 			Stop Forcing Dummy Bot Name(Event Player);
 		End;
 		"Disable outline for blinded players"
-		Start Forcing Player Outlines(Event Player, Filtered Array(All Players(Team 1), Current Array Element.blinded), False, Color(White), Default);
+		Start Forcing Player Outlines(Event Player, Filtered Array(All Players(Team 1), Current Array Element.blinded), False, Color(
+			White), Default);
 	}
 }
 
@@ -8294,21 +8316,24 @@ rule("ILLUISONIST (SOMBRA) ACTIVATES INVISIBILITY ILLUSION")
 			Press Button(Event Player, Button(Ability 1));
 			Wait Until(Is Using Ability 1(Event Player), 0.500);
 		End;
-		Event Player.movementSpeed /= 1.6;
+		Event Player.movementSpeed /= 1.600;
 		Set Move Speed(Event Player, Event Player.movementSpeed * 100);
 		Event Player.botTempValue = True;
 		Wait Until(Event Player.botTarget != Null || !Is Using Ability 1(Event Player), 9999);
 		While(Is Using Ability 1(Event Player));
-			If(Event Player.botSpecialPotentialTargets != Filtered Array(Global.playerTargetList, Distance Between(Position Of(Event Player), Position Of(Current Array Element)) < 30 * Event Player.size));
+			If(Event Player.botSpecialPotentialTargets != Filtered Array(Global.playerTargetList, Distance Between(Position Of(Event Player),
+				Position Of(Current Array Element)) < 30 * Event Player.size));
 				Event Player.botSpecialPotentialTargets.blinded = False;
 				Event Player.botSpecialPotentialTargets.updateOutlines = True;
-				Event Player.botSpecialPotentialTargets = Filtered Array(Global.playerTargetList, Distance Between(Position Of(Event Player), Position Of(Current Array Element)) < 30 * Event Player.size);
+				Event Player.botSpecialPotentialTargets = Filtered Array(Global.playerTargetList, Distance Between(Position Of(Event Player),
+					Position Of(Current Array Element)) < 30 * Event Player.size);
 			End;
 			Event Player.botSpecialPotentialTargets.blinded = True;
 			Event Player.botSpecialPotentialTargets.updateOutlines = True;
-			Wait Until(!Is Using Ability 1(Event Player) || Is True For Any(Event Player.botSpecialPotentialTargets, !Current Array Element.blinded), 3);
+			Wait Until(!Is Using Ability 1(Event Player) || Is True For Any(Event Player.botSpecialPotentialTargets,
+				!Current Array Element.blinded), 3);
 		End;
-		Event Player.movementSpeed *= 1.6;
+		Event Player.movementSpeed *= 1.600;
 		Set Move Speed(Event Player, Event Player.movementSpeed * 100);
 		Event Player.botSpecialPotentialTargets.blinded = False;
 		Event Player.botSpecialPotentialTargets.updateOutlines = True;
@@ -8357,8 +8382,8 @@ rule("ILLUISONIST USES EMP")
 		While(Is Alive(Event Player) && Event Player.pForceFieldCount2_bCount1 < 10);
 			Event Player.botSpecialPotentialTargets.blinded = True;
 			Event Player.botSpecialPotentialTargets.updateOutlines = True;
-			Wait(0.5, Ignore Condition);
-			Event Player.pForceFieldCount2_bCount1 += 0.5;
+			Wait(0.500, Ignore Condition);
+			Event Player.pForceFieldCount2_bCount1 += 0.500;
 		End;
 		Event Player.botSpecialPotentialTargets.blinded = False;
 		Event Player.botSpecialPotentialTargets.updateOutlines = True;
