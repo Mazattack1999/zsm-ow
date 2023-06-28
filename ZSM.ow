@@ -8330,6 +8330,7 @@ rule("ILLUISONIST (SOMBRA) ACTIVATES INVISIBILITY ILLUSION")
 			End;
 			Event Player.botSpecialPotentialTargets.blinded = True;
 			Event Player.botSpecialPotentialTargets.updateOutlines = True;
+			Wait(0.125, Ignore Condition);
 			Wait Until(!Is Using Ability 1(Event Player) || Is True For Any(Event Player.botSpecialPotentialTargets,
 				!Current Array Element.blinded), 3);
 		End;
