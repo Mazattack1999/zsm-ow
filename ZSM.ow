@@ -5272,14 +5272,14 @@ rule("BOT DIES")
 			If(Event Player.reviveTimer <= 0);
 				Event Player.reviveTimer = 1 + (Match Time + Global.matchEndTime) / 60;
 			End;
+			If(Count Of(Global.spawnTimes) < Global.numberOfBots);
+				Modify Global Variable(spawnTimes, Append To Array, Event Player.reviveTimer);
+			End;
 			If(Event Player.customTelePos);
 				Modify Global Variable(customTelePositions, Append To Array, Event Player.customTelePos);
 			End;
 			Wait(1, Ignore Condition);
 			Wait Until(Event Player.damageOverTimeDuration <= 0, 10);
-			If(Count Of(Global.spawnTimes) < Global.numberOfBots);
-				Modify Global Variable(spawnTimes, Append To Array, Event Player.reviveTimer);
-			End;
 			Call Subroutine(updateBotSpawnPoints);
 			Destroy Dummy Bot(Team 2, Slot Of(Event Player));
 			Abort;
