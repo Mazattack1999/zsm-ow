@@ -3477,9 +3477,12 @@ rule("BOSS DIES (ALL BOSS OBJECTIVES)")
 	actions
 	{
 		If(Event Was Environment);
+			Small Message(Host Player, Event Damage);
 			Stop All Damage Over Time(Event Player);
 			If(Team Of(Attacker) == Opposite Team Of(Team Of(Event Player)));
 				Event Player.bossHealth = Event Damage - 200;
+			Else;
+				Event Player.bossHealth = Event Damage;
 			End;
 			If(Event Player.bossHealth > 0);
 				While(Is Dead(Event Player));
