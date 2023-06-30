@@ -2796,7 +2796,7 @@ rule("globalObjectiveEntityManagement")
 		Else If(Global.objectiveValue == 3);
 			"Boss health progress bar"
 			Create Progress Bar HUD Text(Filtered Array(All Players(All Teams), Count Of(Global.bosses) > 0), Normalized Health(First Of(Global.bosses)) * 100, Custom String("Boss Health {0}", Hero Icon String(Hero Of(First Of(
-				Global.bosses)))), Top, 2, Color(Red), Color(Red), Visible To and Values, Default Visibility);
+				Global.bosses)))), Top, 2, Color(Red), Color(Red), Visible To Values and Color, Default Visibility);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Text ID);
 			"Objectives remaining hud text"
 			Create HUD Text(All Players(All Teams), Null, Global.objectiveTypeSetting != 3 ? Custom String("Objectives Remaining: {0}",
@@ -2925,7 +2925,7 @@ rule("globalObjectiveEntityManagement")
 		Else If(Global.objectiveValue == 7);
 			"Zombie Egg Progress Bar"
 			Create Progress Bar HUD Text(Filtered Array(All Players(All Teams), First Of(Global.bosses) != Null), Normalized Health(First Of(Global.bosses)) * 100, Custom String("Zombie Egg Health"), Top, 2, Color(Lime Green), Color(
-				Lime Green), Visible To and Values, Default Visibility);
+				Lime Green), Visible To Values and Color, Default Visibility);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Text ID);
 			"Objectives Remaining Hud Text"
 			Create HUD Text(All Players(All Teams), Null, Custom String("Objectives Remaining: {0}", Count Of(Global.objectivePositions) - 1),
