@@ -2795,8 +2795,7 @@ rule("globalObjectiveEntityManagement")
 		"Bosses"
 		Else If(Global.objectiveValue == 3);
 			"Boss health progress bar"
-			Create Progress Bar HUD Text(Filtered Array(All Players(All Teams), Count Of(Global.bosses) > 0), First Of(Global.bosses)
-				.bossHealth / First Of(Global.bosses).health * 100, Custom String("Boss Health {0}", Hero Icon String(Hero Of(First Of(
+			Create Progress Bar HUD Text(Filtered Array(All Players(All Teams), Count Of(Global.bosses) > 0), Normalized Health(First Of(Global.bosses)) * 100, Custom String("Boss Health {0}", Hero Icon String(Hero Of(First Of(
 				Global.bosses)))), Top, 2, Color(Red), Color(Red), Visible To and Values, Default Visibility);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Text ID);
 			"Objectives remaining hud text"
@@ -2925,8 +2924,7 @@ rule("globalObjectiveEntityManagement")
 		"Zombie Egg"
 		Else If(Global.objectiveValue == 7);
 			"Zombie Egg Progress Bar"
-			Create Progress Bar HUD Text(Filtered Array(All Players(All Teams), First Of(Global.bosses) != Null), First Of(Global.bosses)
-				.bossHealth / First Of(Global.bosses).health * 100, Custom String("Zombie Egg Health"), Top, 2, Color(Lime Green), Color(
+			Create Progress Bar HUD Text(Filtered Array(All Players(All Teams), First Of(Global.bosses) != Null), Normalized Health(First Of(Global.bosses)) * 100, Custom String("Zombie Egg Health"), Top, 2, Color(Lime Green), Color(
 				Lime Green), Visible To and Values, Default Visibility);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Text ID);
 			"Objectives Remaining Hud Text"
@@ -2949,7 +2947,7 @@ rule("globalObjectiveEntityManagement")
 			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 			"Egg toxic gas visual (stationary)"
 			Create Effect(All Players(All Teams), Cloud, Color(Lime Green), First Of(Global.objectivePositions) + Vector(0, -1, 0),
-				Global.objectiveRad, Visible To Position and Radius);
+				25 * (1 - Normalized Health(First Of(Global.bosses))), Visible To Position and Radius);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 		"Satellite Uplink"
 		Else If(Global.objectiveValue == 8);
@@ -3443,29 +3441,21 @@ rule("BOSS HEALTH CONTROL (ALL BOSS OBJECTIVES)")
 
 	conditions
 	{
-		Event Player.bossHealth >= Health(Event Player);
+		Event Damage > 1000;
 		Is Alive(Event Player) == True;
 		Array Contains(Global.bosses, Event Player) == True;
 	}
 
 	actions
 	{
-		"Event damage may not exceed 1000 hit points"
-		If(Event Damage > 1000);
-			Event Player.bossHealth -= 1000;
-			Set Status(Event Player, Null, Phased Out, 3);
+		Event Player.bossHealth = Health(Event Player) + Event Damage - 1000;
+		Set Status(Event Player, Null, Phased Out, 3);
 			While(Absolute Value(Health(Event Player) - Event Player.bossHealth) > 5);
-				Wait(0.016, Ignore Condition);
+				Abort If(!Array Contains(Global.bosses, Event Player));
+				Wait(0.016, Restart When True);
 				Set Player Health(Event Player, Event Player.bossHealth);
 			End;
-			Clear Status(Event Player, Phased Out);
-		Else;
-			Event Player.bossHealth = Health(Event Player);
-		End;
-		"Zombie Egg objective radius control"
-		If(First Of(Global.objectiveTypes) == 7);
-			Global.objectiveRad = 25 * ((Event Player.health - Event Player.bossHealth) / Event Player.health);
-		End;
+		Clear Status(Event Player, Phased Out);
 	}
 }
 
@@ -3489,7 +3479,7 @@ rule("BOSS DIES (ALL BOSS OBJECTIVES)")
 		If(Event Was Environment);
 			Stop All Damage Over Time(Event Player);
 			If(Team Of(Attacker) == Opposite Team Of(Team Of(Event Player)));
-				Event Player.bossHealth -= 200;
+				Event Player.bossHealth = Event Damage - 200;
 			End;
 			If(Event Player.bossHealth > 0);
 				While(Is Dead(Event Player));
@@ -3529,9 +3519,9 @@ rule("BOSS DIES (ALL BOSS OBJECTIVES)")
 				Event Player.reviveTimer = 10;
 			End;
 		"Resurrects player if event damage was greater than 1000 and their health still is higher than 0hp."
-		Else If(Event Player.bossHealth - 1000 > 0);
+		Else If(Event Damage - 1000 > 0);
 			Resurrect(Event Player);
-			Event Player.bossHealth -= 1000;
+			Event Player.bossHealth = Event Damage - 1000;
 			Set Status(Event Player, Null, Phased Out, 3);
 			While(Absolute Value(Health(Event Player) - Event Player.bossHealth) > 5);
 				Abort If(!Array Contains(Global.bosses, Event Player));
@@ -4186,7 +4176,7 @@ rule("BOT BECOMES ZOMBIE EGG")
 		Start Modifying Hero Voice Lines(Event Player, 0.500, False);
 		"Reduce damage taken by bots close to zombie egg"
 		Start Damage Modification(Filtered Array(All Players(Team 2), !Array Contains(Global.bosses, Current Array Element)
-			&& Distance Between(Position Of(Current Array Element), First Of(Global.objectivePositions)) < Global.objectiveRad),
+			&& Distance Between(Position Of(Current Array Element), First Of(Global.objectivePositions)) < 25 * (1 - Normalized Health(Event Player))),
 			All Players(Team 1), 30, Receivers and Damagers);
 		Disable Movement Collision With Environment(Event Player, True);
 		Event Player.health = 15000;
