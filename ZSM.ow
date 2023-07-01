@@ -409,7 +409,7 @@ subroutines
 	47: setPrematchTimer
 }
 
-disabled rule("Fix bot health")
+rule("Fix bot health")
 {
 	event
 	{
@@ -423,7 +423,7 @@ disabled rule("Fix bot health")
 		Global.gameStatus == True;
 		Event Player.initializing != True;
 		Event Player.teleporting != True;
-		Health(Event Player) > Event Player.health;
+		Health(Event Player) > Event Player.health + 5;
 		Array Contains(Global.bosses, Event Player) == False;
 	}
 
