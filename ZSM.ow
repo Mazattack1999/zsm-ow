@@ -409,7 +409,7 @@ subroutines
 	47: setPrematchTimer
 }
 
-rule("Fix bot health")
+disabled rule("Fix bot health")
 {
 	event
 	{
@@ -5180,8 +5180,9 @@ rule("BOT INITIALIZATION")
 			Yellow), True);
 		Wait Until(Has Spawned(Event Player), 2);
 		Set Max Health(Event Player, 1);
+		Event Player.initialMaxHealth = Max Health(Event Player);
 		"Bot Health Pool"
-		Add Health Pool To Player(Event Player, Health, Event Player.health, True, True);
+		Add Health Pool To Player(Event Player, Health, Max(0, Event Player.health - Event Player.initialMaxHealth), True, True);
 		"Bot Health Pool"
 		Add Health Pool To Player(Event Player, Health, Max(0, Event Player.health - 10000), True, True);
 		Start Facing(Event Player, Throttle Of(Event Player), 100, To Player, Direction and Turn Rate);
@@ -6026,6 +6027,8 @@ rule("botRespawnInitialization")
 		Event Player.initializing = True;
 		If(Array Contains(Global.bosses, Event Player));
 			Disable Nameplates(Event Player, All Players(All Teams));
+			Event Player.health = 0;
+			Event Player.initialMaxHealth = Max Health(Event Player);
 		Else;
 			Enable Nameplates(Event Player, All Players(All Teams));
 			Event Player.size = Workshop Setting Real(Custom String("Zombies"), Custom String("Zombie Size"), 1, 0, 20, 0);
@@ -6052,7 +6055,6 @@ rule("botRespawnInitialization")
 		Event Player.bossHealth = -1;
 		Call Subroutine(botStatManagement);
 		Call Subroutine(mutations);
-		Event Player.initialMaxHealth = Event Player.health;
 		Start Scaling Player(Event Player, Event Player.size, False);
 		Call Subroutine(botEntityManagement);
 		Wait Until(Health(Event Player) >= Event Player.health, 5);
