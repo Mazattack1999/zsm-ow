@@ -10070,13 +10070,32 @@ rule("BORN TO BATTLE PLAYER USES ABILITY CHARGE")
 		Else If(Is Button Held(Event Player, Button(Crouch)));
 			Event Player.enhancementValues[2] = Button(Crouch);
 		End;
+		"Temp rein fix ability 2"
 		If(Hero Of(Event Player) == Hero(Reinhardt) && Event Player.enhancementValues[2] == Button(Ability 2));
 			Wait Until(Is Using Ability 2(Event Player), 0.016);
 			If(!Is Using Ability 2(Event Player));
 				Set Ability Charge(Event Player, Event Player.enhancementValues[2], 1);
 				Event Player.enhancementValues[1] = False;
-				Abort;
 			End;
+			Abort;
+		End;
+		"Temp zarya fix ability 1"
+		If(Hero Of(Event Player) == Hero(Zarya) && Event Player.enhancementValues[2] == Button(Ability 1));
+			Wait Until(Is Using Ability 1(Event Player), 0.016);
+			If(!Is Using Ability 1(Event Player));
+				Set Ability Charge(Event Player, Event Player.enhancementValues[2], 1);
+				Event Player.enhancementValues[1] = False;
+			End;
+			Abort;
+		End;
+		"Temp zarya fix ability 2"
+		If(Hero Of(Event Player) == Hero(Zarya) && Event Player.enhancementValues[2] == Button(Ability 2));
+			Wait Until(Is Using Ability 2(Event Player), 0.016);
+			If(!Is Using Ability 2(Event Player));
+				Set Ability Charge(Event Player, Event Player.enhancementValues[2], 1);
+				Event Player.enhancementValues[1] = False;
+			End;
+			Abort;
 		End;
 		Set Ability Charge(Event Player, Event Player.enhancementValues[2], Ability Charge(Event Player, Event Player.enhancementValues[2])
 			+ 1);
@@ -10087,6 +10106,9 @@ rule("BORN TO BATTLE PLAYER USES ABILITY CHARGE")
 		Else If(Ability Cooldown(Event Player, Event Player.enhancementValues[2]) > 0.500);
 			Set Ability Cooldown(Event Player, Event Player.enhancementValues[2], 0);
 			Event Player.enhancementValues[1] = False;
+		"Temp fix for broken ability cooldown detection"
+		Else;
+			If(Event Player.enhancementValues[2] == Button(Ability 1));
 		End;
 	}
 }
