@@ -10106,9 +10106,6 @@ rule("BORN TO BATTLE PLAYER USES ABILITY CHARGE")
 		Else If(Ability Cooldown(Event Player, Event Player.enhancementValues[2]) > 0.500);
 			Set Ability Cooldown(Event Player, Event Player.enhancementValues[2], 0);
 			Event Player.enhancementValues[1] = False;
-		"Temp fix for broken ability cooldown detection"
-		Else;
-			If(Event Player.enhancementValues[2] == Button(Ability 1));
 		End;
 	}
 }
