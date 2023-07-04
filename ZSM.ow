@@ -2391,8 +2391,13 @@ rule("PLAYER EXTRACTION CONTROL")
 		Chase Player Variable At Rate(Event Player, chase2, Event Player.chase2 + Vector(0, 200, 0), Global.evacRate,
 			Destination and Rate);
 		Start Forcing Player Position(Event Player, Event Player.chase2, True);
+		Wait Until(Global.evacRate > 2, 99999);
+		Chase Player Variable Over Time(Event Player, chase2, First Of(Global.objectivePositions) + Vector(0, 50, 0) + (Direction From Angles(360 / Count Of(Global.evacuatingSurvivorList) * Index Of Array Value(Global.evacuatingSurvivorList, Event Player), 0)) * 3, 5, Destination And Duration);
+		Wait Until(Global.evacRate < 10, 99999);
+		Chase Player Variable At Rate(Event Player, chase2, Event Player.chase2 + Vector(0, 200, 0), Global.evacRate,
+			Destination and Rate);
 		Event Player.evacPos = Event Player.chase2 + Direction Towards(First Of(Global.objectivePositions), Global.evacDestination) * 700;
-		Wait(8, Ignore Condition);
+		Wait Until(Global.evacRate > 2, 99999);
 		Chase Player Variable At Rate(Event Player, chase2, Event Player.evacPos, Global.evacRate, Destination and Rate);
 	}
 }
