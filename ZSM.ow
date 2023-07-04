@@ -10072,7 +10072,7 @@ rule("BORN TO BATTLE PLAYER USES ABILITY CHARGE")
 			Event Player.enhancementValues[2] = Button(Crouch);
 		End;
 		"Temp rein fix ability 2"
-		If(Hero Of(Event Player) == Hero(Reinhardt) && Event Player.enhancementValues[2] == Button(Ability 2));
+		If(Hero Of(Event Player) == Hero(Reinhardt) || Hero Of(Event Player) == Hero(Zarya) && Event Player.enhancementValues[2] == Button(Ability 2));
 			Wait Until(Is Using Ability 2(Event Player), 0.016);
 			If(!Is Using Ability 2(Event Player));
 				Set Ability Charge(Event Player, Event Player.enhancementValues[2], 1);
@@ -10084,15 +10084,6 @@ rule("BORN TO BATTLE PLAYER USES ABILITY CHARGE")
 		If(Hero Of(Event Player) == Hero(Zarya) && Event Player.enhancementValues[2] == Button(Ability 1));
 			Wait Until(Is Using Ability 1(Event Player), 0.016);
 			If(!Is Using Ability 1(Event Player));
-				Set Ability Charge(Event Player, Event Player.enhancementValues[2], 1);
-				Event Player.enhancementValues[1] = False;
-			End;
-			Abort;
-		End;
-		"Temp zarya fix ability 2"
-		If(Hero Of(Event Player) == Hero(Zarya) && Event Player.enhancementValues[2] == Button(Ability 2));
-			Wait Until(Is Using Ability 2(Event Player), 0.016);
-			If(!Is Using Ability 2(Event Player));
 				Set Ability Charge(Event Player, Event Player.enhancementValues[2], 1);
 				Event Player.enhancementValues[1] = False;
 			End;
