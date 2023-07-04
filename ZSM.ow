@@ -250,7 +250,7 @@ variables
 		87: objectiveColor
 		88: objectiveCount1
 		89: objectiveChase1
-		90: testSpawnRoom
+		90: spawnRoomIndex
 		91: averageDifficulty
 		92: matchEndTime
 		93: waypoints
@@ -767,38 +767,34 @@ rule("PREGAME SPAWN ROOM ROTATION")
 		Wait(0.016, Abort When False);
 		Create Dummy Bot(Hero(Ana), Team 2, -1, Vector(0, 500, 0), Vector(0, 0, 0));
 		Global.attackSpawnRooms = Empty Array;
-		Global.activeAttackSpawnRoom = 0;
+		Global.spawnRoomIndex = 0;
 		"Records spawn room locations"
 		While(Count Of(Global.attackSpawnRooms) < (Current Game Mode == Game Mode(Assault) ? 2 : 3));
-			Start Forcing Spawn Room(Team 2, Global.activeAttackSpawnRoom);
+			Start Forcing Spawn Room(Team 2, Global.spawnRoomIndex);
 			Wait(0.250, Ignore Condition);
 			Respawn(All Players(Team 2));
 			While(!Is In Spawn Room(First Of(All Players(Team 2))));
 				Wait(0.016, Ignore Condition);
 			End;
 			Modify Global Variable(attackSpawnRooms, Append To Array, Position Of(First Of(All Players(Team 2))));
-			Global.activeAttackSpawnRoom += 1;
+			Global.spawnRoomIndex += 1;
 		End;
 		"Accounts for first attack spawn rooms generally being bigger than other spawn rooms"
 		Global.attackSpawnRooms[0] += Direction Towards(First Of(Global.attackSpawnRooms), Objective Position(0)) * 10;
 		Wait(0.250, Ignore Condition);
 		Destroy All Dummy Bots;
 		"Rotates spawn rooms while waiting for game to start"
-		While(!Is Game In Progress || Global.specialGameModeSetup);
-			Global.activeAttackSpawnRoom += 1;
-			If((Current Game Mode == Game Mode(Assault) && Global.activeAttackSpawnRoom > 1) || (Global.activeAttackSpawnRoom > 2));
-				Global.activeAttackSpawnRoom = 0;
+		While(Global.specialGameModeSetup);
+			Global.spawnRoomIndex += 1;
+			If((Current Game Mode == Game Mode(Assault) && Global.spawnRoomIndex > 1) || (Global.spawnRoomIndex > 2));
+				Global.spawnRoomIndex = 0;
 			End;
 			"Open all spawn rooms"
-			Start Forcing Spawn Room(All Teams, Global.activeAttackSpawnRoom);
+			Start Forcing Spawn Room(All Teams, Global.spawnRoomIndex);
 			Wait(1, Ignore Condition);
 		End;
 		"Change active spawn room to a location"
-		Global.activeAttackSpawnRoom = Null;
-		While(Global.activeAttackSpawnRoom == Null);
-			Global.activeAttackSpawnRoom = Global.attackSpawnRooms[Global.activeAttackSpawnRoom];
-			Wait(1, Ignore Condition);
-		End;
+		Global.activeAttackSpawnRoom = Global.attackSpawnRooms[Global.spawnRoomIndex];
 	}
 }
 
@@ -2412,20 +2408,22 @@ rule("ATTACK SPAWN ROOM CONTROL")
 	conditions
 	{
 		Global.specialGameModeSetup != True;
-		"Does not apply if game mode is arcade mode"
-		Global.specialGameMode == False;
+		"Does not apply if game mode is special mode"
+		Global.specialGameMode != True;
 	}
 
 	actions
 	{
-		Global.testSpawnRoom = Random Value In Array(Remove From Array(Global.attackSpawnRooms, Global.activeAttackSpawnRoom));
-		Wait(1, Ignore Condition);
-		Loop If(Is True For Any(Filtered Array(All Players(Team 1), Has Spawned(Current Array Element)), Distance Between(Position Of(
-			Current Array Element), Global.testSpawnRoom) < 45));
-		Global.activeAttackSpawnRoom = Global.testSpawnRoom;
-		Start Forcing Spawn Room(Team 2, Index Of Array Value(Global.attackSpawnRooms, Global.activeAttackSpawnRoom));
-		"Cooldown on spawn room change"
 		Wait(5, Ignore Condition);
+		Global.spawnRoomIndex += 1;
+		If(Global.spawnRoomIndex >= Count Of(Global.attackSpawnRooms));
+			Global.spawnRoomIndex = 0;
+		End;
+		"Make sure players are clear of test spawn room before activating"
+		If(Is True For All(Filtered Array(All Players(Team 1), Has Spawned(Current Array Element)), Distance Between(Position Of(Current Array Element), Global.attackSpawnRooms[Global.spawnRoomIndex]) > 45));
+			Global.activeAttackSpawnRoom = Global.attackSpawnRooms[Global.spawnRoomIndex];
+			Start Forcing Spawn Room(Team 2, Global.spawnRoomIndex);
+		End;
 		Loop If Condition Is True;
 	}
 }
