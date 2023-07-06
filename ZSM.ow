@@ -2538,6 +2538,7 @@ rule("objectivesManagement")
 	{
 		If(Global.gameStatus);
 			Global.playersOnObjective = Empty Array;
+			Global.survivorToRescue = Null;
 			Global.objectiveCaptureValue = 0;
 			"Checks if current objective is capture point"
 			If(First Of(Global.objectiveTypes) == 1);
