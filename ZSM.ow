@@ -2538,7 +2538,6 @@ rule("objectivesManagement")
 	{
 		If(Global.gameStatus);
 			Global.playersOnObjective = Empty Array;
-			Global.survivorToRescue = Null;
 			Global.objectiveCaptureValue = 0;
 			"Checks if current objective is capture point"
 			If(First Of(Global.objectiveTypes) == 1);
@@ -2639,6 +2638,7 @@ rule("objectivesManagement")
 			Else If(First Of(Global.objectiveTypes) == 5);
 				Global.objectiveDescription = Custom String("Rescue survivors");
 				Global.objectiveSpawnRoomControl = True;
+				Global.survivorToRescue = Null;
 				Global.objectiveRad = 10;
 				Global.objectiveChase1 = Global.objectiveRad;
 				Big Message(All Players(All Teams), Custom String("Locate survivors and bring them to the extraction site!"));
@@ -4047,6 +4047,7 @@ rule("SURVIVOR REACHES EXTRACTION SITE")
 	conditions
 	{
 		Global.objectiveTypes[0] == 5;
+		Global.objectiveComplete == False; 
 		Has Spawned(Global.survivorToRescue) == True;
 		Distance Between(Position Of(Global.survivorToRescue), First Of(Global.objectivePositions)) < 5;
 	}
@@ -4209,6 +4210,7 @@ rule("TELEPORT BOTS TO THE EGG")
 	conditions
 	{
 		Global.objectiveTypes[0] == 7;
+		Global.objectiveComplete == False;
 		Global.bosses[1] == 0;
 		Entity Exists(First Of(Global.bosses)) == True;
 		Is True For Any(Global.playerTargetList, Distance Between(Position Of(Current Array Element), First Of(Global.objectivePositions))
