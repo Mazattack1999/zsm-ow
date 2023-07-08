@@ -434,7 +434,7 @@ rule("Fix bot health")
 	}
 }
 
-disabled rule("interact test")
+rule("interact test")
 {
 	event
 	{
@@ -3452,13 +3452,7 @@ rule("BOSS HEALTH CONTROL (ALL BOSS OBJECTIVES)")
 	actions
 	{
 		Event Player.bossHealth = Health(Event Player) + Event Damage - 1000;
-		Set Status(Event Player, Null, Phased Out, 3);
-			While(Absolute Value(Health(Event Player) - Event Player.bossHealth) > 5);
-				Abort If(!Array Contains(Global.bosses, Event Player));
-				Wait(0.016, Restart When True);
-				Set Player Health(Event Player, Event Player.bossHealth);
-			End;
-		Clear Status(Event Player, Phased Out);
+		Set Player Health(Event Player, Event Player.bossHealth);
 	}
 }
 
@@ -3500,22 +3494,17 @@ rule("BOSS DIES (ALL BOSS OBJECTIVES)")
 					End;
 					Wait(0.016, Restart When True);
 					Resurrect(Event Player);
+					Wait Until(Is Alive(Event Player), 5);
+					Set Player Health(Event Player, Event Player.bossHealth);
 					Disable Movement Collision With Environment(Event Player, True);
 					Event Player.wallCollisionEnabled = False;
 				End;
-				Start Throttle In Direction(Event Player, Direction Towards(Position Of(Event Player), Nearest Walkable Position(Position Of(
-					Event Player))), Event Player.botThrottleSpeed, To World, Replace existing throttle, None);
-				Set Status(Event Player, Null, Phased Out, 3);
-				While(Absolute Value(Health(Event Player) - Event Player.bossHealth) > 5);
-					Abort If(!Array Contains(Global.bosses, Event Player));
-					Wait(0.016, Restart When True);
-					Set Player Health(Event Player, Event Player.bossHealth);
+				If(Event Player.botTarget == Null);
+					Start Throttle In Direction(Event Player, Direction Towards(Position Of(Event Player), Nearest Walkable Position(Position Of(
+						Event Player))), Event Player.botThrottleSpeed, To World, Replace existing throttle, None);
 				End;
-				Clear Status(Event Player, Phased Out);
-				While(!Is On Ground(Event Player) && Y Component Of(Nearest Walkable Position(Position Of(Event Player))) > Y Component Of(
-					Position Of(Event Player)));
-					Wait(0.250, Restart When True);
-				End;
+				Wait Until(Is On Ground(Event Player) || Y Component Of(Nearest Walkable Position(Position Of(Event Player))) < Y Component Of(
+					Position Of(Event Player)), 5);
 				Enable Movement Collision With Environment(Event Player);
 				Event Player.wallCollisionEnabled = True;
 			Else;
@@ -3525,15 +3514,10 @@ rule("BOSS DIES (ALL BOSS OBJECTIVES)")
 			End;
 		"Resurrects player if event damage was greater than 1000 and their health still is higher than 0hp."
 		Else If(Event Damage - 1000 > 0);
-			Resurrect(Event Player);
 			Event Player.bossHealth = Event Damage - 1000;
-			Set Status(Event Player, Null, Phased Out, 3);
-			While(Absolute Value(Health(Event Player) - Event Player.bossHealth) > 5);
-				Abort If(!Array Contains(Global.bosses, Event Player));
-				Wait(0.016, Restart When True);
-				Set Player Health(Event Player, Event Player.bossHealth);
-			End;
-			Clear Status(Event Player, Phased Out);
+			Resurrect(Event Player);
+			Wait Until(Is Alive(Event Player), 5);
+			Set Player Health(Event Player, Event Player.bossHealth);
 		Else;
 			Global.objectiveComplete = True;
 			Global.bosses[Index Of Array Value(Global.bosses, Event Player)] = 0;
