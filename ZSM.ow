@@ -4168,6 +4168,7 @@ rule("BOT BECOMES ZOMBIE EGG")
 		Start Damage Modification(Filtered Array(All Players(Team 2), !Array Contains(Global.bosses, Current Array Element)
 			&& Distance Between(Position Of(Current Array Element), First Of(Global.objectivePositions)) < 25 * (1 - Normalized Health(Event Player))),
 			All Players(Team 1), 30, Receivers and Damagers);
+		Event Player.wallCollisionEnabled = False;
 		Disable Movement Collision With Environment(Event Player, True);
 		Event Player.health = 15000;
 		Event Player.bossHealth = Event Player.health;
