@@ -62,6 +62,7 @@ settings
 
 			enabled maps
 			{
+				Antarctic Peninsula 972777519512068153
 				Busan 972777519512068194 972777519512068153 972777519512068154
 				Oasis 972777519512068292 972777519512068153 972777519512068154
 			}
@@ -2388,7 +2389,9 @@ rule("PLAYER EXTRACTION CONTROL")
 			Destination and Rate);
 		Start Forcing Player Position(Event Player, Event Player.chase2, True);
 		Wait Until(Global.evacRate > 2, 99999);
-		Chase Player Variable Over Time(Event Player, chase2, First Of(Global.objectivePositions) + Vector(0, 50, 0) + (Direction From Angles(360 / Count Of(Global.evacuatingSurvivorList) * Index Of Array Value(Global.evacuatingSurvivorList, Event Player), 0)) * 3, 5, Destination And Duration);
+		Chase Player Variable Over Time(Event Player, chase2, First Of(Global.objectivePositions) + Vector(0, 50, 0)
+			+ Direction From Angles(360 / Count Of(Global.evacuatingSurvivorList) * Index Of Array Value(Global.evacuatingSurvivorList,
+			Event Player), 0) * 3, 5, Destination and Duration);
 		Wait Until(Global.evacRate < 10, 99999);
 		Chase Player Variable At Rate(Event Player, chase2, Event Player.chase2 + Vector(0, 200, 0), Global.evacRate,
 			Destination and Rate);
@@ -2420,7 +2423,8 @@ rule("ATTACK SPAWN ROOM CONTROL")
 			Global.spawnRoomIndex = 0;
 		End;
 		"Make sure players are clear of test spawn room before activating"
-		If(Is True For All(Filtered Array(All Players(Team 1), Has Spawned(Current Array Element)), Distance Between(Position Of(Current Array Element), Global.attackSpawnRooms[Global.spawnRoomIndex]) > 45));
+		If(Is True For All(Filtered Array(All Players(Team 1), Has Spawned(Current Array Element)), Distance Between(Position Of(
+			Current Array Element), Global.attackSpawnRooms[Global.spawnRoomIndex]) > 45));
 			Global.activeAttackSpawnRoom = Global.attackSpawnRooms[Global.spawnRoomIndex];
 			Start Forcing Spawn Room(Team 2, Global.spawnRoomIndex);
 		End;
@@ -2798,8 +2802,9 @@ rule("globalObjectiveEntityManagement")
 		"Bosses"
 		Else If(Global.objectiveValue == 3);
 			"Boss health progress bar"
-			Create Progress Bar HUD Text(Filtered Array(All Players(All Teams), Count Of(Global.bosses) > 0), Normalized Health(First Of(Global.bosses)) * 100, Custom String("Boss Health {0}", Hero Icon String(Hero Of(First Of(
-				Global.bosses)))), Top, 2, Color(Red), Color(Red), Visible To Values and Color, Default Visibility);
+			Create Progress Bar HUD Text(Filtered Array(All Players(All Teams), Count Of(Global.bosses) > 0), Normalized Health(First Of(
+				Global.bosses)) * 100, Custom String("Boss Health {0}", Hero Icon String(Hero Of(First Of(Global.bosses)))), Top, 2, Color(
+				Red), Color(Red), Visible To Values and Color, Default Visibility);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Text ID);
 			"Objectives remaining hud text"
 			Create HUD Text(All Players(All Teams), Null, Global.objectiveTypeSetting != 3 ? Custom String("Objectives Remaining: {0}",
@@ -2927,8 +2932,9 @@ rule("globalObjectiveEntityManagement")
 		"Zombie Egg"
 		Else If(Global.objectiveValue == 7);
 			"Zombie Egg Progress Bar"
-			Create Progress Bar HUD Text(Filtered Array(All Players(All Teams), First Of(Global.bosses) != Null), Normalized Health(First Of(Global.bosses)) * 100, Custom String("Zombie Egg Health"), Top, 2, Color(Lime Green), Color(
-				Lime Green), Visible To Values and Color, Default Visibility);
+			Create Progress Bar HUD Text(Filtered Array(All Players(All Teams), First Of(Global.bosses) != Null), Normalized Health(First Of(
+				Global.bosses)) * 100, Custom String("Zombie Egg Health"), Top, 2, Color(Lime Green), Color(Lime Green),
+				Visible To Values and Color, Default Visibility);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Text ID);
 			"Objectives Remaining Hud Text"
 			Create HUD Text(All Players(All Teams), Null, Custom String("Objectives Remaining: {0}", Count Of(Global.objectivePositions) - 1),
@@ -2949,8 +2955,8 @@ rule("globalObjectiveEntityManagement")
 				Visible To Position and Radius);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 			"Egg toxic gas visual (stationary)"
-			Create Effect(All Players(All Teams), Cloud, Color(Lime Green), First Of(Global.objectivePositions) + Vector(0, -1, 0),
-				25 * (1 - Normalized Health(First Of(Global.bosses))), Visible To Position and Radius);
+			Create Effect(All Players(All Teams), Cloud, Color(Lime Green), First Of(Global.objectivePositions) + Vector(0, -1, 0), 25 * (
+				1 - Normalized Health(First Of(Global.bosses))), Visible To Position and Radius);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 		"Satellite Uplink"
 		Else If(Global.objectiveValue == 8);
@@ -4031,7 +4037,7 @@ rule("SURVIVOR REACHES EXTRACTION SITE")
 	conditions
 	{
 		Global.objectiveTypes[0] == 5;
-		Global.objectiveComplete == False; 
+		Global.objectiveComplete == False;
 		Has Spawned(Global.survivorToRescue) == True;
 		Distance Between(Position Of(Global.survivorToRescue), First Of(Global.objectivePositions)) < 5;
 	}
@@ -4166,8 +4172,8 @@ rule("BOT BECOMES ZOMBIE EGG")
 		Start Modifying Hero Voice Lines(Event Player, 0.500, False);
 		"Reduce damage taken by bots close to zombie egg"
 		Start Damage Modification(Filtered Array(All Players(Team 2), !Array Contains(Global.bosses, Current Array Element)
-			&& Distance Between(Position Of(Current Array Element), First Of(Global.objectivePositions)) < 25 * (1 - Normalized Health(Event Player))),
-			All Players(Team 1), 30, Receivers and Damagers);
+			&& Distance Between(Position Of(Current Array Element), First Of(Global.objectivePositions)) < 25 * (1 - Normalized Health(
+			Event Player))), All Players(Team 1), 30, Receivers and Damagers);
 		Event Player.wallCollisionEnabled = False;
 		Disable Movement Collision With Environment(Event Player, True);
 		Event Player.health = 15000;
@@ -8905,14 +8911,15 @@ rule("airStrike (30-39)")
 			Event Player.powerUpEffects[30] = Last Created Entity;
 			Create Effect(All Players(All Teams), Smoke Sound, Color(Orange), Event Player.chase1, 200, Visible To Position and Radius);
 			Event Player.powerUpEffects[31] = Last Created Entity;
-			Create Effect(All Players(All Teams), Cloud, Color(Red), Event Player.powerUpUsePositionsAndInfo[30], 0.5,
+			Create Effect(All Players(All Teams), Cloud, Color(Red), Event Player.powerUpUsePositionsAndInfo[30], 0.500,
 				Visible To Position and Radius);
 			Event Player.powerUpEffects[32] = Last Created Entity;
 		End;
 		"Number of rockets"
 		For Player Variable(Event Player, pAirStrikeCount, 0, 3, 1);
-			Event Player.chase1 = Event Player.powerUpUsePositionsAndInfo[30] + Direction From Angles(Horizontal Angle From Direction(Direction Towards(Event Player.powerUpUsePositionsAndInfo[30], Position Of(Event Player))) + Random Real(-40, 40), Random Real(-50,
-				-75)) * 100;
+			Event Player.chase1 = Event Player.powerUpUsePositionsAndInfo[30] + Direction From Angles(Horizontal Angle From Direction(
+				Direction Towards(Event Player.powerUpUsePositionsAndInfo[30], Position Of(Event Player))) + Random Real(-40, 40), Random Real(
+				-50, -75)) * 100;
 			Chase Player Variable At Rate(Event Player, chase1, Event Player.powerUpUsePositionsAndInfo[30], 60, None);
 			While(Distance Between(Event Player.powerUpUsePositionsAndInfo[30], Event Player.chase1) > 0.100);
 				Play Effect(All Players(All Teams), Good Explosion, Color(Orange), Event Player.chase1, 1);
@@ -10061,7 +10068,8 @@ rule("BORN TO BATTLE PLAYER USES ABILITY CHARGE")
 			Event Player.enhancementValues[2] = Button(Crouch);
 		End;
 		"Temp rein fix ability 2"
-		If(Hero Of(Event Player) == Hero(Reinhardt) || Hero Of(Event Player) == Hero(Zarya) && Event Player.enhancementValues[2] == Button(Ability 2));
+		If(Hero Of(Event Player) == Hero(Reinhardt) || (Hero Of(Event Player) == Hero(Zarya)
+			&& Event Player.enhancementValues[2] == Button(Ability 2)));
 			Wait Until(Is Using Ability 2(Event Player), 0.016);
 			If(!Is Using Ability 2(Event Player));
 				Set Ability Charge(Event Player, Event Player.enhancementValues[2], 1);
