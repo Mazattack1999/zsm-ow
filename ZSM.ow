@@ -4093,7 +4093,7 @@ rule("MODIFY KILL ZONE SCORE")
 		If(Distance Between(Position Of(Event Player), Global.objectiveChase1) < Global.objectiveRad || Distance Between(Position Of(
 			Victim), Global.objectiveChase1) < Global.objectiveRad);
 			Victim.reviveTimer = 2;
-			Global.objectiveCaptureValue += Round To Integer(Victim.initialMaxHealth / 280, Up);
+			Global.objectiveCaptureValue += Round To Integer(Victim.health / 280, Up);
 			If(Global.objectiveCaptureValue >= Global.eliminationsNeededPerObjective);
 				Global.objectiveComplete = True;
 				"Give all bots a long respawn time"
@@ -5827,8 +5827,9 @@ rule("teleportBots")
 					Current Array Element)) > Global.botMaxTeleportRange[1]));
 					Event Player.filteredBotSpawnPointGrid = Filtered Array(Global.botSpawnPoints, Distance Between(Current Array Element,
 						Event Player.averagePlayersPos) < Global.botMaxTeleportRange[1]);
+					"Filter out spawn points on cooldown"
 					Event Player.filteredBotSpawnPointGrid = Filtered Array(Event Player.filteredBotSpawnPointGrid,
-						Global.botSpawnPointTimers[Index Of Array Value(Global.botSpawnPoints, Current Array Element)] < 1 * Count Of(
+						Global.botSpawnPointTimers[Index Of Array Value(Global.botSpawnPoints, Current Array Element)] < 2 * Count Of(
 						Event Player.filteredBotSpawnPointGrid));
 					"Bots utilize saved spawn points"
 					If(Count Of(Global.botSpawnPoints) > 0 && Count Of(Event Player.filteredBotSpawnPointGrid) > 0);
