@@ -2413,11 +2413,11 @@ rule("ATTACK SPAWN ROOM CONTROL")
 		Global.specialGameModeSetup != True;
 		"Does not apply if game mode is special mode"
 		Global.specialGameMode != True;
+		Is True For Any(Global.playerTargetList, Distance Between(Position Of(Current Array Element), Global.activeAttackSpawnRoom) < 45) == True;
 	}
 
 	actions
 	{
-		Wait(5, Ignore Condition);
 		Global.spawnRoomIndex += 1;
 		If(Global.spawnRoomIndex >= Count Of(Global.attackSpawnRooms));
 			Global.spawnRoomIndex = 0;
@@ -2428,6 +2428,7 @@ rule("ATTACK SPAWN ROOM CONTROL")
 			Global.activeAttackSpawnRoom = Global.attackSpawnRooms[Global.spawnRoomIndex];
 			Start Forcing Spawn Room(Team 2, Global.spawnRoomIndex);
 		End;
+		Wait(1, Ignore Condition);
 		Loop If Condition Is True;
 	}
 }
