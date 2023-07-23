@@ -1048,7 +1048,7 @@ rule("setZombieMode")
 			Global.botSpawnRates = Array(0, 0, 30, 0, 0, 13, 12, 10, 0, 10, 15, 5, 5, 0, 0);
 		End;
 		"TESTING ONLY"
-		disabled Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100);
+		disabled Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0);
 	}
 }
 
@@ -2956,7 +2956,7 @@ rule("globalObjectiveEntityManagement")
 		Else If(Global.objectiveValue == 8);
 			"Capture percentage hud text"
 			Create HUD Text(All Players(All Teams), Custom String("{0}% | {1}% | {2}%", Round To Integer(First Of(
-				Global.objectiveCaptureValue), Down), Round To Integer(Global.objectiveCaptureValue[1], Up), Round To Integer(
+				Global.objectiveCaptureValue), Down), Round To Integer(Global.objectiveCaptureValue[1], Down), Round To Integer(
 				Global.objectiveCaptureValue[2], Down)), Custom String("Objectives remaining: {0}", Count Of(Global.objectivePositions) - 1),
 				Custom String(" "), Top, 1, Global.objectiveColor, Global.objectiveColor, Global.objectiveColor, Visible To and String,
 				Default Visibility);
@@ -4095,7 +4095,7 @@ rule("MODIFY KILL ZONE SCORE")
 				Global.objectiveComplete = True;
 				"Give all bots a long respawn time"
 				All Players(Team 2).reviveTimer = 12;
-				Global.spawnTimes = Mapped Array(Global.spawnTimes, Current Array Element * 0 + 12);
+				Global.spawnTimes = Mapped Array(Global.spawnTimes, 12);
 			End;
 		End;
 		"Adjust Kill Zone Positions"
@@ -4448,7 +4448,7 @@ rule("fireSatellite")
 			Else;
 				"Give all bots a long respawn time"
 				All Players(Team 2).reviveTimer = 12;
-				Global.spawnTimes = Mapped Array(Global.spawnTimes, Current Array Element * 0 + 12);
+				Global.spawnTimes = Mapped Array(Global.spawnTimes, 12);
 			End;
 		End;
 		Stop Chasing Global Variable(objectiveChase1);
@@ -7434,7 +7434,7 @@ rule("SLIMER FLIGHT (BOSS ONLY)")
 			Event Player.specialThrottling = True;
 			Event Player.specialFacing = True;
 			Stop Throttle In Direction(Event Player);
-			While(Count Of(Event Player.potentialTargets) > 0 && Is Using Ultimate(Event Player) && !Event Player.crowdControlled);
+			While(Event Player.botTarget != Null && Is Using Ultimate(Event Player) && !Event Player.crowdControlled);
 				Start Facing(Event Player, Direction Towards(Eye Position(Event Player), Eye Position(Event Player.botTarget) + Evaluate Once(
 					Direction From Angles(Random Real(0, 360), Random Real(-90, 90))) * 1), Event Player.crowdControlled ? 0 : 200, To World,
 					Direction and Turn Rate);
@@ -7466,6 +7466,7 @@ rule("SLIMER FLIGHT (BOSS ONLY)")
 			End;
 			Event Player.specialThrottling = False;
 			Event Player.specialFacing = False;
+			Start Rule(restoreDefaultFacingMovement, Do Nothing);
 			Wait(0.250, Ignore Condition);
 		End;
 		Event Player.specialThrottling = False;
