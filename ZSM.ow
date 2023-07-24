@@ -240,7 +240,7 @@ variables
 		76: playerTargetList
 		77: losHeightCheck
 		78: survivorToRescue
-		79: objectiveSpawnRoomControl
+		79: nonBossZombies
 		80: availableMutations
 		81: numberOfPowerUpsPerSupplyDrop
 		82: objectiveDescription
@@ -1016,6 +1016,8 @@ rule("setZombieMode")
 		"Bot available hero list"
 		Global.botHeros = Array(Hero(Reaper), Hero(Junkrat), Hero(Torbjörn), Hero(Roadhog), Hero(Reinhardt), Hero(Genji), Hero(Widowmaker),
 			Hero(Orisa), Hero(Mercy), Hero(Wrecking Ball), Hero(Moira), Hero(D.Va), Hero(Pharah), Hero(Ramattra), Hero(Sombra));
+		"Zombie types without a boss variation"
+		Global.nonBossZombies = Array(Hero(Genji), Hero(Widowmaker), Hero(D.Va), Hero(Ramattra));
 		"All Zombies"
 		If(Global.zombieSetting == 1);
 			"Bot respawn probablities"
@@ -1046,7 +1048,7 @@ rule("setZombieMode")
 			Global.botSpawnRates = Array(0, 0, 30, 0, 0, 13, 12, 10, 0, 10, 15, 5, 5, 0, 0);
 		End;
 		"TESTING ONLY"
-		disabled Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100);
+		disabled Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0);
 	}
 }
 
@@ -1362,14 +1364,14 @@ rule("GLOBAL MENU INITIALIZATION")
 		Else;
 			While(Global.startPos == Null);
 				Global.startPos = Objective Position(Random Integer(0, Current Game Mode != Game Mode(Assault) ? 2 : 1));
-				disabled Global.startPos = Objective Position(2);
+				disabled Global.startPos = Objective Position(1);
 				Global.startCamPos = Global.startPos + Vector(0, 1.500, 0) + Direction From Angles(Random Real(0, 360), 0)
 					* Global.startCamDistance;
 				Global.startCamPos = Ray Cast Hit Position(Global.startCamPos, Global.startCamPos - Vector(0, 5, 0), Null, Null, False) + Vector(0,
 					1.500, 0);
 				Global.startPos = Vector(X Component Of(Global.startPos), Y Component Of(Global.startCamPos) - 1.500, Z Component Of(
 					Global.startPos));
-				Global.startPos = Ray Cast Hit Position(Global.startPos + Vector(0, 0.100, 0), Global.startPos - Vector(0, 5, 0), Null, Null,
+				Global.startPos = Ray Cast Hit Position(Global.startPos + Vector(0, 0.400, 0), Global.startPos - Vector(0, 5, 0), Null, Null,
 					False);
 				Global.startPos = Ray Cast Hit Position(Global.startCamPos - Vector(0, 0.750, 0), Global.startPos + Vector(0, 0.750, 0), Null,
 					Null, False) - Vector(0, 0.750, 0);
@@ -2413,11 +2415,11 @@ rule("ATTACK SPAWN ROOM CONTROL")
 		Global.specialGameModeSetup != True;
 		"Does not apply if game mode is special mode"
 		Global.specialGameMode != True;
+		Is True For Any(Global.playerTargetList, Distance Between(Position Of(Current Array Element), Global.activeAttackSpawnRoom) < 45) == True;
 	}
 
 	actions
 	{
-		Wait(5, Ignore Condition);
 		Global.spawnRoomIndex += 1;
 		If(Global.spawnRoomIndex >= Count Of(Global.attackSpawnRooms));
 			Global.spawnRoomIndex = 0;
@@ -2428,6 +2430,7 @@ rule("ATTACK SPAWN ROOM CONTROL")
 			Global.activeAttackSpawnRoom = Global.attackSpawnRooms[Global.spawnRoomIndex];
 			Start Forcing Spawn Room(Team 2, Global.spawnRoomIndex);
 		End;
+		Wait(1, Ignore Condition);
 		Loop If Condition Is True;
 	}
 }
@@ -2599,7 +2602,6 @@ rule("objectivesManagement")
 		If(Count Of(Global.objectivePositions) == 1);
 			Global.playersOnObjective = Empty Array;
 			Global.objectiveDescription = Custom String("Proceed to the extraction point");
-			Global.objectiveSpawnRoomControl = True;
 			"Shrink extraction zone radius down to size of extraction point"
 			Chase Global Variable Over Time(extractionZoneRad, 0, 120, Destination and Duration);
 			Global.objectiveRad = 10;
@@ -2607,7 +2609,6 @@ rule("objectivesManagement")
 		Else;
 			If(First Of(Global.objectiveTypes) == 1);
 				Global.objectiveDescription = Custom String("Secure the capture point");
-				Global.objectiveSpawnRoomControl = True;
 				Global.objectiveCaptureValue = 0;
 				Global.objectiveRad = 10;
 				If(Count Of(Global.objectivePositions) > 2);
@@ -2617,7 +2618,6 @@ rule("objectivesManagement")
 				End;
 			Else If(First Of(Global.objectiveTypes) == 2);
 				Global.objectiveDescription = Custom String("Eliminate zombies");
-				Global.objectiveSpawnRoomControl = False;
 				Global.objectiveCaptureValue = 0;
 				Global.eliminationsNeededPerObjective = 40;
 				Big Message(All Players(All Teams), Custom String("Eliminate {0} zombies!",
@@ -2625,7 +2625,6 @@ rule("objectivesManagement")
 					Global.objectivePositions) - 1)));
 			Else If(First Of(Global.objectiveTypes) == 3);
 				Global.objectiveDescription = Custom String("Eliminate the boss");
-				Global.objectiveSpawnRoomControl = False;
 				If(Count Of(Global.objectivePositions) > 2);
 					Big Message(All Players(All Teams), Custom String("Eliminate the giant zombie!"));
 				Else;
@@ -2633,7 +2632,6 @@ rule("objectivesManagement")
 				End;
 			Else If(First Of(Global.objectiveTypes) == 4);
 				Global.objectiveDescription = Custom String("Collect resources");
-				Global.objectiveSpawnRoomControl = True;
 				Global.objectiveCaptureValue = 0;
 				Global.objectiveResourcePositions = Empty Array;
 				All Players(Team 1).playerObjectiveResourceValue = 0;
@@ -2641,14 +2639,12 @@ rule("objectivesManagement")
 				Big Message(All Players(All Teams), Custom String("Collect resources and bring them to the collection site!"));
 			Else If(First Of(Global.objectiveTypes) == 5);
 				Global.objectiveDescription = Custom String("Rescue survivors");
-				Global.objectiveSpawnRoomControl = True;
 				Global.survivorToRescue = Null;
 				Global.objectiveRad = 10;
 				Global.objectiveChase1 = Global.objectiveRad;
 				Big Message(All Players(All Teams), Custom String("Locate survivors and bring them to the extraction site!"));
 			Else If(First Of(Global.objectiveTypes) == 6);
 				Global.objectiveDescription = Custom String("Clear the kill zone");
-				Global.objectiveSpawnRoomControl = True;
 				Global.objectiveRad = 20;
 				Global.eliminationsNeededPerObjective = 50;
 				Global.objectiveChase1 = First Of(Global.objectivePositions);
@@ -2657,13 +2653,11 @@ rule("objectivesManagement")
 				Global.objectiveCaptureValue = 0;
 			Else If(First Of(Global.objectiveTypes) == 7);
 				Global.objectiveDescription = Custom String("Destroy the egg");
-				Global.objectiveSpawnRoomControl = True;
 				Global.objectiveRad = 0;
 				Big Message(All Players(All Teams), Custom String("Destroy the{0} zombie egg!", Count Of(Global.objectivePositions)
 					== 2 ? Custom String(" final") : Custom String("")));
 			Else If(First Of(Global.objectiveTypes) == 8);
 				Global.objectiveDescription = Custom String("Repair satellite control terminals");
-				Global.objectiveSpawnRoomControl = True;
 				Global.objectiveRad = 3;
 				Global.objectiveColor = Custom Color(28, 169, 201, 255);
 				Global.objectiveResourcePositions = Empty Array;
@@ -2962,7 +2956,7 @@ rule("globalObjectiveEntityManagement")
 		Else If(Global.objectiveValue == 8);
 			"Capture percentage hud text"
 			Create HUD Text(All Players(All Teams), Custom String("{0}% | {1}% | {2}%", Round To Integer(First Of(
-				Global.objectiveCaptureValue), Down), Round To Integer(Global.objectiveCaptureValue[1], Up), Round To Integer(
+				Global.objectiveCaptureValue), Down), Round To Integer(Global.objectiveCaptureValue[1], Down), Round To Integer(
 				Global.objectiveCaptureValue[2], Down)), Custom String("Objectives remaining: {0}", Count Of(Global.objectivePositions) - 1),
 				Custom String(" "), Top, 1, Global.objectiveColor, Global.objectiveColor, Global.objectiveColor, Visible To and String,
 				Default Visibility);
@@ -3376,6 +3370,9 @@ rule("BOT BECOMES BOSS")
 		Set Invisible(Event Player, None);
 		If(Count Of(Global.availableBosses) == 0);
 			Global.availableBosses = Filtered Array(Global.botHeros, Global.botSpawnRates[Current Array Index] > 0);
+			If(Count of(Global.availableBosses) > Count Of(Global.nonBossZombies));
+				Modify Global Variable(availableBosses, Remove From Array By Value, Global.nonBossZombies);
+			End;
 		End;
 		Start Forcing Player To Be Hero(Event Player, Random Value In Array(Global.availableBosses));
 		Call Subroutine(botRespawnInitialization);
@@ -4098,7 +4095,7 @@ rule("MODIFY KILL ZONE SCORE")
 				Global.objectiveComplete = True;
 				"Give all bots a long respawn time"
 				All Players(Team 2).reviveTimer = 12;
-				Global.spawnTimes = Mapped Array(Global.spawnTimes, Current Array Element * 0 + 12);
+				Global.spawnTimes = Mapped Array(Global.spawnTimes, 12);
 			End;
 		End;
 		"Adjust Kill Zone Positions"
@@ -4174,13 +4171,14 @@ rule("BOT BECOMES ZOMBIE EGG")
 		Start Damage Modification(Filtered Array(All Players(Team 2), !Array Contains(Global.bosses, Current Array Element)
 			&& Distance Between(Position Of(Current Array Element), First Of(Global.objectivePositions)) < 25 * (1 - Normalized Health(
 			Event Player))), All Players(Team 1), 30, Receivers and Damagers);
-		Event Player.wallCollisionEnabled = False;
-		Disable Movement Collision With Environment(Event Player, True);
 		Event Player.health = 15000;
 		Event Player.bossHealth = Event Player.health;
 		Event Player.size = 2.500;
 		Start Scaling Player(Event Player, Event Player.size, False);
 		Set Player Health(Event Player, Max Health(Event Player));
+		Wait Until(Event Player.wallCollisionEnabled == True, 5);
+		Event Player.wallCollisionEnabled = False;
+		Disable Movement Collision With Environment(Event Player, True);
 		While(!Global.objectiveComplete);
 			If(!Is Using Ability 1(Event Player) && Is Alive(Event Player));
 				Press Button(Event Player, Button(Ability 1));
@@ -4450,7 +4448,7 @@ rule("fireSatellite")
 			Else;
 				"Give all bots a long respawn time"
 				All Players(Team 2).reviveTimer = 12;
-				Global.spawnTimes = Mapped Array(Global.spawnTimes, Current Array Element * 0 + 12);
+				Global.spawnTimes = Mapped Array(Global.spawnTimes, 12);
 			End;
 		End;
 		Stop Chasing Global Variable(objectiveChase1);
@@ -6935,95 +6933,6 @@ rule("SLICER (GENJI) SUPER JUMP")
 	}
 }
 
-rule("SLICER PROJECTILES (BOSS ONLY)")
-{
-	event
-	{
-		Ongoing - Each Player;
-		Team 2;
-		Genji;
-	}
-
-	conditions
-	{
-		Event Player.botTarget != Null;
-		Event Player.crowdControlled != True;
-		Is Alive(Event Player) == True;
-		Is Using Ultimate(Event Player) == False;
-		Array Contains(Global.bosses, Event Player) == True;
-		Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget)) > 3 * Event Player.size;
-	}
-
-	actions
-	{
-		Set Primary Fire Enabled(Event Player, True);
-		If(Ammo(Event Player, 0) < 5);
-			Set Max Ammo(Event Player, 0, 1000);
-			Set Ammo(Event Player, 0, Max Ammo(Event Player, 0));
-		End;
-		Wait(0.125, Abort When False);
-		Press Button(Event Player, Random Real(0, 2) > 1 ? Button(Primary Fire) : Button(Secondary Fire));
-		Loop If Condition Is True;
-	}
-}
-
-rule("SLICER DRAGON BLADE (BOSS ONLY)")
-{
-	event
-	{
-		Ongoing - Each Player;
-		Team 2;
-		Genji;
-	}
-
-	conditions
-	{
-		Event Player.botTarget != Null;
-		Array Contains(Global.bosses, Event Player) == True;
-		Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget)) < 4 * Event Player.size;
-	}
-
-	actions
-	{
-		Start Damage Modification(All Players(Team 1), Event Player, 50, Receivers Damagers and Damage Percent);
-		Event Player.botTempValue = Last Damage Modification ID;
-		Set Ultimate Charge(Event Player, 100);
-		Press Button(Event Player, Button(Ultimate));
-		Wait(1, Ignore Condition);
-		While(Is Using Ultimate(Event Player));
-			Wait Until(!Event Player.crowdControlled, 3);
-			Press Button(Event Player, Button(Primary Fire));
-			Wait(1, Ignore Condition);
-		End;
-		Stop Damage Modification(Event Player.botTempValue);
-		Wait(10, Ignore Condition);
-		Loop If Condition Is True;
-	}
-}
-
-rule("SLICER DRAGON BLADE DAMAGES SURVIVOR (BOSS ONLY)")
-{
-	event
-	{
-		Player Dealt Damage;
-		Team 2;
-		Genji;
-	}
-
-	conditions
-	{
-		Event Ability == Button(Ultimate);
-	}
-
-	actions
-	{
-		Play Effect(All Players(All Teams), Bad Pickup Effect, Color(Green), Position Of(Victim), 1);
-		Apply Impulse(Victim, Direction From Angles(Horizontal Angle From Direction(Direction Towards(Position Of(Attacker), Position Of(
-			Victim))), Min(-20, Vertical Angle From Direction(Direction Towards(Position Of(Attacker), Position Of(Victim))))),
-			15 * Event Player.size, To World, Cancel Contrary Motion);
-	}
-}
-
 rule("RIDER (WIDOWMAKER) ATTACH TO PLAYERS")
 {
 	event
@@ -7182,57 +7091,6 @@ rule("RIDER USE GRAPPLING HOOK")
 			Set Ability Cooldown(Event Player, Button(Ability 1), 12);
 		End;
 		Wait(0.250, Ignore Condition);
-		Loop If Condition Is True;
-	}
-}
-
-rule("RIDER THROWS ZOMBIES (BOSS ONLY)")
-{
-	event
-	{
-		Ongoing - Each Player;
-		Team 2;
-		Widowmaker;
-	}
-
-	conditions
-	{
-		Event Player.botTarget != Null;
-		Event Player.crowdControlled != True;
-		Is Alive(Event Player) == True;
-		Array Contains(Global.bosses, Event Player) == True;
-		Is True For Any(Remove From Array(All Living Players(Team 2), Event Player), Distance Between(Position Of(Event Player),
-			Position Of(Current Array Element)) < 3 * Event Player.size) == True;
-	}
-
-	actions
-	{
-		Event Player.botSpecialTarget = First Of(Sorted Array(Remove From Array(Filtered Array(All Living Players(Team 2),
-			Distance Between(Position Of(Event Player), Position Of(Current Array Element)) < 3 * Event Player.size), Event Player),
-			Distance Between(Position Of(Event Player), Position Of(Current Array Element))));
-		Event Player.botSpecialTarget.attached = True;
-		Attach Players(Event Player.botSpecialTarget, Event Player, Vector(0, 0.650 * Event Player.size, 0.500 * Event Player.size));
-		Wait(1, Ignore Condition);
-		Wait Until(Is Dead(Event Player) || Event Player.botTarget == Null || Angle Between Vectors(Facing Direction Of(Event Player),
-			Direction Towards(Eye Position(Event Player), Eye Position(Event Player.botTarget))) < 10, 10);
-		Detach Players(Event Player.botSpecialTarget);
-		Event Player.botSpecialTarget.attached = False;
-		If(Is Alive(Event Player) && Is Alive(Event Player.botSpecialTarget));
-			Wait Until(!Is Meleeing(Event Player), 1);
-			Press Button(Event Player, Button(Melee));
-			Play Effect(All Players(All Teams), Bad Explosion, Color(Purple), Position Of(Event Player.botSpecialTarget),
-				1.500 * Event Player.botSpecialTarget.size);
-			If(Event Player.botTarget != Null);
-				Apply Impulse(Event Player.botSpecialTarget, Direction Towards(Position Of(Event Player.botSpecialTarget), Eye Position(
-					Event Player.botTarget) + Vector(0, 3 * Event Player.botTarget.size, 0)), 15 * Event Player.size, To World,
-					Cancel Contrary Motion);
-			Else;
-				Apply Impulse(Event Player.botSpecialTarget, Direction From Angles(Horizontal Facing Angle Of(Event Player), -35),
-					15 * Event Player.size, To World, Cancel Contrary Motion);
-			End;
-		End;
-		Event Player.botSpecialTarget = Null;
-		Wait(2, Ignore Condition);
 		Loop If Condition Is True;
 	}
 }
@@ -7576,7 +7434,7 @@ rule("SLIMER FLIGHT (BOSS ONLY)")
 			Event Player.specialThrottling = True;
 			Event Player.specialFacing = True;
 			Stop Throttle In Direction(Event Player);
-			While(Count Of(Event Player.potentialTargets) > 0 && Is Using Ultimate(Event Player) && !Event Player.crowdControlled);
+			While(Event Player.botTarget != Null && Is Using Ultimate(Event Player) && !Event Player.crowdControlled);
 				Start Facing(Event Player, Direction Towards(Eye Position(Event Player), Eye Position(Event Player.botTarget) + Evaluate Once(
 					Direction From Angles(Random Real(0, 360), Random Real(-90, 90))) * 1), Event Player.crowdControlled ? 0 : 200, To World,
 					Direction and Turn Rate);
@@ -7608,6 +7466,7 @@ rule("SLIMER FLIGHT (BOSS ONLY)")
 			End;
 			Event Player.specialThrottling = False;
 			Event Player.specialFacing = False;
+			Start Rule(restoreDefaultFacingMovement, Do Nothing);
 			Wait(0.250, Ignore Condition);
 		End;
 		Event Player.specialThrottling = False;
@@ -8204,23 +8063,7 @@ rule("NANOMANCER (RAMATTRA) FIRES NANITE SWARM")
 			Set Projectile Speed(Event Player, 10);
 			Start Holding Button(Event Player, Button(Primary Fire));
 		End;
-		"Bosses Only"
-		If(Array Contains(Global.bosses, Event Player));
-			Wait Until(Event Player.botTarget == Null || Is Using Ultimate(Event Player), Random Real(2, 3));
-			Stop Holding Button(Event Player, Button(Primary Fire));
-			If(!Is Using Ultimate(Event Player));
-				Set Projectile Speed(Event Player, 100);
-				Set Ability Cooldown(Event Player, Button(Ability 2), 0);
-				Wait Until(!Is Meleeing(Event Player), 1);
-				Press Button(Event Player, Button(Ability 2));
-				Event Player.specialThrottling = False;
-				Event Player.specialFacing = False;
-				Start Rule(restoreDefaultFacingMovement, Do Nothing);
-				Wait(0.500, Ignore Condition);
-			End;
-		Else;
-			Wait Until(Event Player.botTarget == Null || Is Using Ultimate(Event Player), 1);
-		End;
+		Wait Until(Event Player.botTarget == Null || Is Using Ultimate(Event Player), 1);
 		Loop If Condition Is True;
 		Stop Holding Button(Event Player, Button(Primary Fire));
 		Event Player.specialThrottling = False;
