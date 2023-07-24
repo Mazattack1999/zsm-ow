@@ -588,7 +588,7 @@ rule("SPAWN TIME CONTROL")
 			Global.spawnTimes = Sorted Array(Mapped Array(Global.spawnTimes, Current Array Element - 1), Current Array Element);
 		End;
 		If(Count Of(Global.botSpawnPointTimers) > 0);
-			Global.botSpawnPointTimers = Mapped Array(Global.botSpawnPointTimers, Max(0, Current Array Element - 0.250));
+			Global.botSpawnPointTimers = Mapped Array(Global.botSpawnPointTimers, Max(0, Current Array Element - 1));
 		End;
 		Wait(1, Ignore Condition);
 		Loop If Condition Is True;
@@ -5829,12 +5829,12 @@ rule("teleportBots")
 						Event Player.averagePlayersPos) < Global.botMaxTeleportRange[1]);
 					"Filter out spawn points on cooldown"
 					Event Player.filteredBotSpawnPointGrid = Filtered Array(Event Player.filteredBotSpawnPointGrid,
-						Global.botSpawnPointTimers[Index Of Array Value(Global.botSpawnPoints, Current Array Element)] < 2 * Count Of(
+						Global.botSpawnPointTimers[Index Of Array Value(Global.botSpawnPoints, Current Array Element)] < 8 * Count Of(
 						Event Player.filteredBotSpawnPointGrid));
 					"Bots utilize saved spawn points"
 					If(Count Of(Global.botSpawnPoints) > 0 && Count Of(Event Player.filteredBotSpawnPointGrid) > 0);
 						Event Player.telePos = Random Value In Array(Event Player.filteredBotSpawnPointGrid);
-						Global.botSpawnPointTimers[Index Of Array Value(Global.botSpawnPoints, Event Player.telePos)] += 1;
+						Global.botSpawnPointTimers[Index Of Array Value(Global.botSpawnPoints, Event Player.telePos)] += 4;
 						Break;
 					Else;
 						Event Player.telePos = Nearest Walkable Position(Event Player.averagePlayersPos + Direction From Angles(Random Real(0, 360),
@@ -5850,11 +5850,11 @@ rule("teleportBots")
 					Event Player.teleporting = False;
 				"Teleport was unsuccessful due to line of sight and view angle"
 				Else If(Array Contains(Global.botSpawnPoints, Event Player.telePos));
-					Modify Global Variable(waypoints, Remove From Array By Index, Index Of Array Value(Global.botSpawnPoints, Event Player.telePos));
-					Modify Global Variable(botSpawnPointTimers, Remove From Array By Index, Index Of Array Value(Global.botSpawnPoints,
+					disabled Modify Global Variable(waypoints, Remove From Array By Index, Index Of Array Value(Global.botSpawnPoints, Event Player.telePos));
+					disabled Modify Global Variable(botSpawnPointTimers, Remove From Array By Index, Index Of Array Value(Global.botSpawnPoints,
 						Event Player.telePos));
-					Modify Global Variable(botSpawnPoints, Remove From Array By Value, Event Player.telePos);
-					Teleport(Event Player, Vector(500, 50, 500));
+					disabled Modify Global Variable(botSpawnPoints, Remove From Array By Value, Event Player.telePos);
+					Global.botSpawnPointTimers[Index Of Array Value(Global.botSpawnPoints, Event Player.telePos)] += 30;
 				End;
 			End;
 		Else;
