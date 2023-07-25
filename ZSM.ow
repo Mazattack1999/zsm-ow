@@ -4213,15 +4213,12 @@ rule("TELEPORT BOTS TO THE EGG")
 			!Current Array Element.teleporting && !Current Array Element.successfullyTeleported);
 		"Only teleport bots and play effect if there are bots to teleport"
 		If(Count Of(Global.survivorToRescue) > 0);
-			"Player whose reticle is closest to the egg"
-			disabled Global.testPos2 = First Of(Sorted Array(Filtered Array(Global.playerTargetList, Distance Between(Position Of(
-				Current Array Element), First Of(Global.objectivePositions)) < 40), Angle Between Vectors(Facing Direction Of(
-				Current Array Element), Direction Towards(Eye Position(Current Array Element), First Of(Global.objectivePositions)))));
 			Global.survivorToRescue.successfullyTeleported = True;
-			Global.survivorToRescue.reviveTimer = 1;
+			Global.survivorToRescue.reviveTimer = 1.5;
 			Global.survivorToRescue.customTelePos = Vector(500, 900, 500);
 			Teleport(Global.survivorToRescue, First Of(Global.objectivePositions));
 			Play Effect(All Players(All Teams), Bad Explosion, Color(Lime Green), First Of(Global.objectivePositions), 3);
+			Wait(0.25 * Count Of(Global.survivorToRescue), Ignore Condition);
 		End;
 		Loop If Condition Is True;
 		If(Is True For All(Global.playerTargetList, Distance Between(Position Of(Current Array Element), First Of(
@@ -5162,8 +5159,6 @@ rule("BOT INITIALIZATION")
 			Event Player.customTelePos = Null;
 		End;
 		Event Player.canTeleport = False;
-		"Adjustable bot respawn time"
-		disabled Chase Player Variable At Rate(Event Player, reviveTimer, 0, 1, None);
 		"Damage over time duration"
 		Chase Player Variable At Rate(Event Player, damageOverTimeDuration, -1, 0.950, None);
 		"Bot target warning icon (flashing)"
