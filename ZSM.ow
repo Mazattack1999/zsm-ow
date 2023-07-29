@@ -4781,13 +4781,13 @@ rule("PLAYER PICKS UP HEALTH PACK")
 
 	actions
 	{
+		Start Heal Over Time(Event Player, Null, 5, 20);
 		If(Match Time > Global.matchEndTime);
 			"Update known health pack positions"
 			If(Is True For All(Global.healthpackPositions, Distance Between(Current Array Element, Position Of(Event Player)) > 5));
 				Modify Global Variable(healthpackPositions, Append To Array, Position Of(Event Player));
 			End;
 			Stop All Damage Over Time(Event Player);
-			Start Heal Over Time(Event Player, Null, 5, 20);
 			Clear Status(Event Player, Burning);
 			If(Event Player.infectionLvl > 0);
 				Event Player.infected = False;
