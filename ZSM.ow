@@ -9731,7 +9731,7 @@ rule("LASER BARRICADE BLOCKS ZOMBIES")
 			Event Player.botTarget = Event Player.potentialTargets[Event Player.enhancementCount1];
 			If(!Has Status(Event Player.botTarget, Rooted));
 				"Damage the barricade"
-				Event Player.enhancementChase1 -= Max Health(Event Player.botTarget) * 1.500;
+				Event Player.enhancementChase1 -= Max Health(Event Player.botTarget) * 2.5;
 				Set Status(Event Player.botTarget, Event Player, Rooted, 0.500);
 				Damage(Event Player.botTarget, Event Player, 10);
 			End;
