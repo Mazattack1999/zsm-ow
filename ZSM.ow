@@ -2949,7 +2949,7 @@ rule("globalObjectiveEntityManagement")
 				Visible To Position and Radius);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 			"Egg toxic gas visual (stationary)"
-			Create Effect(All Players(All Teams), Cloud, Color(Lime Green), First Of(Global.objectivePositions) + Vector(0, -1, 0), 25 * (
+			Create Effect(Filtered Array(All Players(All Teams), First Of(Global.bosses) != Null), Cloud, Color(Lime Green), First Of(Global.objectivePositions) + Vector(0, -1, 0), 25 * (
 				1 - Normalized Health(First Of(Global.bosses))), Visible To Position and Radius);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 		"Satellite Uplink"
@@ -3318,7 +3318,6 @@ rule("SPAWN BOSS")
 	{
 		Global.objectiveTypes[0] == 3;
 		Global.objectiveComplete == False;
-		Global.bosses[1] == 0;
 		Count Of(Filtered Array(Global.bosses, Entity Exists(Current Array Element))) == 0;
 		Is True For Any(All Living Players(Team 2), Has Spawned(Current Array Element)
 			&& !Current Array Element.teleporting && Current Array Element.botTarget == Null) == True;
@@ -3393,11 +3392,13 @@ rule("BOT BECOMES BOSS")
 		Disable Movement Collision With Environment(Event Player, False);
 		Event Player.wallCollisionEnabled = False;
 		Event Player.potentialTargets = Empty Array;
+		Wait Until(Is On Ground(Event Player), 1);
+		Global.bosses[1] = Distance Between(Position Of(Event Player), Eye Position(Event Player));
 		Wait Until(Event Player.botTarget == Null, 1);
 		Wait(0.250, Ignore Condition);
 		Wait Until(Event Player.botTarget != Null || Health(Event Player) < Event Player.health, 9999);
 		Clear Status(Event Player, Rooted);
-		Global.bosses[2] = Distance Between(Position Of(Event Player), Eye Position(Event Player));
+		Global.bosses[1] = Distance Between(Position Of(Event Player), Eye Position(Event Player));
 		Wait(1, Ignore Condition);
 		Enable Movement Collision With Environment(Event Player);
 		Event Player.wallCollisionEnabled = True;
@@ -3421,7 +3422,7 @@ rule("BOSS STUCK")
 		Event Player.botTarget != Null;
 		Is Crouching(Event Player) == False;
 		Array Contains(Global.bosses, Event Player) == True;
-		Distance Between(Position Of(Event Player), Eye Position(Event Player)) < Global.bosses[2] - 0.250;
+		Distance Between(Position Of(Event Player), Eye Position(Event Player)) < Global.bosses[1] - 0.250;
 	}
 
 	actions
@@ -4180,6 +4181,7 @@ rule("BOT BECOMES ZOMBIE EGG")
 		Event Player.wallCollisionEnabled = False;
 		Disable Movement Collision With Environment(Event Player, True);
 		While(!Global.objectiveComplete);
+			Global.bosses[1] = Distance Between(Position Of(Event Player), Eye Position(Event Player));
 			If(!Is Using Ability 1(Event Player) && Is Alive(Event Player));
 				Press Button(Event Player, Button(Ability 1));
 				Wait(0.250, Ignore Condition);
@@ -4200,7 +4202,6 @@ rule("TELEPORT BOTS TO THE EGG")
 	{
 		Global.objectiveTypes[0] == 7;
 		Global.objectiveComplete == False;
-		Global.bosses[1] == 0;
 		Entity Exists(First Of(Global.bosses)) == True;
 		Is True For Any(Global.playerTargetList, Distance Between(Position Of(Current Array Element), First Of(Global.objectivePositions))
 			< 40) == True;
@@ -7867,7 +7868,7 @@ rule("HOPPER DEMECH INITIALIZATION")
 		If(Array Contains(Global.bosses, Event Player));
 			Event Player.bossHealth = Event Player.health;
 			"Adjust recorded boss height"
-			Global.bosses[2] = Distance Between(Position Of(Event Player), Eye Position(Event Player));
+			Global.bosses[1] = Distance Between(Position Of(Event Player), Eye Position(Event Player));
 		End;
 	}
 }
