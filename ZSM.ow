@@ -2949,7 +2949,7 @@ rule("globalObjectiveEntityManagement")
 				Visible To Position and Radius);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 			"Egg toxic gas visual (stationary)"
-			Create Effect(All Players(All Teams), Cloud, Color(Lime Green), First Of(Global.objectivePositions) + Vector(0, -1, 0), 25 * (
+			Create Effect(Filtered Array(All Players(All Teams), First Of(Global.bosses) != Null), Cloud, Color(Lime Green), First Of(Global.objectivePositions) + Vector(0, -1, 0), 25 * (
 				1 - Normalized Health(First Of(Global.bosses))), Visible To Position and Radius);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 		"Satellite Uplink"
@@ -3318,7 +3318,6 @@ rule("SPAWN BOSS")
 	{
 		Global.objectiveTypes[0] == 3;
 		Global.objectiveComplete == False;
-		Global.bosses[1] == 0;
 		Count Of(Filtered Array(Global.bosses, Entity Exists(Current Array Element))) == 0;
 		Is True For Any(All Living Players(Team 2), Has Spawned(Current Array Element)
 			&& !Current Array Element.teleporting && Current Array Element.botTarget == Null) == True;
@@ -3393,11 +3392,13 @@ rule("BOT BECOMES BOSS")
 		Disable Movement Collision With Environment(Event Player, False);
 		Event Player.wallCollisionEnabled = False;
 		Event Player.potentialTargets = Empty Array;
+		Wait Until(Is On Ground(Event Player), 1);
+		Global.bosses[1] = Distance Between(Position Of(Event Player), Eye Position(Event Player));
 		Wait Until(Event Player.botTarget == Null, 1);
 		Wait(0.250, Ignore Condition);
 		Wait Until(Event Player.botTarget != Null || Health(Event Player) < Event Player.health, 9999);
 		Clear Status(Event Player, Rooted);
-		Global.bosses[2] = Distance Between(Position Of(Event Player), Eye Position(Event Player));
+		Global.bosses[1] = Distance Between(Position Of(Event Player), Eye Position(Event Player));
 		Wait(1, Ignore Condition);
 		Enable Movement Collision With Environment(Event Player);
 		Event Player.wallCollisionEnabled = True;
@@ -3421,7 +3422,7 @@ rule("BOSS STUCK")
 		Event Player.botTarget != Null;
 		Is Crouching(Event Player) == False;
 		Array Contains(Global.bosses, Event Player) == True;
-		Distance Between(Position Of(Event Player), Eye Position(Event Player)) < Global.bosses[2] - 0.250;
+		Distance Between(Position Of(Event Player), Eye Position(Event Player)) < Global.bosses[1] - 0.250;
 	}
 
 	actions
@@ -4180,6 +4181,7 @@ rule("BOT BECOMES ZOMBIE EGG")
 		Event Player.wallCollisionEnabled = False;
 		Disable Movement Collision With Environment(Event Player, True);
 		While(!Global.objectiveComplete);
+			Global.bosses[1] = Distance Between(Position Of(Event Player), Eye Position(Event Player));
 			If(!Is Using Ability 1(Event Player) && Is Alive(Event Player));
 				Press Button(Event Player, Button(Ability 1));
 				Wait(0.250, Ignore Condition);
@@ -4200,7 +4202,6 @@ rule("TELEPORT BOTS TO THE EGG")
 	{
 		Global.objectiveTypes[0] == 7;
 		Global.objectiveComplete == False;
-		Global.bosses[1] == 0;
 		Entity Exists(First Of(Global.bosses)) == True;
 		Is True For Any(Global.playerTargetList, Distance Between(Position Of(Current Array Element), First Of(Global.objectivePositions))
 			< 40) == True;
@@ -4213,15 +4214,12 @@ rule("TELEPORT BOTS TO THE EGG")
 			!Current Array Element.teleporting && !Current Array Element.successfullyTeleported);
 		"Only teleport bots and play effect if there are bots to teleport"
 		If(Count Of(Global.survivorToRescue) > 0);
-			"Player whose reticle is closest to the egg"
-			disabled Global.testPos2 = First Of(Sorted Array(Filtered Array(Global.playerTargetList, Distance Between(Position Of(
-				Current Array Element), First Of(Global.objectivePositions)) < 40), Angle Between Vectors(Facing Direction Of(
-				Current Array Element), Direction Towards(Eye Position(Current Array Element), First Of(Global.objectivePositions)))));
 			Global.survivorToRescue.successfullyTeleported = True;
-			Global.survivorToRescue.reviveTimer = 1;
+			Global.survivorToRescue.reviveTimer = 1.5;
 			Global.survivorToRescue.customTelePos = Vector(500, 900, 500);
 			Teleport(Global.survivorToRescue, First Of(Global.objectivePositions));
 			Play Effect(All Players(All Teams), Bad Explosion, Color(Lime Green), First Of(Global.objectivePositions), 3);
+			Wait(0.25 * Count Of(Global.survivorToRescue), Ignore Condition);
 		End;
 		Loop If Condition Is True;
 		If(Is True For All(Global.playerTargetList, Distance Between(Position Of(Current Array Element), First Of(
@@ -4784,13 +4782,13 @@ rule("PLAYER PICKS UP HEALTH PACK")
 
 	actions
 	{
+		Start Heal Over Time(Event Player, Null, 5, 20);
 		If(Match Time > Global.matchEndTime);
 			"Update known health pack positions"
 			If(Is True For All(Global.healthpackPositions, Distance Between(Current Array Element, Position Of(Event Player)) > 5));
 				Modify Global Variable(healthpackPositions, Append To Array, Position Of(Event Player));
 			End;
 			Stop All Damage Over Time(Event Player);
-			Start Heal Over Time(Event Player, Null, 5, 20);
 			Clear Status(Event Player, Burning);
 			If(Event Player.infectionLvl > 0);
 				Event Player.infected = False;
@@ -5162,8 +5160,6 @@ rule("BOT INITIALIZATION")
 			Event Player.customTelePos = Null;
 		End;
 		Event Player.canTeleport = False;
-		"Adjustable bot respawn time"
-		disabled Chase Player Variable At Rate(Event Player, reviveTimer, 0, 1, None);
 		"Damage over time duration"
 		Chase Player Variable At Rate(Event Player, damageOverTimeDuration, -1, 0.950, None);
 		"Bot target warning icon (flashing)"
@@ -7867,7 +7863,7 @@ rule("HOPPER DEMECH INITIALIZATION")
 		If(Array Contains(Global.bosses, Event Player));
 			Event Player.bossHealth = Event Player.health;
 			"Adjust recorded boss height"
-			Global.bosses[2] = Distance Between(Position Of(Event Player), Eye Position(Event Player));
+			Global.bosses[1] = Distance Between(Position Of(Event Player), Eye Position(Event Player));
 		End;
 	}
 }
@@ -9731,7 +9727,7 @@ rule("LASER BARRICADE BLOCKS ZOMBIES")
 			Event Player.botTarget = Event Player.potentialTargets[Event Player.enhancementCount1];
 			If(!Has Status(Event Player.botTarget, Rooted));
 				"Damage the barricade"
-				Event Player.enhancementChase1 -= Max Health(Event Player.botTarget) * 1.500;
+				Event Player.enhancementChase1 -= Max Health(Event Player.botTarget) * 2.5;
 				Set Status(Event Player.botTarget, Event Player, Rooted, 0.500);
 				Damage(Event Player.botTarget, Event Player, 10);
 			End;
