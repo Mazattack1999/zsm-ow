@@ -5843,7 +5843,10 @@ rule("teleportBots")
 					Event Player.teleporting = False;
 				"Teleport was unsuccessful due to line of sight and view angle"
 				Else If(Array Contains(Global.botSpawnPoints, Event Player.telePos));
-					Global.botSpawnPointTimers[Index Of Array Value(Global.botSpawnPoints, Event Player.telePos)] += 30;
+					Modify Global Variable(waypoints, Remove From Array By Index, Index Of Array Value(Global.botSpawnPoints, Event Player.telePos));
+					Modify Global Variable(botSpawnPointTimers, Remove From Array By Index, Index Of Array Value(Global.botSpawnPoints,
+						Event Player.telePos));
+					Modify Global Variable(botSpawnPoints, Remove From Array By Value, Event Player.telePos);
 				End;
 			End;
 		Else;
