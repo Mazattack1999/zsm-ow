@@ -719,7 +719,10 @@ rule("setAvailableObjectives")
 			"Satellite Uplink"), True, 8));
 		"Set objective type votes empty"
 		Global.objectiveTypeVotes[9] = Array(Null, Workshop Setting Toggle(Custom String("Available Objective Types"), Custom String(
-			"Mixed Objectives"), True, 9));
+			"Graveyard"), True, 9));
+		"Set objective type votes empty"
+		Global.objectiveTypeVotes[10] = Array(Null, Workshop Setting Toggle(Custom String("Available Objective Types"), Custom String(
+			"Mixed Objectives"), True, 10));
 		"Mixed Objectives pool"
 		Global.mixedObjectivesPool[0] = Workshop Setting Toggle(Custom String("Mixed Objectives Pool"), Custom String("Capture Points."),
 			True, 1) ? 1 : 0;
@@ -744,6 +747,9 @@ rule("setAvailableObjectives")
 		"Mixed Objectives pool"
 		Global.mixedObjectivesPool[7] = Workshop Setting Toggle(Custom String("Mixed Objectives Pool"), Custom String("Satellite Uplink."),
 			True, 8) ? 8 : 0;
+		"Mixed Objectives pool"
+		Global.mixedObjectivesPool[8] = Workshop Setting Toggle(Custom String("Mixed Objectives Pool"), Custom String("Graveyard."),
+			True, 9) ? 9 : 0;
 		"Removed disabled objectives"
 		Modify Global Variable(mixedObjectivesPool, Remove From Array By Value, 0);
 	}
@@ -1558,8 +1564,12 @@ rule("EFFECTS/TEXTS")
 		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 8), Custom String(
 			"Objective Type: Satellite Uplink {0}", Icon String(Moon)), Custom String(
 			"Survivors must repair terminals to communicate with a satellite"), Global.voting ? Custom String("Change Vote (Press [{0}])",
-			Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Custom Color(12, 129, 132, 255), Custom Color(12, 129,
-			132, 255), Custom Color(12, 129, 132, 255), Visible To and String, Default Visibility);
+			Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Custom Color(12, 129, 132, 255), Custom Color(12, 129, 132, 255), Custom Color(12, 129, 132, 255), Visible To and String, Default Visibility);
+		"Vote objective type text: Graveyard Objectives"
+		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 9), Custom String(
+			"Objective Type: Graveyard {0}", Icon String(Skull)), Custom String(
+			"Survivors must clear an area where zombies are coming out of the ground"), Global.voting ? Custom String("Change Vote (Press [{0}])",
+			Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Color(Turquoise), Color(Turquoise), Color(Turquoise), Visible To and String, Default Visibility);
 		"Vote objective type text: Mixed Objectives"
 		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == Count Of(
 			Global.objectiveTypeVotes) - 1), Custom String("Objective Type: Mixed Objectives {0}", Icon String(Spiral)), Custom String(
@@ -2571,7 +2581,6 @@ rule("objectivesManagement")
 			Else If(First Of(Global.objectiveTypes) == 6);
 				Play Effect(All Players(All Teams), Ring Explosion Sound, Color(Red), Global.objectiveChase1, 200);
 				Play Effect(All Players(All Teams), Ring Explosion, Color(Red), Global.objectiveChase1, Global.objectiveRad * 2);
-				Stop Chasing Global Variable(objectiveChase1);
 				Big Message(All Players(All Teams), Custom String("The kill zone has been cleared!"));
 			"Checks if current objective is Zombie Egg"
 			Else If(First Of(Global.objectiveTypes) == 7);
@@ -2584,6 +2593,11 @@ rule("objectivesManagement")
 			Else If(First Of(Global.objectiveTypes) == 8);
 				Play Effect(All Players(All Teams), Ring Explosion Sound, Color(Lime Green), First Of(Global.objectivePositions), 200);
 				Big Message(All Players(All Teams), Custom String("Firing sequence complete!"));
+			"Checks if current objective is Graveyard"
+			Else If(First Of(Global.objectiveTypes) == 9);
+				Play Effect(All Players(All Teams), Ring Explosion Sound, Color(Turquoise), Global.objectiveChase1, 200);
+				Play Effect(All Players(All Teams), Ring Explosion, Color(Turquoise), Global.objectiveChase1, Global.objectiveRad * 2);
+				Big Message(All Players(All Teams), Custom String("All graves have been destroyed!"));
 			End;
 			Wait(0.016, Ignore Condition);
 			"Checks if current objective type is elimination only"
@@ -2666,6 +2680,14 @@ rule("objectivesManagement")
 				Global.testPos2 = 50;
 				Big Message(All Players(All Teams), Custom String("Repair the{0} satellite control terminals!", Count Of(Global.objectivePositions)
 					== 2 ? Custom String(" final") : Custom String("")));
+			Else If(First Of(Global.objectiveTypes) == 9);
+				Global.objectiveDescription = Custom String("Destroy the graves");
+				Global.objectiveRad = 25;
+				Global.objectiveColor = Color(Turquoise);
+				"All Grave Locations"
+				Global.objectiveCaptureValue = Filtered Array(Global.mapGrid, Distance Between(First Of(Global.objectivePositions), Current Array Element) < Global.objectiveRad);
+				"Active Grave Locations"
+				Global.objectiveResourcePositions = Mapped Array(Global.objectiveCaptureValue, 0);
 			End;
 		End;
 		"Updates global objective entities"
