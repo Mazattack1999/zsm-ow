@@ -4563,7 +4563,7 @@ rule("ZOMBIES SPAWN AT GRAVES")
 		If(Array Contains(Global.objectiveResourcePositions, Event Player));
 			Event Player.telePos = Global.objectiveCaptureValue[Index Of Array Value(Global.objectiveResourcePositions, Event Player)];
 		"Check if any active graves are not in use"
-		Else If(Count Of(Global.objectiveResourcePositions) < Global.survivorToRescue);
+		Else If(Count Of(Global.objectiveResourcePositions) < Min(Global.survivorToRescue, Count Of(Global.objectiveCaptureValue)));
 			Modify Global Variable(objectiveResourcePositions, Append To Array, Event Player);
 			Event Player.telePos = Global.objectiveCaptureValue[Index Of Array Value(Global.objectiveResourcePositions, Event Player)];
 		Else;
