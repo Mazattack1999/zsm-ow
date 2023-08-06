@@ -3069,12 +3069,11 @@ rule("globalObjectiveEntityManagement")
 				Create Effect(All Players(All Teams), Cloud, Global.objectiveColor, Global.objectiveCaptureValue[Evaluate Once(
 					Global.objectiveEntityCount)], 2, Visible To Position and Radius);
 				Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
-				"Grave zombie target text"
-				Create In-World Text(Filtered Array(All Players(All Teams), Global.objectiveResourcePositions[Evaluate Once(
-					Global.objectiveEntityCount)]), Custom String("Target"), Global.objectiveResourcePositions[Evaluate Once(
-					Global.objectiveEntityCount)], 1.5, Clip Against Surfaces, Visible To and String, Global.objectiveColor,
-					Visible Never);
-				Modify Global Variable(objectiveEntities, Append To Array, Last Text ID);
+				"Grave zombie icon"
+				Create Icon(Filtered Array(All Players(All Teams), Global.objectiveResourcePositions[Evaluate Once(
+					Global.objectiveEntityCount)]), Global.objectiveResourcePositions[Evaluate Once(
+					Global.objectiveEntityCount)], Skull, Visible To And Position, Global.objectiveColor, True);
+				Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 			End;
 		End;
 	}
@@ -4597,7 +4596,7 @@ rule("DESTROY GRAVES")
 		Global.objectiveTypes[0] == 9;
 		Array Contains(Global.objectiveResourcePositions, Victim) == True;
 		"Player kills zombie or zombie dies really close to grave"
-		(Team Of(Attacker) == Team(Team 1) || !Victim.canTeleport) == True;
+		(!Event Was Environment || Team Of(Attacker) == Team 1 || !Victim.canTeleport) == True;
 	}
 
 	actions
@@ -6088,6 +6087,10 @@ rule("botTeleportCenter")
 				Event Player.averagePlayersPos = Position Of(First Of(Sorted Array(Global.playerTargetList, Distance Between(Position Of(
 					Current Array Element), First Of(Global.objectivePositions)))));
 			End;
+		"Graveyard"
+		Else If(Global.objectiveTypes[0] == 9);
+			Event Player.averagePlayersPos = Position Of(First Of(Sorted Array(Global.playerTargetList, Distance Between(Position Of(
+				Current Array Element), First Of(Global.objectivePositions)))));
 		"Default"
 		Else;
 			Call Subroutine(locateAveragePlayerLocation);
