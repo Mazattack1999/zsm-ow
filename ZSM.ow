@@ -2683,11 +2683,13 @@ rule("objectivesManagement")
 			Else If(First Of(Global.objectiveTypes) == 9);
 				Global.objectiveDescription = Custom String("Destroy the graves");
 				Global.objectiveRad = 25;
-				Global.objectiveColor = Color(Turquoise);
+				Global.objectiveColor = Color(Sky Blue);
 				"All Grave Locations"
 				Global.objectiveCaptureValue = Filtered Array(Global.mapGrid, Distance Between(First Of(Global.objectivePositions), Current Array Element) < Global.objectiveRad);
 				"Active Grave Locations"
-				Global.objectiveResourcePositions = Mapped Array(Global.objectiveCaptureValue, 0);
+				Global.objectiveResourcePositions = Empty Array;
+				"Max number of active graves "
+				Global.survivorToRescue = 4;
 			End;
 		End;
 		"Updates global objective entities"
@@ -3023,6 +3025,39 @@ rule("globalObjectiveEntityManagement")
 					Global.objectiveResourcePositions[Evaluate Once(Global.objectiveEntityCount)], 1, Do Not Clip, Visible To Position and String,
 					Global.objectiveColor, Visible Never);
 				Modify Global Variable(objectiveEntities, Append To Array, Last Text ID);
+			End;
+		"Graveyard"
+		Else If(Global.objectiveValue == 9);
+			"Graves remaining HUD text"
+			Create HUD Text(All Players(All Teams), Custom String("Graves Remaining: {0}", Count Of(Global.objectiveCaptureValue)), Custom String("Objectives remaining: {0}", Count Of(Global.objectivePositions) - 1),
+				Custom String(" "), Top, 1, Global.objectiveColor, Global.objectiveColor, Global.objectiveColor, Visible To and String,
+				Default Visibility);
+			Modify Global Variable(objectiveEntities, Append To Array, Last Text ID);
+			"Objective distance"
+			Create In-World Text(Filtered Array(All Players(Team 1), Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element)) > Global.objectiveRad), Custom String("Distance: {0}m", Distance Between(Position Of(Local Player), First Of(
+				Global.objectivePositions)) - Global.objectiveRad), First Of(Global.objectivePositions), 1, Do Not Clip, Visible To and String, Global.objectiveColor,
+				Visible Never);
+			Modify Global Variable(objectiveEntities, Append To Array, Last Text ID);
+			"Objective icon"
+			Create Icon(Filtered Array(All Players(Team 1), Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element)) > Global.objectiveRad), First Of(Global.objectivePositions) + Vector(0, 1, 0), Skull, Visible To, Global.objectiveColor, True);
+			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
+			"Graveyard fog effect"
+			Create Effect(Filtered Array(All Players(Team 1), Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element)) < Global.objectiveRad), Cloud, Global.objectiveColor, Update Every Frame(Position Of(Local Player)), 10, Visible To Position And Radius);
+			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
+			"Near fog visual"
+				Create Effect(Filtered Array(All Players(Team 1), Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element)) < Global.objectiveRad), Bad Aura, Global.objectiveColor, Eye Position(Local Player) + Facing Direction Of(Local Player) * 20, 50, Visible To Position and Radius);
+			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
+			"Grave effects"
+			For Global Variable(objectiveEntityCount, 0, Global.survivorToRescue, 1);
+				"Grave ring"
+				Create Effect(Filtered Array(All Players(All Teams), Global.objectiveResourcePositions[Evaluate Once(
+					Global.objectiveEntityCount)]), Ring, Global.objectiveColor, Global.objectiveCaptureValue[Evaluate Once(
+					Global.objectiveEntityCount)], 1, Visible To Position and Radius);
+				Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
+				"Grave cloud"
+				Create Effect(All Players(All Teams), Cloud, Global.objectiveColor, Global.objectiveCaptureValue[Evaluate Once(
+					Global.objectiveEntityCount)], 1, Visible To Position and Radius);
+				Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 			End;
 		End;
 	}
