@@ -4510,6 +4510,81 @@ rule("fireSatellite")
 	}
 }
 
+disabled rule("============================================== OBJECTIVE TYPE: GRAVEYARD ==============================================")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("ZOMBIES SPAWN AT GRAVES")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		All;
+	}
+
+	conditions
+	{
+		Global.objectiveTypes[0] == 9;
+		Event Player.initializing != True;
+		Event Player.teleporting != True;
+		Event Player.successfullyTeleported != True;
+		Is Alive(Event Player) == True;
+		Is True For Any(Global.playerTargetList, Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element)) < Global.objectiveRad) == True;
+	}
+
+	actions
+	{
+		Wait(0.25, Abort When False);
+		Event Player.canTeleport = False;
+		Event Player.successfullyTeleported = True;
+		"Check if zombie is already assigned to a grave"
+		If(Array Contains(Global.objectiveResourcePositions, Event Player));
+			Event Player.telePos = Global.objectiveCaptureValue[Index Of Array Value(Global.objectiveResourcePositions, Event Player)];
+		"Check if any active graves are not in use"
+		Else If(Count Of(Global.objectiveResourcePositions) < Global.survivorToRescue);
+			Modify Global Variable(objectiveResourcePositions, Append To Array, Event Player);
+			Event Player.telePos = Global.objectiveCaptureValue[Index Of Array Value(Global.objectiveResourcePositions, Event Player)];
+		Else;
+			Event Player.telePos = Random Value In Array(Array Slice(Global.objectiveCaptureValue, 0, Global.survivorToRescue));
+		End;
+		Event Player.averagePlayersPos = Event Player.telePos;
+		"Move telePos under ground"
+		Event Player.telePos += Vector(0, -5, 0);
+		Play Effect(All Players(All Teams), Ring Explosion, Global.objectiveColor, Event Player.averagePlayersPos, 2);
+		Play Effect(All Players(All Teams), Bad Pickup Effect, Global.objectiveColor, Event Player.averagePlayersPos, 2);
+		Start Forcing Player Position(Event Player, Event Player.telePos, True);
+		Chase Player Variable Over Time(Event Player, telePos, Event Player.averagePlayersPos, 1, None);
+		Wait Until(Is Dead(Event Player), 1);
+		Stop Forcing Player Position(Event Player);
+		Event Player.canTeleport = True;		
+	}
+}
+
+rule("DESTROY GRAVES")
+{
+	event
+	{
+		Player Dealt Final Blow;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Global.objectiveTypes[0] == 9;
+	}
+
+	actions
+	{
+		
+	}
+}
+
 disabled rule("============================================== PLAYERS GAME IN PROGRESS ====================================================")
 {
 	event
