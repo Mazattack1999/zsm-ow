@@ -3050,13 +3050,13 @@ rule("globalObjectiveEntityManagement")
 			Create Icon(Filtered Array(All Players(Team 1), Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element)) > Global.objectiveRad), First Of(Global.objectivePositions) + Vector(0, 1, 0), Arrow: Down, Visible To, Global.objectiveColor, True);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 			"Bad Aura Ambiance"
-				Create Effect(Filtered Array(All Players(Team 1), Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element)) < Global.objectiveRad), Bad Aura, Global.objectiveColor, Eye Position(Local Player) + Facing Direction Of(Local Player) * 30, 50, Visible To Position and Radius);
+				Create Effect(Filtered Array(All Players(Team 1), Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element)) < Global.objectiveRad), Bad Aura, Global.objectiveColor, Update Every Frame(Eye Position(Local Player) + Facing Direction Of(Local Player) * 30), 50, Visible To Position and Radius);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 			"Bad Aura Ambiance"
-				Create Effect(Filtered Array(All Players(Team 1), Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element)) < Global.objectiveRad), Bad Aura, Global.objectiveColor, Eye Position(Local Player) + Facing Direction Of(Local Player) * 31, 50, Visible To Position and Radius);
+				Create Effect(Filtered Array(All Players(Team 1), Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element)) < Global.objectiveRad), Bad Aura, Global.objectiveColor, Update Every Frame(Eye Position(Local Player) + Facing Direction Of(Local Player) * 31), 50, Visible To Position and Radius);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 			"Bad Aura Ambiance"
-				Create Effect(Filtered Array(All Players(Team 1), Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element)) < Global.objectiveRad), Bad Aura, Global.objectiveColor, Eye Position(Local Player) + Facing Direction Of(Local Player) * 32, 50, Visible To Position and Radius);
+				Create Effect(Filtered Array(All Players(Team 1), Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element)) < Global.objectiveRad), Bad Aura, Global.objectiveColor, Update Every Frame(Eye Position(Local Player) + Facing Direction Of(Local Player) * 32), 50, Visible To Position and Radius);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 			"Grave effects"
 			For Global Variable(objectiveEntityCount, 0, Global.survivorToRescue, 1);
