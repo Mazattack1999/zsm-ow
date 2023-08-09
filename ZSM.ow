@@ -4264,42 +4264,38 @@ rule("BOT BECOMES ZOMBIE EGG")
 	}
 }
 
-rule("TELEPORT BOTS TO THE EGG")
+rule("BOTS TELEPORT TO THE EGG")
 {
 	event
 	{
-		Ongoing - Global;
+		Ongoing - Each Player;
+		Team 2;
+		All;
 	}
 
 	conditions
 	{
 		Global.objectiveTypes[0] == 7;
-		Global.objectiveComplete == False;
+		Global.objectiveComplete != True;
+		Event Player.initializing != True;
+		Event Player.teleporting != True;
+		Event Player.successfullyTeleported != True;
+		Is Alive(Event Player) == True;
 		Entity Exists(First Of(Global.bosses)) == True;
-		Is True For Any(Global.playerTargetList, Distance Between(Position Of(Current Array Element), First Of(Global.objectivePositions))
-			< 40) == True;
+		Array Contains(Global.bosses, Event Player) != True;
+		Is True For Any(Global.playerTargetList, Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element)) < 40) == True;
 	}
 
 	actions
 	{
-		Wait(0.250, Ignore Condition);
-		Global.survivorToRescue = Filtered Array(Remove From Array(All Living Players(Team 2), First Of(Global.bosses)),
-			!Current Array Element.teleporting && !Current Array Element.successfullyTeleported);
-		"Only teleport bots and play effect if there are bots to teleport"
-		If(Count Of(Global.survivorToRescue) > 0);
-			Global.survivorToRescue.successfullyTeleported = True;
-			Global.survivorToRescue.reviveTimer = 1.5;
-			Global.survivorToRescue.customTelePos = Vector(500, 900, 500);
-			Teleport(Global.survivorToRescue, First Of(Global.objectivePositions));
-			Play Effect(All Players(All Teams), Bad Explosion, Color(Lime Green), First Of(Global.objectivePositions), 3);
-			Wait(0.25 * Count Of(Global.survivorToRescue), Ignore Condition);
-		End;
-		Loop If Condition Is True;
-		If(Is True For All(Global.playerTargetList, Distance Between(Position Of(Current Array Element), First Of(
-			Global.objectivePositions)) >= 40) || First Of(Global.objectiveTypes != 7));
-			Filtered Array(All Players(Team 2), Current Array Element.customTelePos != Null).customTelePos = Null;
-			Global.customTelePositions = Empty Array;
-		End;
+		Wait(0.25, Abort When False);
+		Event Player.successfullyTeleported = True;
+		Event Player.customTelePos = Vector(500, 500, 500);
+		Event Player.telePos = First Of(Global.objectivePositions);
+		Event Player.averagePlayersPos = Event Player.telePos;
+		Event Player.reviveTimer = 1;
+		Play Effect(All Players(All Teams), Bad Explosion, Color(Lime Green), First Of(Global.objectivePositions), 3);
+		Teleport(Event Player, Event Player.telePos);
 	}
 }
 
@@ -4557,7 +4553,6 @@ rule("ZOMBIES SPAWN AT GRAVES")
 	actions
 	{
 		Wait(0.25, Abort When False);
-		Event Player.canTeleport = False;
 		Event Player.successfullyTeleported = True;
 		"Check if zombie is already assigned to a grave"
 		If(Array Contains(Global.objectiveResourcePositions, Event Player));
@@ -4569,6 +4564,7 @@ rule("ZOMBIES SPAWN AT GRAVES")
 		Else;
 			Event Player.telePos = Random Value In Array(Array Slice(Global.objectiveCaptureValue, 0, Min(Global.survivorToRescue, Count Of(Global.objectiveCaptureValue))));
 		End;
+		Event Player.customTelePos = Vector(500, 500, 500);
 		Event Player.averagePlayersPos = Event Player.telePos;
 		"Move telePos under ground"
 		Event Player.telePos += Vector(0, -2.5, 0);
@@ -4578,7 +4574,6 @@ rule("ZOMBIES SPAWN AT GRAVES")
 		Chase Player Variable Over Time(Event Player, telePos, Event Player.averagePlayersPos, 1, None);
 		Wait Until(Is Dead(Event Player), 1);
 		Stop Forcing Player Position(Event Player);
-		Event Player.canTeleport = True;
 	}
 }
 
