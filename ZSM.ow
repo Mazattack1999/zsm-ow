@@ -478,11 +478,6 @@ disabled rule("interact test")
 		Else;
 			Global.objectiveCaptureValue = 99;
 		End;
-		"Shows the closest 50 points to the player"
-		For Global Variable(count1, 0, 50, 1);
-			Play Effect(Host Player, Ring Explosion, Color(Purple), Sorted Array(Global.mapGrid, Distance Between(Current Array Element,
-				Position Of(Host Player)))[Global.count1], 5);
-		End;
 		If(Is Button Held(Host Player, Button(Primary Fire)));
 			All Players(Team 1).currentPowerUp = 5;
 		End;
