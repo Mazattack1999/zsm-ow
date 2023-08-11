@@ -3277,7 +3277,16 @@ rule("WIN/LOSS CONDITIONS")
 			Start Rule(nukeMap, Do Nothing);
 			Global.evacRate = 50;
 			Wait(8, Ignore Condition);
-			Declare Team Victory(Team 1);
+			"Temporary Fix for flashpoint"
+			If(Current Game Mode == Game Mode(Flashpoint));
+				Big Message(All Players(Team 1), Custom String("Victory!"));
+				Set Slow Motion(35);
+				Set Aim Speed(All Players(Team 1), 50);
+				Wait(1.5, Ignore Condition);
+				Restart Match;
+			Else;
+				Declare Team Victory(Team 1);
+			End;
 		End;
 		Enable Hero HUD(All Players(All Teams));
 		Enable Game Mode HUD(All Players(All Teams));
