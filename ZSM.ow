@@ -3259,7 +3259,16 @@ rule("WIN/LOSS CONDITIONS")
 				* -2 + Total Time Elapsed * -7.500, -30) * 200, Global.walkCenter, 10);
 			Start Rule(nukeMap, Do Nothing);
 			Wait(8, Ignore Condition);
-			Declare Team Victory(Team 2);
+			"Temporary Fix for flashpoint"
+			If(Current Game Mode == Game Mode(Flashpoint));
+				Big Message(All Players(Team 1), Custom String("Defeat!"));
+				Set Slow Motion(35);
+				Set Aim Speed(All Players(Team 1), 50);
+				Wait(1.5, Ignore Condition);
+				Restart Match;
+			Else;
+				Declare Team Victory(Team 2);
+			End;
 		Else;
 			Resurrect(Filtered Array(All Players(Team 1), Has Spawned(Current Array Element) && Distance Between(First Of(
 				Global.objectivePositions), Vector(X Component Of(Position Of(Current Array Element)), Y Component Of(First Of(
