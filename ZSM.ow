@@ -22,7 +22,10 @@ settings
 	{
 		Assault
 		{
+			Allow Hero Switching: Off
 			Capture Speed Modifier: 10%
+			Game Mode Start: Manual
+			Kill Cam: Off
 			Tank Role Passive Health Bonus: Always Enabled
 
 			disabled maps
@@ -33,12 +36,15 @@ settings
 
 		Capture the Flag
 		{
+			Allow Hero Switching: Off
 			Damage Interrupts Flag Interaction: On
 			Flag Carrier Abilities: All
 			Flag Dropped Lock Time: 10.0
 			Flag Pickup Time: 5.0
 			Flag Return Time: 0.0
 			Flag Score Respawn Time: 20.0
+			Game Mode Start: Manual
+			Kill Cam: Off
 			Tank Role Passive Health Bonus: Always Enabled
 
 			disabled maps
@@ -56,7 +62,10 @@ settings
 
 		Control
 		{
+			Allow Hero Switching: Off
 			Capture Speed Modifier: 10%
+			Game Mode Start: Manual
+			Kill Cam: Off
 			Scoring Speed Modifier: 10%
 			Tank Role Passive Health Bonus: Always Enabled
 
@@ -68,20 +77,29 @@ settings
 			}
 		}
 
-		disabled Elimination
-		{
-			Capture Objective Tiebreaker: Off
-		}
-
 		Escort
 		{
+			Allow Hero Switching: Off
+			Game Mode Start: Manual
+			Kill Cam: Off
 			Payload Speed Modifier: 10%
 			Tank Role Passive Health Bonus: Always Enabled
 		}
 
-		Hybrid
+		Flashpoint
 		{
 			Capture Speed Modifier: 10%
+			First Active Control Point: Random
+			Score To Win: 10
+			Scoring Speed Modifier: 10%
+		}
+
+		Hybrid
+		{
+			Allow Hero Switching: Off
+			Capture Speed Modifier: 10%
+			Game Mode Start: Manual
+			Kill Cam: Off
 			Payload Speed Modifier: 10%
 			Tank Role Passive Health Bonus: Always Enabled
 
@@ -93,6 +111,9 @@ settings
 
 		Push
 		{
+			Allow Hero Switching: Off
+			Game Mode Start: Manual
+			Kill Cam: Off
 			Tank Role Passive Health Bonus: Always Enabled
 			TS-1 Push Speed Modifier: 10%
 			TS-1 Walk Speed Modifier: 10%
@@ -100,6 +121,9 @@ settings
 
 		Team Deathmatch
 		{
+			Allow Hero Switching: Off
+			Game Mode Start: Manual
+			Kill Cam: Off
 			Tank Role Passive Health Bonus: Always Enabled
 
 			enabled maps
@@ -116,13 +140,6 @@ settings
 				Necropolis 972777519512068153
 				Petra 972777519512063901
 			}
-		}
-
-		General
-		{
-			Allow Hero Switching: Off
-			Game Mode Start: Manual
-			Kill Cam: Off
 		}
 	}
 
@@ -461,6 +478,11 @@ disabled rule("interact test")
 		Else;
 			Global.objectiveCaptureValue = 99;
 		End;
+		"Shows the closest 50 points to the player"
+		For Global Variable(count1, 0, 50, 1);
+			Play Effect(Host Player, Ring Explosion, Color(Purple), Sorted Array(Global.mapGrid, Distance Between(Current Array Element,
+				Position Of(Host Player)))[Global.count1], 5);
+		End;
 		If(Is Button Held(Host Player, Button(Primary Fire)));
 			All Players(Team 1).currentPowerUp = 5;
 		End;
@@ -748,8 +770,8 @@ rule("setAvailableObjectives")
 		Global.mixedObjectivesPool[7] = Workshop Setting Toggle(Custom String("Mixed Objectives Pool"), Custom String("Satellite Uplink."),
 			True, 8) ? 8 : 0;
 		"Mixed Objectives pool"
-		Global.mixedObjectivesPool[8] = Workshop Setting Toggle(Custom String("Mixed Objectives Pool"), Custom String("Graveyard."),
-			True, 9) ? 9 : 0;
+		Global.mixedObjectivesPool[8] = Workshop Setting Toggle(Custom String("Mixed Objectives Pool"), Custom String("Graveyard."), True,
+			9) ? 9 : 0;
 		"Removed disabled objectives"
 		Modify Global Variable(mixedObjectivesPool, Remove From Array By Value, 0);
 	}
@@ -954,7 +976,7 @@ rule("generateMapGrid")
 				Global.testPos2)), Global.testPosMaxDistance));
 			"Do not grid points inside spawn rooms on CTF maps"
 			If((Current Game Mode != Game Mode(Capture the Flag) && Current Game Mode != Game Mode(Push) && Current Game Mode != Game Mode(
-				Control)) || (Is True For All(Spawn Points(Team 2), Distance Between(Position Of(Current Array Element), Global.testPos) > 50)
+				Control) && Current Game Mode!= Game Mode(Flashpoint)) || (Is True For All(Spawn Points(Team 2), Distance Between(Position Of(Current Array Element), Global.testPos) > 50)
 				&& Is True For All(Spawn Points(Team 1), Distance Between(Position Of(Current Array Element), Global.testPos) > 40)));
 				If(Count Of(Global.mapGrid) == 0 || Is True For All(Global.mapGrid, Distance Between(Current Array Element, Global.testPos)
 					> 2.500));
@@ -1564,12 +1586,14 @@ rule("EFFECTS/TEXTS")
 		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 8), Custom String(
 			"Objective Type: Satellite Uplink {0}", Icon String(Moon)), Custom String(
 			"Survivors must repair terminals to communicate with a satellite"), Global.voting ? Custom String("Change Vote (Press [{0}])",
-			Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Custom Color(12, 129, 132, 255), Custom Color(12, 129, 132, 255), Custom Color(12, 129, 132, 255), Visible To and String, Default Visibility);
+			Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Custom Color(12, 129, 132, 255), Custom Color(12, 129,
+			132, 255), Custom Color(12, 129, 132, 255), Visible To and String, Default Visibility);
 		"Vote objective type text: Graveyard Objectives"
 		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 9), Custom String(
 			"Objective Type: Graveyard {0}", Icon String(Skull)), Custom String(
-			"Survivors must clear an area where zombies are coming out of the ground"), Global.voting ? Custom String("Change Vote (Press [{0}])",
-			Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Color(Turquoise), Color(Turquoise), Color(Turquoise), Visible To and String, Default Visibility);
+			"Survivors must clear an area where zombies are coming out of the ground"), Global.voting ? Custom String(
+			"Change Vote (Press [{0}])", Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Color(Turquoise), Color(
+			Turquoise), Color(Turquoise), Visible To and String, Default Visibility);
 		"Vote objective type text: Mixed Objectives"
 		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == Count Of(
 			Global.objectiveTypeVotes) - 1), Custom String("Objective Type: Mixed Objectives {0}", Icon String(Spiral)), Custom String(
@@ -2425,7 +2449,8 @@ rule("ATTACK SPAWN ROOM CONTROL")
 		Global.specialGameModeSetup != True;
 		"Does not apply if game mode is special mode"
 		Global.specialGameMode != True;
-		Is True For Any(Global.playerTargetList, Distance Between(Position Of(Current Array Element), Global.activeAttackSpawnRoom) < 45) == True;
+		Is True For Any(Global.playerTargetList, Distance Between(Position Of(Current Array Element), Global.activeAttackSpawnRoom) < 45)
+			== True;
 	}
 
 	actions
@@ -2690,8 +2715,9 @@ rule("objectivesManagement")
 				While(Count Of(Global.objectiveCaptureValue) < 30);
 					Global.objectiveRad += 2;
 					"All Grave Locations"
-					Global.objectiveCaptureValue = Filtered Array(Global.mapGrid, Distance Between(First Of(Global.objectivePositions), Current Array Element) < Global.objectiveRad - 10);
-					Wait(0.25, Ignore Condition);
+					Global.objectiveCaptureValue = Filtered Array(Global.mapGrid, Distance Between(First Of(Global.objectivePositions),
+						Current Array Element) < Global.objectiveRad - 10);
+					Wait(0.250, Ignore Condition);
 				End;
 				Global.objectiveCaptureValue = Filtered Array(Global.objectiveCaptureValue, Current Array Index < 30);
 				"Active Grave Locations"
@@ -2981,8 +3007,9 @@ rule("globalObjectiveEntityManagement")
 				Visible To Position and Radius);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 			"Egg toxic gas visual (stationary)"
-			Create Effect(Filtered Array(All Players(All Teams), First Of(Global.bosses) != Null), Cloud, Color(Lime Green), First Of(Global.objectivePositions) + Vector(0, -1, 0), 25 * (
-				1 - Normalized Health(First Of(Global.bosses))), Visible To Position and Radius);
+			Create Effect(Filtered Array(All Players(All Teams), First Of(Global.bosses) != Null), Cloud, Color(Lime Green), First Of(
+				Global.objectivePositions) + Vector(0, -1, 0), 25 * (1 - Normalized Health(First Of(Global.bosses))),
+				Visible To Position and Radius);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 		"Satellite Uplink"
 		Else If(Global.objectiveValue == 8);
@@ -3037,42 +3064,51 @@ rule("globalObjectiveEntityManagement")
 		"Graveyard"
 		Else If(Global.objectiveValue == 9);
 			"Graves remaining HUD text"
-			Create HUD Text(All Players(All Teams), Custom String("Graves Remaining: {0}", Count Of(Global.objectiveCaptureValue)), Custom String("Objectives remaining: {0}", Count Of(Global.objectivePositions) - 1),
-				Custom String(" "), Top, 1, Global.objectiveColor, Global.objectiveColor, Global.objectiveColor, Visible To and String,
-				Default Visibility);
+			Create HUD Text(All Players(All Teams), Custom String("Graves Remaining: {0}", Count Of(Global.objectiveCaptureValue)),
+				Custom String("Objectives remaining: {0}", Count Of(Global.objectivePositions) - 1), Custom String(" "), Top, 1,
+				Global.objectiveColor, Global.objectiveColor, Global.objectiveColor, Visible To and String, Default Visibility);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Text ID);
 			"Objective distance"
-			Create In-World Text(Filtered Array(All Players(Team 1), Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element)) > Global.objectiveRad), Custom String("Distance: {0}m", Distance Between(Position Of(Local Player), First Of(
-				Global.objectivePositions)) - Global.objectiveRad), First Of(Global.objectivePositions), 1, Do Not Clip, Visible To and String, Global.objectiveColor,
-				Visible Never);
+			Create In-World Text(Filtered Array(All Players(Team 1), Distance Between(First Of(Global.objectivePositions), Position Of(
+				Current Array Element)) > Global.objectiveRad), Custom String("Distance: {0}m", Distance Between(Position Of(Local Player),
+				First Of(Global.objectivePositions)) - Global.objectiveRad), First Of(Global.objectivePositions), 1, Do Not Clip,
+				Visible To and String, Global.objectiveColor, Visible Never);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Text ID);
 			"Objective icon"
-			Create Icon(Filtered Array(All Players(Team 1), Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element)) > Global.objectiveRad), First Of(Global.objectivePositions) + Vector(0, 1, 0), Arrow: Down, Visible To, Global.objectiveColor, True);
+			Create Icon(Filtered Array(All Players(Team 1), Distance Between(First Of(Global.objectivePositions), Position Of(
+				Current Array Element)) > Global.objectiveRad), First Of(Global.objectivePositions) + Vector(0, 1, 0), Arrow: Down, Visible To,
+				Global.objectiveColor, True);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 			"Bad Aura Ambiance"
-				Create Effect(Filtered Array(All Players(Team 1), Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element)) < Global.objectiveRad), Bad Aura, Global.objectiveColor, Update Every Frame(Eye Position(Local Player) + Facing Direction Of(Local Player) * 30), 50, Visible To Position and Radius);
+			Create Effect(Filtered Array(All Players(Team 1), Distance Between(First Of(Global.objectivePositions), Position Of(
+				Current Array Element)) < Global.objectiveRad), Bad Aura, Global.objectiveColor, Update Every Frame(Eye Position(Local Player)
+				+ Facing Direction Of(Local Player) * 30), 50, Visible To Position and Radius);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 			"Bad Aura Ambiance"
-				Create Effect(Filtered Array(All Players(Team 1), Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element)) < Global.objectiveRad), Bad Aura, Global.objectiveColor, Update Every Frame(Eye Position(Local Player) + Facing Direction Of(Local Player) * 31), 50, Visible To Position and Radius);
+			Create Effect(Filtered Array(All Players(Team 1), Distance Between(First Of(Global.objectivePositions), Position Of(
+				Current Array Element)) < Global.objectiveRad), Bad Aura, Global.objectiveColor, Update Every Frame(Eye Position(Local Player)
+				+ Facing Direction Of(Local Player) * 31), 50, Visible To Position and Radius);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 			"Bad Aura Ambiance"
-				Create Effect(Filtered Array(All Players(Team 1), Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element)) < Global.objectiveRad), Bad Aura, Global.objectiveColor, Update Every Frame(Eye Position(Local Player) + Facing Direction Of(Local Player) * 32), 50, Visible To Position and Radius);
+			Create Effect(Filtered Array(All Players(Team 1), Distance Between(First Of(Global.objectivePositions), Position Of(
+				Current Array Element)) < Global.objectiveRad), Bad Aura, Global.objectiveColor, Update Every Frame(Eye Position(Local Player)
+				+ Facing Direction Of(Local Player) * 32), 50, Visible To Position and Radius);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 			"Grave effects"
 			For Global Variable(objectiveEntityCount, 0, Global.survivorToRescue, 1);
 				"Grave ring"
-				Create Effect(Filtered Array(All Players(All Teams), Global.objectiveResourcePositions[Evaluate Once(
-					Global.objectiveEntityCount)]), Ring, Global.objectiveColor, Global.objectiveCaptureValue[Evaluate Once(
-					Global.objectiveEntityCount)], 1, Visible To Position and Radius);
+				Create Effect(Filtered Array(All Players(All Teams), Global.objectiveResourcePositions[Evaluate Once(Global.objectiveEntityCount)
+					]), Ring, Global.objectiveColor, Global.objectiveCaptureValue[Evaluate Once(Global.objectiveEntityCount)], 1,
+					Visible To Position and Radius);
 				Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 				"Grave cloud"
 				Create Effect(All Players(All Teams), Cloud, Global.objectiveColor, Global.objectiveCaptureValue[Evaluate Once(
 					Global.objectiveEntityCount)], 2, Visible To Position and Radius);
 				Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 				"Grave zombie icon"
-				Create Icon(Filtered Array(All Players(All Teams), Global.objectiveResourcePositions[Evaluate Once(
-					Global.objectiveEntityCount)]), Global.objectiveResourcePositions[Evaluate Once(
-					Global.objectiveEntityCount)], Skull, Visible To And Position, Global.objectiveColor, True);
+				Create Icon(Filtered Array(All Players(All Teams), Global.objectiveResourcePositions[Evaluate Once(Global.objectiveEntityCount)]),
+					Global.objectiveResourcePositions[Evaluate Once(Global.objectiveEntityCount)], Skull, Visible To and Position,
+					Global.objectiveColor, True);
 				Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 			End;
 		End;
@@ -3442,7 +3478,7 @@ rule("BOT BECOMES BOSS")
 		Set Invisible(Event Player, None);
 		If(Count Of(Global.availableBosses) == 0);
 			Global.availableBosses = Filtered Array(Global.botHeros, Global.botSpawnRates[Current Array Index] > 0);
-			If(Count of(Global.availableBosses) > Count Of(Global.nonBossZombies));
+			If(Count Of(Global.availableBosses) > Count Of(Global.nonBossZombies));
 				Modify Global Variable(availableBosses, Remove From Array By Value, Global.nonBossZombies);
 			End;
 		End;
@@ -4283,12 +4319,13 @@ rule("BOTS TELEPORT TO THE EGG")
 		Is Alive(Event Player) == True;
 		Entity Exists(First Of(Global.bosses)) == True;
 		Array Contains(Global.bosses, Event Player) != True;
-		Is True For Any(Global.playerTargetList, Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element)) < 40) == True;
+		Is True For Any(Global.playerTargetList, Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element))
+			< 40) == True;
 	}
 
 	actions
 	{
-		Wait(0.25, Abort When False);
+		Wait(0.250, Abort When False);
 		Event Player.successfullyTeleported = True;
 		Event Player.customTelePos = Vector(500, 500, 500);
 		Event Player.telePos = First Of(Global.objectivePositions);
@@ -4547,12 +4584,13 @@ rule("ZOMBIES SPAWN AT GRAVES")
 		Event Player.teleporting != True;
 		Event Player.successfullyTeleported != True;
 		Is Alive(Event Player) == True;
-		Is True For Any(Global.playerTargetList, Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element)) < Global.objectiveRad) == True;
+		Is True For Any(Global.playerTargetList, Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element))
+			< Global.objectiveRad) == True;
 	}
 
 	actions
 	{
-		Wait(0.25, Abort When False);
+		Wait(0.250, Abort When False);
 		Event Player.successfullyTeleported = True;
 		"Check if zombie is already assigned to a grave"
 		If(Array Contains(Global.objectiveResourcePositions, Event Player));
@@ -4562,12 +4600,13 @@ rule("ZOMBIES SPAWN AT GRAVES")
 			Modify Global Variable(objectiveResourcePositions, Append To Array, Event Player);
 			Event Player.telePos = Global.objectiveCaptureValue[Index Of Array Value(Global.objectiveResourcePositions, Event Player)];
 		Else;
-			Event Player.telePos = Random Value In Array(Array Slice(Global.objectiveCaptureValue, 0, Min(Global.survivorToRescue, Count Of(Global.objectiveCaptureValue))));
+			Event Player.telePos = Random Value In Array(Array Slice(Global.objectiveCaptureValue, 0, Min(Global.survivorToRescue, Count Of(
+				Global.objectiveCaptureValue))));
 		End;
 		Event Player.customTelePos = Vector(500, 500, 500);
 		Event Player.averagePlayersPos = Event Player.telePos;
 		"Move telePos under ground"
-		Event Player.telePos += Vector(0, -2.5, 0);
+		Event Player.telePos += Vector(0, -2.500, 0);
 		Play Effect(All Players(All Teams), Ring Explosion, Global.objectiveColor, Event Player.averagePlayersPos, 2);
 		Play Effect(All Players(All Teams), Bad Pickup Effect, Global.objectiveColor, Event Player.averagePlayersPos, 2);
 		Start Forcing Player Position(Event Player, Event Player.telePos, True);
@@ -9895,7 +9934,7 @@ rule("LASER BARRICADE BLOCKS ZOMBIES")
 			Event Player.botTarget = Event Player.potentialTargets[Event Player.enhancementCount1];
 			If(!Has Status(Event Player.botTarget, Rooted));
 				"Damage the barricade"
-				Event Player.enhancementChase1 -= Max Health(Event Player.botTarget) * 2.5;
+				Event Player.enhancementChase1 -= Max Health(Event Player.botTarget) * 2.500;
 				Set Status(Event Player.botTarget, Event Player, Rooted, 0.500);
 				Damage(Event Player.botTarget, Event Player, 10);
 			End;
@@ -10071,7 +10110,8 @@ rule("BORN TO BATTLE PLAYER USES ABILITY CHARGE")
 			Event Player.enhancementValues[2] = Button(Crouch);
 		End;
 		"Temp rein fix ability 2"
-		If((Hero Of(Event Player) == Hero(Reinhardt) || Hero Of(Event Player) == Hero(Zarya)) && Event Player.enhancementValues[2] == Button(Ability 2));
+		If((Hero Of(Event Player) == Hero(Reinhardt) || Hero Of(Event Player) == Hero(Zarya))
+			&& Event Player.enhancementValues[2] == Button(Ability 2));
 			Wait Until(Is Using Ability 2(Event Player), 0.016);
 			If(!Is Using Ability 2(Event Player));
 				Set Ability Charge(Event Player, Event Player.enhancementValues[2], 1);
