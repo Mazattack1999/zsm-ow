@@ -4308,7 +4308,7 @@ rule("BOT BECOMES ZOMBIE EGG")
 				Press Button(Event Player, Button(Ability 1));
 				Wait(0.250, Ignore Condition);
 			End;
-			Wait Until(Global.objectiveComplete || !Is Using Ability 1(Event Player), 99999);
+			Wait Until(Global.objectiveComplete || (!Is Using Ability 1(Event Player) && Is Alive(Event Player)), 99999);
 		End;
 	}
 }
