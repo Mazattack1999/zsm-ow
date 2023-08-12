@@ -89,7 +89,7 @@ settings
 		Flashpoint
 		{
 			Capture Speed Modifier: 10%
-			First Active Control Point: Random
+			First Active Control Point: A
 			Score To Win: 10
 			Scoring Speed Modifier: 10%
 		}
@@ -452,7 +452,7 @@ rule("Fix bot health")
 	}
 }
 
-disabled rule("interact test")
+rule("interact test")
 {
 	event
 	{
@@ -477,6 +477,11 @@ disabled rule("interact test")
 			Global.objectiveCaptureValue = 249;
 		Else;
 			Global.objectiveCaptureValue = 99;
+		End;
+		"Shows the closest 50 points to the player"
+		For Global Variable(count1, 0, 50, 1);
+			Play Effect(Host Player, Ring Explosion, Color(Purple), Sorted Array(Global.mapGrid, Distance Between(Current Array Element,
+				Position Of(Host Player)))[Global.count1], 5);
 		End;
 		If(Is Button Held(Host Player, Button(Primary Fire)));
 			All Players(Team 1).currentPowerUp = 5;
