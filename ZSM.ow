@@ -855,9 +855,9 @@ rule("VARIABLE ASSIGNMENT")
 		Global.votingEndTime = 30;
 		"Relative center of the map"
 		While(Global.walkCenter == Null);
+			Wait(1, Ignore Condition);
 			Global.walkCenter = (Nearest Walkable Position(Vector(999, 999, 999)) + Nearest Walkable Position(Vector(-999, -999, -999))) / 2;
 			Small Message(All Players(All Teams), Custom String("Loading..."));
-			Wait(1, Ignore Condition);
 		End;
 		If(Current Game Mode == Game Mode(Control));
 			Global.walkCenter = Objective Position(Objective Index);
@@ -959,16 +959,7 @@ rule("generateMapGrid")
 	{
 		Global.mapGrid = Empty Array;
 		While(Count Of(Global.mapGrid) < 900);
-			Global.testPos2 = Count Of(Global.mapGrid) > 5 ? Random Value In Array(Global.mapGrid) : Global.walkCenter;
-			Global.testPos = Nearest Walkable Position(Global.testPos2 + Direction From Angles(Random Real(0, 360), Random Real(-90, 90))
-				* Random Real(0, 50));
-			Global.testDirection = Direction From Angles(Horizontal Angle From Direction(Direction Towards(Global.testPos2, Global.testPos)),
-				0);
-			Global.testPosMaxDistance = Distance Between(Global.walkCenter, Vector(X Component Of(Global.testPos), Y Component Of(
-				Global.testPos2), Z Component Of(Global.testPos)));
-			Global.testPos = Nearest Walkable Position(Vector(X Component Of(Global.testPos2), Y Component Of(Global.testPos), Z Component Of(
-				Global.testPos2)) + Global.testDirection * Random Real(Distance Between(Global.testPos2, Nearest Walkable Position(
-				Global.testPos2)), Global.testPosMaxDistance));
+			Global.testPos = Nearest Walkable Position((Count Of(Global.mapGrid) > 5 ? Random Value In Array(Global.mapGrid) : Global.walkCenter) +  Direction From Angles(Random Real(0, 360), Random Real(-35, 35)) * Random Real(10, 100));
 			"Do not grid points inside spawn rooms on CTF maps"
 			If((Current Game Mode != Game Mode(Capture the Flag) && Current Game Mode != Game Mode(Push) && Current Game Mode != Game Mode(
 				Control) && Current Game Mode!= Game Mode(Flashpoint)) || (Is True For All(Spawn Points(Team 2), Distance Between(Position Of(Current Array Element), Global.testPos) > 50)
@@ -983,6 +974,7 @@ rule("generateMapGrid")
 			End;
 			Wait(0.016, Ignore Condition);
 		End;
+		Small Message(Host Player, Custom String("Map Grid Count: {0}", Count Of(Global.mapGrid)));
 		"0: Consecutive, 1: Minimum"
 		Global.objectiveSpacing = Array(Min(60, Count Of(Global.mapGrid) / 11), Min(30, Count Of(Global.mapGrid) / 20));
 	}
