@@ -4603,6 +4603,7 @@ rule("ZOMBIES SPAWN AT GRAVES")
 	{
 		Wait(0.250, Abort When False);
 		Event Player.successfullyTeleported = True;
+		Event Player.canTeleport = False;
 		"Check if zombie is already assigned to a grave"
 		If(Array Contains(Global.objectiveResourcePositions, Event Player));
 			Event Player.telePos = Global.objectiveCaptureValue[Index Of Array Value(Global.objectiveResourcePositions, Event Player)];
@@ -4624,6 +4625,7 @@ rule("ZOMBIES SPAWN AT GRAVES")
 		Chase Player Variable Over Time(Event Player, telePos, Event Player.averagePlayersPos, 1, None);
 		Wait Until(Is Dead(Event Player), 1);
 		Stop Forcing Player Position(Event Player);
+		Event Player.canTeleport = True;
 	}
 }
 
