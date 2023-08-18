@@ -1393,7 +1393,7 @@ rule("GLOBAL MENU INITIALIZATION")
 				Global.startCamPos = Global.startPos + Vector(0, 1.500, 0) + Direction From Angles(Horizontal Angle From Direction(
 					Direction Towards(Global.startPos, Global.startCamPos)), 0) * Global.startCamDistance;
 				"Line of Sight Checks for each player position"
-				For Global Variable(count1, -20, 21, 40 / (Number Of Slots(Team 1) - 1));
+				For Global Variable(count1, -20, 21, 2);
 					If(!Is In Line of Sight(Global.startCamPos, Global.startCamPos + Vector(0, -0.750, 0) + Direction From Angles(
 						Horizontal Angle From Direction(Direction Towards(Global.startCamPos, Global.startPos)) + Global.count1, 0)
 						* Global.startCamDistance, Barriers Do Not Block LOS) || !Is In Line of Sight(Global.startCamPos + Vector(0, -0.750, 0)
