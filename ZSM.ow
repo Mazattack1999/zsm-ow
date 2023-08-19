@@ -1035,7 +1035,7 @@ rule("setZombieMode")
 		"All Zombies"
 		If(Global.zombieSetting == 1);
 			"Bot respawn probablities"
-			Global.botSpawnRates = Array(57, 10, 5, 3, 2, 4, 3, 2, 3, 1, 2, 1, 2, 2, 3);
+			Global.botSpawnRates = Array(50, 5, 8, 3, 2, 8, 3, 2, 3, 1, 7, 1, 2, 2, 3);
 		"Classic"
 		Else If(Global.zombieSetting == 2);
 			"Bot respawn probablities"
