@@ -2356,7 +2356,7 @@ rule("EFFECTS/TEXTS")
 		Create HUD Text(Filtered Array(All Players(All Teams), (Count Of(Global.healthpackPositions) == 0 || Health(Current Array Element)
 			< ((Round To Integer(Current Array Element.infectionLvl, Down) ^ 4) / 16) * 20)
 			&& Current Array Element.infected && Match Time > Global.matchEndTime), Custom String("{0} Find a healthpack {0}", Icon String(
-			Plus)), Null, Null, Right, 0, Round To Integer(Total Time Elapsed * 2, Up) % 2 == 0 ? (Health(Local Player) < ((Round To Integer(Current Array Element.infectionLvl, Down) ^ 4) / 16) * 10 ? Color(Red) : Color(Lime Green)) : Color(White), Color(White), Color(White),
+			Plus)), Null, Null, Right, 0, Round To Integer(Total Time Elapsed * 2, Up) % 2 == 0 ? (Health(Local Player) < ((Round To Integer(Local Player.infectionLvl, Down) ^ 4) / 16) * 10 ? Color(Red) : Color(Lime Green)) : Color(White), Color(White), Color(White),
 			Visible To and Color, Default Visibility);
 		"Nearest Healthpack Distance"
 		Create In-World Text(Filtered Array(All Players(Team 1), Count Of(Global.healthpackPositions)
