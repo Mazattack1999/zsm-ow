@@ -900,7 +900,7 @@ rule("VARIABLE ASSIGNMENT")
 		Call Subroutine(enableMutations);
 		Global.numberOfPowerUpsPerSupplyDrop = Workshop Setting Integer(Custom String("Power Ups"), Custom String(
 			"Number of Powerups Per Supply Drop"), 5, 1, 10, -1);
-		Global.uniqueSkinCap = Workshop Setting Integer(Custom String("General"), Custom String("Maximum Number of Unique Hero Skins"), 10,
+		Global.uniqueSkinCap = Workshop Setting Integer(Custom String("General"), Custom String("Maximum Number of Unique Hero Skins"), 11,
 			1, 11, 0);
 		Global.objectiveComplete = False;
 		Global.numberOfBots = Workshop Setting Integer(Custom String("General"), Custom String("Number of zombies"), 6, 1, 23, 1);
@@ -2354,10 +2354,9 @@ rule("EFFECTS/TEXTS")
 			Custom Color(215, 215, 215, 255), Visible To and String, Default Visibility);
 		"Infected Hud"
 		Create HUD Text(Filtered Array(All Players(All Teams), (Count Of(Global.healthpackPositions) == 0 || Health(Current Array Element)
-			< Round To Integer(Current Array Element.infectionLvl, Down) ^ 2 * 20)
+			< ((Round To Integer(Current Array Element.infectionLvl, Down) ^ 4) / 16) * 20)
 			&& Current Array Element.infected && Match Time > Global.matchEndTime), Custom String("{0} Find a healthpack {0}", Icon String(
-			Plus)), Null, Null, Right, 0, Round To Integer(Total Time Elapsed * 2, Up) % 2 == 0 ? (Health(Local Player) < Round To Integer(
-			Local Player.infectionLvl, Down) ^ 2 * 10 ? Color(Red) : Color(Lime Green)) : Color(White), Color(White), Color(White),
+			Plus)), Null, Null, Right, 0, Round To Integer(Total Time Elapsed * 2, Up) % 2 == 0 ? (Health(Local Player) < ((Round To Integer(Current Array Element.infectionLvl, Down) ^ 4) / 16) * 10 ? Color(Red) : Color(Lime Green)) : Color(White), Color(White), Color(White),
 			Visible To and Color, Default Visibility);
 		"Nearest Healthpack Distance"
 		Create In-World Text(Filtered Array(All Players(Team 1), Count Of(Global.healthpackPositions)
@@ -5051,7 +5050,7 @@ rule("PLAYER INFECTION DAMAGE MANAGEMENT")
 		If(Event Player.infectionLvl < 1);
 			Event Player.infected = False;
 		End;
-		Start Damage Over Time(Event Player, Null, 1, Round To Integer(Event Player.infectionLvl, Down) ^ 2);
+		Start Damage Over Time(Event Player, Null, 1, (Round To Integer(Event Player.infectionLvl, Down) ^ 4) / 16);
 		Wait(1, Ignore Condition);
 		Loop If Condition Is True;
 	}
