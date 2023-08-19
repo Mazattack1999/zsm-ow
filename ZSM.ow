@@ -1139,7 +1139,7 @@ rule("setDifficulty")
 		If(Global.difficultySetting == 1);
 			Global.startTime = 600;
 			"Bot Health Values"
-			Global.botHealthValues = Array(213, 130, 75, 750, 1250, 100, 110, 500, 125, 450, 100, 800, 200, 250, 100);
+			Global.botHealthValues = Array(213, 130, 75, 750, 1250, 100, 110, 500, 125, 450, 100, 400, 200, 250, 100);
 			"Bot bite damage"
 			Global.biteDamages = Array(5, 2.500, 2, 20, 0, 5, 2, 7.500, 5, 10, 10, 5, 30, 0, 3);
 			"Bot bite durations"
@@ -1153,7 +1153,7 @@ rule("setDifficulty")
 		Else If(Global.difficultySetting == 2);
 			Global.startTime = 600;
 			"Bot Health Values"
-			Global.botHealthValues = Array(225, 170, 125, 900, 2000, 140, 140, 700, 160, 650, 135, 1200, 275, 400, 150);
+			Global.botHealthValues = Array(225, 170, 125, 900, 2000, 140, 140, 700, 160, 650, 135, 600, 275, 400, 150);
 			"Bot bite damage"
 			Global.biteDamages = Array(5, 2.500, 2, 20, 0, 5, 2, 7.500, 5, 10, 10, 5, 30, 0, 3);
 			"Bot bite durations"
@@ -1166,7 +1166,7 @@ rule("setDifficulty")
 		Else If(Global.difficultySetting == 3);
 			Global.startTime = 450;
 			"Bot Health Values"
-			Global.botHealthValues = Array(225, 170, 125, 900, 2000, 140, 140, 700, 160, 650, 135, 1200, 275, 400, 150);
+			Global.botHealthValues = Array(225, 170, 125, 900, 2000, 140, 140, 700, 160, 650, 135, 600, 275, 400, 150);
 			"Bot bite damage"
 			Global.biteDamages = Array(25, 15, 20, 65, 0, 20, 17.500, 20, 30, 20, 40, 12.500, 60, 0, 10);
 			"Bot bite durations"
@@ -1179,7 +1179,7 @@ rule("setDifficulty")
 		Else If(Global.difficultySetting == 4);
 			Global.startTime = 450;
 			"Bot Health Values"
-			Global.botHealthValues = Array(300, 200, 125, 900, 2000, 160, 150, 800, 200, 750, 175, 1200, 300, 400, 200);
+			Global.botHealthValues = Array(300, 200, 125, 900, 2000, 160, 150, 800, 200, 750, 175, 600, 300, 400, 200);
 			"Bot bite damage"
 			Global.biteDamages = Array(35, 22, 25, 75, 0, 25, 20, 25, 35, 25, 90, 31, 70, 0, 20);
 			"Bot bite durations"
@@ -1192,7 +1192,7 @@ rule("setDifficulty")
 		Else If(Global.difficultySetting == 5);
 			Global.startTime = 300;
 			"Bot Health Values"
-			Global.botHealthValues = Array(300, 250, 200, 1200, 2500, 200, 250, 1000, 250, 900, 200, 1800, 350, 600, 275);
+			Global.botHealthValues = Array(300, 250, 200, 1200, 2500, 200, 250, 1000, 250, 900, 200, 800, 350, 600, 275);
 			"Bot bite damage"
 			Global.biteDamages = Array(35, 30, 35, 85, 0, 30, 35, 35, 45, 40, 110, 60, 80, 0, 35);
 			"Bot bite durations"
@@ -6029,11 +6029,11 @@ rule("teleportBots")
 						Event Player.averagePlayersPos) < Global.botMaxTeleportRange[1]);
 					"Filter out spawn points on cooldown"
 					Event Player.filteredBotSpawnPointGrid = Filtered Array(Event Player.filteredBotSpawnPointGrid,
-						Global.botSpawnPointTimers[Index Of Array Value(Global.botSpawnPoints, Current Array Element)] < 60);
+						Global.botSpawnPointTimers[Index Of Array Value(Global.botSpawnPoints, Current Array Element)] < 15);
 					"Bots utilize saved spawn points"
 					If(Count Of(Global.botSpawnPoints) > 0 && Count Of(Event Player.filteredBotSpawnPointGrid) > 0);
 						Event Player.telePos = Random Value In Array(Event Player.filteredBotSpawnPointGrid);
-						Global.botSpawnPointTimers[Index Of Array Value(Global.botSpawnPoints, Event Player.telePos)] += 10;
+						Global.botSpawnPointTimers[Index Of Array Value(Global.botSpawnPoints, Event Player.telePos)] += 5;
 						Break;
 					Else;
 						Event Player.telePos = Nearest Walkable Position(Event Player.averagePlayersPos + Direction From Angles(Random Real(0, 360),
@@ -8067,7 +8067,7 @@ rule("HOPPER DEMECH INITIALIZATION")
 		Set Move Speed(Event Player, 100 * Event Player.movementSpeed);
 		Disable Movement Collision With Players(Event Player);
 		Event Player.playerCollisionEnabled = False;
-		Event Player.health /= 10;
+		Event Player.health /= 4;
 		Event Player.size /= 1.250;
 		Start Scaling Player(Event Player, Event Player.size, False);
 		Apply Impulse(Event Player, Vector(0, 1, 0), 15, To Player, Cancel Contrary Motion);
@@ -8384,7 +8384,7 @@ rule("ILLUISONIST (SOMBRA) ACTIVATES INVISIBILITY ILLUSION")
 		Event Player.botSpecialPotentialTargets.blinded = False;
 		Event Player.botSpecialPotentialTargets.updateOutlines = True;
 		Event Player.botTempValue = False;
-		Set Ability Cooldown(Event Player, Button(Ability 1), 2);
+		Set Ability Cooldown(Event Player, Button(Ability 1), 5);
 	}
 }
 
