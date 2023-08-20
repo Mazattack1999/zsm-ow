@@ -5598,9 +5598,9 @@ rule("BOT TARGET VISIBLE")
 		Global.specialGameModeSetup != True;
 		Event Player.teleporting != True;
 		Event Player.initializing != True;
-		Event Player.botTarget == Null;
 		Is Alive(Event Player) == True;
 		Has Spawned(Event Player) == True;
+		(Event Player.botTarget == Null || Is True For Any(Remove From Array(Global.playerTargetList, Event Player.botTarget), !Current Array Element.invisible && Distance Between(Position Of(Current Array Element), Position Of(Event Player)) < 7.5)) == True;
 		Is True For Any(Global.playerTargetList, !Current Array Element.invisible && Distance Between(Position Of(Event Player),
 			Position Of(Current Array Element)) < 150 && Is In Line of Sight(Eye Position(Current Array Element), Position Of(Event Player)
 			+ Vector(0, Global.losHeightCheck, 0), Barriers Do Not Block LOS)) == True;
@@ -5612,30 +5612,6 @@ rule("BOT TARGET VISIBLE")
 		Start Rule(selectTarget, Restart Rule);
 		Wait(1, Ignore Condition);
 		Loop If Condition Is True;
-	}
-}
-
-rule("BOT TAKES DAMAGE AND SWITCHES TARGETS")
-{
-	event
-	{
-		Player Took Damage;
-		Team 2;
-		All;
-	}
-
-	conditions
-	{
-		Event Player.botTarget != Null;
-		Attacker != Event Player.botTarget;
-		Is Alive(Event Player) == True;
-		Team Of(Attacker) != Team Of(Victim);
-	}
-
-	actions
-	{
-		Start Rule(selectTarget, Do Nothing);
-		Wait(2, Ignore Condition);
 	}
 }
 
