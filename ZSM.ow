@@ -9988,7 +9988,7 @@ rule("PYROTECHNIC SETS ENEMIES ON FIRE")
 		Attacker.enhancementValues[1] == True;
 		Victim != Event Player;
 		Event Ability != Null;
-		Distance Between(Position Of(Attacker), Position Of(Victim)) < 15;
+		Distance Between(Position Of(Attacker), Position Of(Victim)) < 10;
 	}
 
 	actions
@@ -10020,8 +10020,8 @@ rule("PYROTECHNIC APPLIES DAMAGE")
 			Event Player.enhancementValues[3] = First Of(Event Player.enhancementChase2);
 			If(Is Alive(Event Player.enhancementValues[3]));
 				"Amount of times zombie was hit in last cycle"
-				Event Player.enhancementValues[4] = Min(3 * Count Of(Filtered Array(Event Player.enhancementChase2,
-					Current Array Element == Event Player.enhancementValues[3])), 25);
+				Event Player.enhancementValues[4] = Min(4 * Count Of(Filtered Array(Event Player.enhancementChase2,
+					Current Array Element == Event Player.enhancementValues[3])), 30);
 				If(Array Contains(Global.bosses, Event Player.enhancementValues[3]));
 					Event Player.enhancementValues[4] /= 2;
 				End;
