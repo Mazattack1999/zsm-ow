@@ -687,7 +687,7 @@ rule("SKIP ASSEMBLING HEROES")
 			Wait(0.250, Ignore Condition);
 		End;
 		Set Match Time(3599);
-		Wait Until(Count Of(Filtered Array(All Players(Team 1), Has Spawned(Current Array Element))) > 0 && Global.walkCenter != Null,
+		Wait Until(Count Of(Filtered Array(All Players(Team 1), Has Spawned(Current Array Element))) > 0 && Count Of(Global.mapGrid) > 0,
 			9999);
 		Set Match Time(60);
 		Wait(0.016, Ignore Condition);
@@ -1352,7 +1352,7 @@ rule("GLOBAL MENU INITIALIZATION")
 	conditions
 	{
 		Global.specialGameModeSetup == True;
-		Global.walkCenter != Null;
+		Count Of(Global.mapGrid) > 0;
 	}
 
 	actions
