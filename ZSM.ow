@@ -8908,7 +8908,6 @@ rule("airStrike (30-39)")
 
 	actions
 	{
-		Event Player.randVal = Random Integer(1, 100);
 		Wait(0.016, Ignore Condition);
 		If(Event Player.randVal <= 99);
 			Small Message(All Players(All Teams), Custom String("{0} {1}: \"{2}\"", Event Player, Hero Icon String(Hero Of(Event Player)),
@@ -8921,41 +8920,34 @@ rule("airStrike (30-39)")
 		"Air Strike Location"
 		Event Player.powerUpUsePositionsAndInfo[30] = Ray Cast Hit Position(Eye Position(Event Player), Eye Position(Event Player)
 			+ Facing Direction Of(Event Player) * 40, Null, All Players(All Teams), False);
+		Event Player.pAirStrikeCount = 0;
 		If(Event Player.powerUpEffects[30] == 0);
 			Create Effect(All Players(All Teams), Ring, Color(Red), Event Player.powerUpUsePositionsAndInfo[30], 10,
 				Visible To Position and Radius);
 			Event Player.powerUpEffects[30] = Last Created Entity;
-			Create Effect(All Players(All Teams), Smoke Sound, Color(Orange), Event Player.chase1, 200, Visible To Position and Radius);
-			Event Player.powerUpEffects[31] = Last Created Entity;
 			Create Effect(All Players(All Teams), Cloud, Color(Red), Event Player.powerUpUsePositionsAndInfo[30], 0.500,
 				Visible To Position and Radius);
-			Event Player.powerUpEffects[32] = Last Created Entity;
+			Event Player.powerUpEffects[31] = Last Created Entity;
 		End;
-		"Number of rockets"
-		For Player Variable(Event Player, pAirStrikeCount, 0, 3, 1);
-			Event Player.chase1 = Event Player.powerUpUsePositionsAndInfo[30] + Direction From Angles(Horizontal Angle From Direction(
-				Direction Towards(Event Player.powerUpUsePositionsAndInfo[30], Position Of(Event Player))) + Random Real(-40, 40), Random Real(
-				-50, -75)) * 100;
-			Chase Player Variable At Rate(Event Player, chase1, Event Player.powerUpUsePositionsAndInfo[30], 60, None);
-			While(Distance Between(Event Player.powerUpUsePositionsAndInfo[30], Event Player.chase1) > 0.100);
-				Play Effect(All Players(All Teams), Good Explosion, Color(Orange), Event Player.chase1, 1);
-				Wait(0.016, Ignore Condition);
-			End;
-			Play Effect(All Players(All Teams), Bad Explosion, Color(Orange), Event Player.powerUpUsePositionsAndInfo[30], 10);
-			Play Effect(All Players(All Teams), Ring Explosion Sound, Color(Orange), Event Player.powerUpUsePositionsAndInfo[30], 150);
-			Play Effect(All Players(All Teams), Explosion Sound, Color(Orange), Event Player.powerUpUsePositionsAndInfo[30], 150);
-			Event Player.powerUpUsePositionsAndInfo[31] = Filtered Array(All Players(Team 2), Distance Between(Position Of(
-				Current Array Element), Event Player.chase1) < 10);
-			Damage(Event Player.powerUpUsePositionsAndInfo[31], Event Player, 300);
-			Start Damage Over Time(Event Player.powerUpUsePositionsAndInfo[31], Event Player, 3, 40);
-			Event Player.powerUpUsePositionsAndInfo[31].reviveTimer = 10;
-			Set Status(Event Player.powerUpUsePositionsAndInfo[31], Event Player, Burning, 3);
-			Stop Chasing Player Variable(Event Player, chase1);
-			Wait(0.016, Ignore Condition);
+		Wait(2, Ignore Condition);
+		"Count up to max radius. Number of explosions = Max radius / step size"
+		For Player Variable(Event Player, pAirStrikeCount, 0, 50, 1);
+			"Random position in ring"
+			Event Player.powerUpUsePositionsAndInfo[31] = Event Player.powerUpUsePositionsAndInfo[30] + Vector(0, 5, 0) + (Direction From Angles(Random Real(0, 360), 0) * Random Real(0, 10));
+			"Ray Cast downwards"
+			Event Player.powerUpUsePositionsAndInfo[31] = Ray Cast Hit Position(Event Player.powerUpUsePositionsAndInfo[31], Event Player.powerUpUsePositionsAndInfo[31] + Vector(0, -25, 0), Null, All Players(All Teams), False);
+			Play Effect(All Players(All Teams), Bad Pickup Effect, Color(Orange), Event Player.powerUpUsePositionsAndInfo[31], 2.5);
+			Play Effect(All Players(All Teams), Ring Explosion, Color(Orange), Event Player.powerUpUsePositionsAndInfo[31], 5);
+			Play Effect(All Players(All Teams), Ring Explosion Sound, Color(Orange), Event Player.powerUpUsePositionsAndInfo[31], 100);
+			Play Effect(All Players(All Teams), Explosion Sound, Color(Orange), Event Player.powerUpUsePositionsAndInfo[31], 100);
+			Event Player.powerUpUsePositionsAndInfo[32] = Filtered Array(All Players(Team 2), Distance Between(Position Of(
+				Current Array Element), Event Player.powerUpUsePositionsAndInfo[31]) < 5);
+			Damage(Event Player.powerUpUsePositionsAndInfo[32], Event Player, 150);
+			Event Player.powerUpUsePositionsAndInfo[32].reviveTimer = 10;
+			Wait(0.125, Ignore Condition);
 		End;
 		Destroy Effect(Event Player.powerUpEffects[30]);
 		Destroy Effect(Event Player.powerUpEffects[31]);
-		Destroy Effect(Event Player.powerUpEffects[32]);
 		Event Player.powerUpEffects[30] = 0;
 	}
 }
