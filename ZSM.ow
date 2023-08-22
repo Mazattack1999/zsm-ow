@@ -4092,15 +4092,14 @@ rule("PLAYER SAYS GROUP UP TO SURVIVOR")
 	{
 		Global.objectiveTypes[0] == 5;
 		Global.survivorToRescue.botFollowTarget != Null;
-		Is True For Any(Global.survivorToRescue.potentialTargets, Is Communicating(Current Array Element, Group Up)) == True;
+		Is True For Any(Global.survivorToRescue.potentialTargets, Is Communicating(Current Array Element, Group Up) && Distance Between(Position Of(Current Array Element), Position Of(Global.survivorToRescue)) < 12) == True;
 	}
 
 	actions
 	{
 		Wait(1, Abort When False);
 		Global.survivorToRescue.botFollowTarget = First Of(Sorted Array(Filtered Array(Global.survivorToRescue.potentialTargets,
-			Is Communicating(Current Array Element, Group Up)), Distance Between(Position Of(Current Array Element), Last Of(
-			Global.survivorToRescue.path))));
+			Is Communicating(Current Array Element, Group Up) && Distance Between(Position Of(Current Array Element), Position Of(Global.survivorToRescue)) < 12), Distance Between(Position Of(Current Array Element), Position Of(Global.survivorToRescue))));
 		Global.survivorToRescue.path = Empty Array;
 		Communicate(Global.survivorToRescue, On My Way);
 		Wait(3, Ignore Condition);
@@ -4205,7 +4204,7 @@ rule("MODIFY KILL ZONE SCORE")
 			End;
 		End;
 		"Adjust Kill Zone Positions"
-		Global.objectiveChase1 += 0.250 * Direction Towards(Global.objectiveChase1, Position Of(Victim));
+		Global.objectiveChase1 += 0.5 * Direction Towards(Global.objectiveChase1, Position Of(Victim));
 	}
 }
 
