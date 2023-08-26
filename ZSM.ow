@@ -975,7 +975,7 @@ rule("generateMapGrid")
 			Wait(0.016, Ignore Condition);
 		End;
 		"0: Consecutive, 1: Minimum"
-		Global.objectiveSpacing = Array(Min(60, Count Of(Global.mapGrid) / 11), Min(30, Count Of(Global.mapGrid) / 20));
+		Global.objectiveSpacing = Array(75, 40);
 	}
 }
 
