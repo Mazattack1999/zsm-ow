@@ -4540,7 +4540,7 @@ rule("fireSatellite")
 			"Damage Zombies"
 			Damage(Filtered Array(All Players(Team 2), Distance Between(Position Of(Current Array Element), Global.testPos2) < 5), Null, 500);
 			"Damage Players"
-			Damage(Filtered Array(All Players(Team 1), Distance Between(Position Of(Current Array Element), Global.testPos2) < 5), Null, 70);
+			Damage(Filtered Array(All Players(Team 1), Distance Between(Position Of(Current Array Element), Global.testPos2) < 3), Null, 100);
 			If(Global.objectiveCount1 > 5);
 				"Give all bots quick respawn time"
 				All Players(Team 2).reviveTimer = 1;
