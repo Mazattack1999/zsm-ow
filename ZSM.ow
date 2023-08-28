@@ -10120,8 +10120,8 @@ rule("PLAGUE DOCTOR REDUCES PLAYERS' INFECTION LEVELS")
 
 	actions
 	{
-		Healee.infectionLvl -= Event Healing / 500;
-		Event Player.enhancementValues[1] += Event Healing / 500;
+		Healee.infectionLvl -= Event Healing / 300;
+		Event Player.enhancementValues[1] += Event Healing / 300;
 		If(Healee.infectionLvl < 1);
 			Healee.infectionLvl -= 0.500;
 			Event Player.enhancementValues[1] += 0.500;
