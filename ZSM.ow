@@ -2950,12 +2950,12 @@ rule("globalObjectiveEntityManagement")
 			"Objective distance"
 			Create In-World Text(Filtered Array(All Players(All Teams), Distance Between(Position Of(Current Array Element),
 				Global.objectiveChase1) > Global.objectiveRad), Custom String("Distance: {0}m", Distance Between(Position Of(Local Player),
-				Global.objectiveChase1) - Global.objectiveRad), Global.objectiveChase1, 1, Do Not Clip, Visible To and String, Color(Red),
+				Global.objectiveChase1) - Global.objectiveRad), Global.objectiveChase1, 1, Do Not Clip, Visible To Position and String, Color(Red),
 				Visible Never);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Text ID);
 			"Objective icon"
 			Create Icon(Filtered Array(All Players(All Teams), Distance Between(Position Of(Current Array Element), Global.objectiveChase1)
-				> Global.objectiveRad), Global.objectiveChase1 + Vector(0, 1, 0), Arrow: Down, Visible To, Color(Red), True);
+				> Global.objectiveRad), Global.objectiveChase1 + Vector(0, 1, 0), Arrow: Down, Visible To And Position, Color(Red), True);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 			"Kill Zone Sphere"
 			Create Effect(Filtered Array(All Players(All Teams), Distance Between(Position Of(Current Array Element), Global.objectiveChase1)
