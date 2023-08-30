@@ -1392,7 +1392,7 @@ rule("GLOBAL MENU INITIALIZATION")
 				Global.startCamPos = Global.startPos + Vector(0, 1.500, 0) + Direction From Angles(Horizontal Angle From Direction(
 					Direction Towards(Global.startPos, Global.startCamPos)), 0) * Global.startCamDistance;
 				"Line of Sight Checks for each player position"
-				For Global Variable(count1, -20, 21, 2);
+				For Global Variable(count1, -26, 27, 2);
 					If(!Is In Line of Sight(Global.startCamPos, Global.startCamPos + Vector(0, -0.750, 0) + Direction From Angles(
 						Horizontal Angle From Direction(Direction Towards(Global.startCamPos, Global.startPos)) + Global.count1, 0)
 						* Global.startCamDistance, Barriers Do Not Block LOS) || !Is In Line of Sight(Global.startCamPos + Vector(0, -0.750, 0)
@@ -4693,7 +4693,9 @@ rule("PLAYER INITIALIZATION")
 		Event Player.infectionLvl = 0;
 		Call Subroutine(enableDisableAbilities);
 		Event Player.size = 1;
+		"Player joins midgame"
 		If(First Of(Event Player.playerMenuStatus) == 0);
+			"Player joins game fo the first time"
 			If(!Array Contains(Global.users, Custom String("{0}", Event Player)));
 				Call Subroutine(updateUsers);
 				Teleport(Event Player, Nearest Walkable Position(Position Of(First Of(Sorted Array(Remove From Array(Global.playerTargetList,
@@ -4701,18 +4703,21 @@ rule("PLAYER INITIALIZATION")
 				Set Status(Event Player, Null, Invincible, 10);
 				Small Message(Event Player, Custom String("Help your teammates with completing objectives"));
 				Event Player.playerActiveStatus = True;
+			"Player rejoins game after having left"
 			Else;
 				"Index of user in user array"
 				Event Player.userIndex = Index Of Array Value(Global.users, Custom String("{0}", Event Player));
 				Event Player.deathTimer = Global.globalPlayerStats[Event Player.userIndex][1];
 				Event Player.reviveTimer = Global.globalPlayerStats[Event Player.userIndex][2];
 				Event Player.reviveStartTime = Global.globalPlayerStats[Event Player.userIndex][3];
+				"Player was alive when they left"
 				If(First Of(Global.globalPlayerStats[Event Player.userIndex]) == 0);
 					Teleport(Event Player, Nearest Walkable Position(Position Of(First Of(Sorted Array(Remove From Array(Global.playerTargetList,
 						Event Player), Distance Between(Position Of(Current Array Element), First Of(Global.objectivePositions)))))));
 					Set Status(Event Player, Null, Phased Out, 10);
 					Small Message(Event Player, Custom String("Help your teammates with completing objectives"));
 					Event Player.playerActiveStatus = True;
+				"Player was downed when they left"
 				Else If(First Of(Global.globalPlayerStats[Event Player.userIndex]) == 1);
 					Teleport(Event Player, Global.globalPlayerStats[Event Player.userIndex][4]);
 					While(Is Alive(Event Player));
@@ -4723,6 +4728,7 @@ rule("PLAYER INITIALIZATION")
 					Big Message(Event Player, Custom String("You are downed"));
 					Wait(0.500, Ignore Condition);
 					Small Message(Event Player, Custom String("Wait for a teammate to revive you"));
+				"Player was dead when they left"
 				Else If(First Of(Global.globalPlayerStats[Event Player.userIndex]) == 2);
 					Event Player.playerActiveStatus = False;
 					Teleport(Event Player, Global.globalPlayerStats[Event Player.userIndex][4]);
@@ -4732,6 +4738,7 @@ rule("PLAYER INITIALIZATION")
 					Set Invisible(Event Player, All);
 				End;
 			End;
+		"Player joined on start screen"
 		Else;
 			Wait Until(Count Of(Global.objectivePositions) >= 1, 5);
 			If(Global.specialGameMode);
