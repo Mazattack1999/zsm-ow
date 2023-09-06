@@ -269,7 +269,7 @@ variables
 		88: objectiveCount1
 		89: objectiveChase1
 		90: spawnRoomIndex
-		91: averageDifficulty
+		91: averageVote
 		92: matchEndTime
 		93: waypoints
 		94: availableBosses
@@ -996,19 +996,25 @@ rule("determineZombieMode")
 				Global.zombieVotes[Global.count1] = -1;
 			End;
 		End;
+		Global.averageVote = 0;
+		For Global Variable(count1, 1, Count Of(Global.zombieVotes), 1);
+			Global.averageVote += Global.zombieVotes[Global.count1] * Global.count1;
+		End;
+		Global.averageVote /= Count Of(Filtered Array(All Players(Team 1), Current Array Element.playerMenuStatus[2] > 0));
 		For Global Variable(count1, 1, Count Of(Global.zombieVotes), 1);
 			If(Global.zombieVotes[Global.zombieSetting] < Global.zombieVotes[Global.count1]);
 				Global.zombieSetting = Global.count1;
-			Else If(Global.zombieVotes[Global.zombieSetting] == Global.zombieVotes[Global.count1]);
-				"Randomly pick mode to break tie"
-				If(Global.zombieSetting != 0 && Random Integer(0, 1) == 0);
+			Else If(
+					Global.zombieVotes[Global.count1] > 0 && Global.zombieVotes[Global.zombieSetting] == Global.zombieVotes[Global.count1]);
+				"Pick Zombie mode closest to the average zombie vote"
+				If(Absolute Value(Global.zombieSetting - Global.averageVote) > Absolute Value(Global.count1 - Global.averageVote));
 					Global.zombieSetting = Global.count1;
 				End;
 			End;
 		End;
-		"If all players choose no preference, randomize"
+		"If all players choose no preference set zombie mode to default"
 		If(Global.zombieSetting == 0);
-			Global.zombieSetting = 1;
+			Global.zombieSetting = 2;
 		End;
 		Start Rule(determineDifficulty, Restart Rule);
 		Start Rule(setZombieMode, Restart Rule);
@@ -1070,11 +1076,11 @@ rule("determineDifficulty")
 				Global.difficultyVotes[Global.count1] = -1;
 			End;
 		End;
-		Global.averageDifficulty = 0;
+		Global.averageVote = 0;
 		For Global Variable(count1, 1, Count Of(Global.difficultyVotes), 1);
-			Global.averageDifficulty += Global.difficultyVotes[Global.count1] * Global.count1;
+			Global.averageVote += Global.difficultyVotes[Global.count1] * Global.count1;
 		End;
-		Global.averageDifficulty /= Count Of(Filtered Array(All Players(Team 1), Current Array Element.playerMenuStatus[2] > 0));
+		Global.averageVote /= Count Of(Filtered Array(All Players(Team 1), Current Array Element.playerMenuStatus[2] > 0));
 		For Global Variable(count1, 1, Count Of(Global.difficultyVotes), 1);
 			"If difficulty being compared has more votes than current difficulty"
 			If(Global.difficultyVotes[Global.difficultySetting] < Global.difficultyVotes[Global.count1]);
@@ -1082,7 +1088,7 @@ rule("determineDifficulty")
 			Else If(
 					Global.difficultyVotes[Global.count1] > 0 && Global.difficultyVotes[Global.difficultySetting] == Global.difficultyVotes[Global.count1]);
 				"Pick difficulty closest to the average difficulty vote"
-				If(Absolute Value(Global.difficultySetting - Global.averageDifficulty) > Absolute Value(Global.count1 - Global.averageDifficulty));
+				If(Absolute Value(Global.difficultySetting - Global.averageVote) > Absolute Value(Global.count1 - Global.averageVote));
 					Global.difficultySetting = Global.count1;
 				End;
 			End;
@@ -1484,28 +1490,28 @@ rule("EFFECTS/TEXTS")
 			1, Color(Aqua), Color(Aqua), Color(Aqua), Visible To and String, Default Visibility);
 		"Vote zombie mode text: Wave 1"
 		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[3] == 1), Custom String(
-			"Wave 1 - The Beginning"), Custom String("Early Days of the outbreak. Squishy zombies spawn."), Global.voting ? Custom String(
+			"Wave 1 - The Beginning"), Custom String("Years after the outbreak begins, zombies start developing strange abilities."), Global.voting ? Custom String(
 			"Change Vote (Press [{0}])", Input Binding String(Button(Ability 1))) : Custom String(""), Left, 1, Color(Green), Color(
-			Green), Color(Green), Visible To and String, Default Visibility);
+			White), Color(Green), Visible To and String, Default Visibility);
 		"Vote game type text: Wave 2"
 		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[3] == 2), Custom String(
-			"Wave 2 - Darker Days"), Custom String(""), Global.voting ? Custom String(
+			"Wave 2 - Darker Days"), Custom String("As the outbreak continues, zomibes with more powerful abilities appear."), Global.voting ? Custom String(
 			"Change Vote (Press [{0}])", Input Binding String(Button(Ability 1))) : Custom String(""), Left, 1, Color(Yellow), Color(
-			Yellow), Color(Yellow), Visible To and String, Default Visibility);
+			White), Color(Yellow), Visible To and String, Default Visibility);
 		"Vote zombie mode text: Wave 3"
 		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[3] == 3), Custom String(
-			"Wave 3 - Tipping Point"), Custom String(""),
+			"Wave 3 - Tipping Point"), Custom String("The outbreak reaches its peak when there are few normal zombies left."),
 			Global.voting ? Custom String("Change Vote (Press [{0}])", Input Binding String(Button(Ability 1))) : Custom String(""), Left,
-			1, Color(Orange), Color(Orange), Color(Orange), Visible To and String, Default Visibility);
+			1, Color(Orange), Color(White), Color(Orange), Visible To and String, Default Visibility);
 		"Vote zombie mode text: Wave 4"
 		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[3] == 4), Custom String(
-			"Wave 4 - Turning Tide"), Custom String(""), Global.voting ? Custom String(
+			"Wave 4 - Turning Tide"), Custom String("As mankinds fights off the hoard, the number of weaker zombies begins to dwindle."), Global.voting ? Custom String(
 			"Change Vote (Press [{0}])", Input Binding String(Button(Ability 1))) : Custom String(""), Left, 1, Color(Red), Color(
-			Red), Color(Red), Visible To and String, Default Visibility);
+			White), Color(Red), Visible To and String, Default Visibility);
 		"Vote zombie mode text: Wave 5 - The Final Days"
 		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[3] == 5), Custom String(
-			"Wave 5 - The Final Days"), Custom String(""), Global.voting ? Custom String(
-			"Change Vote (Press [{0}])", Input Binding String(Button(Ability 1))) : Custom String(""), Left, 1, Global.specialEffectsTiming ? Color(White) : Color(Turquoise), Global.specialEffectsTiming ? Color(White) : Color(Turquoise), Global.specialEffectsTiming ? Color(White) : Color(Turquoise), Visible To String And Color, Default Visibility);
+			"Wave 5 - The Final Days"), Custom String("The outbreak is nearly over. Only the strongest zombies remain."), Global.voting ? Custom String(
+			"Change Vote (Press [{0}])", Input Binding String(Button(Ability 1))) : Custom String(""), Left, 1, Global.specialEffectsTiming ? Color(White) : Color(Turquoise), Color(White), Global.specialEffectsTiming ? Color(White) : Color(Turquoise), Visible To String And Color, Default Visibility);
 		"Vote objective type text: No preference"
 		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 0), Custom String(
 			"Objective Type: No Preference"), Null, Custom String("Change Vote (Press [{0}])", Input Binding String(Button(Ability 2))),
@@ -2351,20 +2357,20 @@ rule("EFFECTS/TEXTS")
 			"SERVER LOAD AVERAGE: {0}", Server Load Average), Custom String("SERVER LOAD PEAK: {0}", Server Load Peak), Right, 0, Color(
 			White), Color(White), Color(White), Visible To and String, Default Visibility);
 		If(Global.difficultySetting == 1);
-			Create HUD Text(All Players(All Teams), Null, Null, Custom String("Difficulty: Beginner"), Right, 0.100, Color(White), Color(
+			Create HUD Text(All Players(All Teams), Null, Null, Custom String("Difficulty: Beginner | Wave {0}", Global.zombieSetting), Right, 0.100, Color(White), Color(
 				White), Color(Green), Visible To, Default Visibility);
 		Else If(Global.difficultySetting == 2);
-			Create HUD Text(All Players(All Teams), Null, Null, Custom String("Difficulty: Normal"), Right, 0.100, Color(White), Color(White),
+			Create HUD Text(All Players(All Teams), Null, Null, Custom String("Difficulty: Normal | Wave {0}", Global.zombieSetting), Right, 0.100, Color(White), Color(White),
 				Color(Yellow), Visible To, Default Visibility);
 		Else If(Global.difficultySetting == 3);
-			Create HUD Text(All Players(All Teams), Null, Null, Custom String("Difficulty: Expert"), Right, 0.100, Color(White), Color(White),
+			Create HUD Text(All Players(All Teams), Null, Null, Custom String("Difficulty: Expert | Wave {0}", Global.zombieSetting), Right, 0.100, Color(White), Color(White),
 				Color(Orange), Visible To, Default Visibility);
 		Else If(Global.difficultySetting == 4);
-			Create HUD Text(All Players(All Teams), Null, Null, Custom String("Difficulty: Legendary"), Right, 0.100, Color(White), Color(
+			Create HUD Text(All Players(All Teams), Null, Null, Custom String("Difficulty: Legendary | Wave {0}", Global.zombieSetting), Right, 0.100, Color(White), Color(
 				White), Color(Red), Visible To, Default Visibility);
 		Else If(Global.difficultySetting == 5);
 			"Vote text: Insanity"
-			Create HUD Text(All Players(All Teams), Null, Null, Custom String("Difficulty: Insanity"), Right, 0.100, Color(White), Color(
+			Create HUD Text(All Players(All Teams), Null, Null, Custom String("Difficulty: Insanity | Wave {0}", Global.zombieSetting), Right, 0.100, Color(White), Color(
 				White), Global.specialEffectsTiming ? Color(White) : Color(Turquoise), Visible To and Color, Default Visibility);
 		End;
 	}
