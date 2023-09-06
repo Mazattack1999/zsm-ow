@@ -1047,10 +1047,10 @@ rule("setZombieMode")
 			Global.botSpawnRates = Array(5, 7, 13, 3, 2, 20, 8, 5, 3, 5, 15, 3, 5, 3, 3);
 		"Wave 4"
 		Else If(Global.zombieSetting == 4);
-			Global.botSpawnRates = Array(5, 6, 10, 7, 4, 7, 4, 15, 3, 10, 6, 5, 5, 10, 3);
+			Global.botSpawnRates = Array(5, 6, 5, 3, 2, 17, 4, 15, 3, 12, 6, 7, 5, 7, 3);
 		"Wave 5"
 		Else If(Global.zombieSetting == 5);
-			Global.botSpawnRates = Array(1, 1, 1, 4, 35, 2, 1, 10, 2, 17, 2, 3, 11, 7, 3);
+			Global.botSpawnRates = Array(1, 1, 1, 5, 15, 17, 1, 10, 2, 17, 2, 3, 15, 7, 3);
 		End;
 		"TESTING ONLY"
 		disabled Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -1505,7 +1505,7 @@ rule("EFFECTS/TEXTS")
 			1, Color(Orange), Color(White), Color(Orange), Visible To and String, Default Visibility);
 		"Vote zombie mode text: Wave 4"
 		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[3] == 4), Custom String(
-			"Wave 4 - Turning Tide"), Custom String("As mankinds fights off the hoard, the number of weaker zombies begins to dwindle."), Global.voting ? Custom String(
+			"Wave 4 - Turning Tide"), Custom String("As mankind fights off the hoard, the number of weaker zombies begins to dwindle."), Global.voting ? Custom String(
 			"Change Vote (Press [{0}])", Input Binding String(Button(Ability 1))) : Custom String(""), Left, 1, Color(Red), Color(
 			White), Color(Red), Visible To and String, Default Visibility);
 		"Vote zombie mode text: Wave 5 - The Final Days"
@@ -5046,6 +5046,7 @@ rule("PLAYER AFK")
 		Throttle Of(Event Player) == Vector(0, 0, 0);
 		Is Dummy Bot(Event Player) == False;
 		Is Alive(Event Player) == True;
+		Has Spawned(Event Player) == True;
 		Is Firing Primary(Event Player) == False;
 		Is Firing Secondary(Event Player) == False;
 		Array Contains(Global.playersOnObjective, Event Player) != True;
