@@ -1050,7 +1050,7 @@ rule("setZombieMode")
 			Global.botSpawnRates = Array(3, 3, 4, 3, 2, 17, 3, 16, 2, 16, 10, 10, 5, 3, 3);
 		"Wave 5"
 		Else If(Global.zombieSetting == 5);
-			Global.botSpawnRates = Array(1, 1, 1, 5, 15, 17, 1, 10, 2, 17, 2, 3, 15, 7, 3);
+			Global.botSpawnRates = Array(1, 1, 1, 8, 14, 17, 1, 10, 2, 16, 10, 3, 10, 3, 3);
 		End;
 		"TESTING ONLY"
 		disabled Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0);
