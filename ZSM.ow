@@ -5513,7 +5513,7 @@ rule("TELEPORT BOTS WHEN NOT USED FOR TOO LONG")
 			Wait(10, Abort When False);
 		Else;
 			Wait(0.500, Abort When False);
-			Wait(Max(1, 10 - Distance Between(Position Of(Event Player), Event Player.averagePlayersPos) / 8), Abort When False);
+			Wait(Max(1, 5 - Distance Between(Position Of(Event Player), Event Player.averagePlayersPos) / 16), Abort When False);
 			Loop If(Event Player.successfullyTeleported);
 		End;
 		Call Subroutine(teleportBots);
