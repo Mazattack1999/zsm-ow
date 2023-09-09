@@ -530,7 +530,7 @@ rule("SPAWN BOTS")
 		Global.gameStatus == True;
 		Server Load Average <= Workshop Setting Integer(Custom String("General"), Custom String(
 			"Spawn Zombies When Server Load Average is Less Than"), 180, 100, 255, 2);
-		Number Of Players(Team 2) < Global.numberOfBots;
+		disabled Number Of Players(Team 2) < Global.numberOfBots;
 		Number Of Players(All Teams) < 24;
 		((Count Of(Global.spawnTimes) > 0 && First Of(Global.spawnTimes) <= 0) || (Count Of(Global.spawnTimes) + Number Of Players(Team 2)
 			< Global.numberOfBots)) == True;
@@ -4260,7 +4260,7 @@ rule("BOT BECOMES ZOMBIE EGG")
 		"Reduce damage taken by bots close to zombie egg"
 		Start Damage Modification(Filtered Array(All Players(Team 2), !Array Contains(Global.bosses, Current Array Element)
 			&& Distance Between(Position Of(Current Array Element), First Of(Global.objectivePositions)) < 25 * (1 - Normalized Health(
-			Event Player))), All Players(Team 1), 30, Receivers and Damagers);
+			Event Player))), All Players(Team 1), 50, Receivers and Damagers);
 		Event Player.health = 15000;
 		Event Player.bossHealth = Event Player.health;
 		Event Player.size = 2.500;
@@ -4310,7 +4310,7 @@ rule("BOTS TELEPORT TO THE EGG")
 		Event Player.customTelePos = Vector(500, 500, 500);
 		Event Player.telePos = First Of(Global.objectivePositions);
 		Event Player.averagePlayersPos = Event Player.telePos;
-		Event Player.reviveTimer = 1;
+		Event Player.reviveTimer = -1;
 		Play Effect(All Players(All Teams), Bad Explosion, Color(Lime Green), First Of(Global.objectivePositions), 3);
 		Teleport(Event Player, Event Player.telePos);
 	}
@@ -5435,8 +5435,8 @@ rule("BOT DIES")
 		If(!Event Was Environment || Team Of(Attacker) == Team 1);
 			Disable Nameplates(Event Player, All Players(All Teams));
 			"Allow for custom revive times"
-			Wait Until(Event Player.reviveTimer > 0, 0.125);
-			If(Event Player.reviveTimer <= 0);
+			Wait Until(Event Player.reviveTimer != 0, 0.125);
+			If(Event Player.reviveTimer == 0);
 				Event Player.reviveTimer = 1 + (Match Time + Global.matchEndTime) / 60;
 			End;
 			If(Count Of(Global.spawnTimes) < Global.numberOfBots);
@@ -5513,7 +5513,7 @@ rule("TELEPORT BOTS WHEN NOT USED FOR TOO LONG")
 			Wait(10, Abort When False);
 		Else;
 			Wait(0.500, Abort When False);
-			Wait(Max(1, 5 - Distance Between(Position Of(Event Player), Event Player.averagePlayersPos) / 16), Abort When False);
+			Wait(Max(1, 7 - Distance Between(Position Of(Event Player), Event Player.averagePlayersPos) / 8), Abort When False);
 			Loop If(Event Player.successfullyTeleported);
 		End;
 		Call Subroutine(teleportBots);
