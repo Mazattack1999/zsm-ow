@@ -3408,7 +3408,7 @@ rule("SPAWN BOSS")
 		Global.objectiveComplete == False;
 		Count Of(Filtered Array(Global.bosses, Entity Exists(Current Array Element))) == 0;
 		Is True For Any(All Living Players(Team 2), Has Spawned(Current Array Element)
-			&& !Current Array Element.teleporting && Current Array Element.botTarget == Null) == True;
+			&& !Current Array Element.teleporting && !Current Array Element.successfullyTeleported) == True;
 		"Keeps amount of different bots within the max limit."
 		Count Of(Filtered Array(Global.botHeros, Number Of Heroes(Current Array Element, Team 2) > 0)) < Global.uniqueSkinCap - (
 			Number Of Players(Team 1) <= Number Of Slots(Team 1) ? Number Of Slots(Team 1) : Number Of Players(Team 1));
@@ -3418,7 +3418,7 @@ rule("SPAWN BOSS")
 	{
 		Wait(0.250, Abort When False);
 		Global.bosses[0] = First Of(Filtered Array(All Living Players(Team 2), Has Spawned(Current Array Element)
-			&& !Current Array Element.teleporting && Current Array Element.botTarget == Null));
+			&& !Current Array Element.teleporting && !Current Array Element.successfullyTeleported));
 		Teleport(Global.bosses, Vector(500, 500, 500));
 		Wait Until(Global.bosses[0].initializing, 3);
 		Wait Until(!Global.bosses[0].initializing, 5);
@@ -4201,7 +4201,7 @@ disabled rule("============================================== OBJECTIVE TYPE: ZO
 	}
 }
 
-rule("ASSIGN ZOMBIE TO BECOME EGG")
+rule("SPAWN ZOMBIE EGG")
 {
 	event
 	{
@@ -4213,7 +4213,7 @@ rule("ASSIGN ZOMBIE TO BECOME EGG")
 		Global.objectiveTypes[0] == 7;
 		Global.objectiveComplete == False;
 		Entity Exists(First Of(Global.bosses)) == False;
-		Is True For Any(All Living Players(Team 2), !Current Array Element.teleporting && Current Array Element.botTarget == Null) == True;
+		Is True For Any(All Living Players(Team 2), !Current Array Element.teleporting && !Current Array Element.successfullyTeleported) == True;
 		Count Of(Filtered Array(Global.botHeros, Number Of Heroes(Current Array Element, Team 2) > 0)) < Global.uniqueSkinCap - Max(
 			Number Of Slots(Team 1), Number Of Players(Team 1));
 	}
@@ -4222,7 +4222,7 @@ rule("ASSIGN ZOMBIE TO BECOME EGG")
 	{
 		Wait(0.250, Abort When False);
 		Global.bosses[0] = Random Value In Array(Filtered Array(All Living Players(Team 2),
-			!Current Array Element.teleporting && Current Array Element.botTarget == Null));
+			!Current Array Element.teleporting && !Current Array Element.successfullyTeleported));
 		Loop If Condition Is True;
 	}
 }
