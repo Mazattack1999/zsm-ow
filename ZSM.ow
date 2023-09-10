@@ -2699,6 +2699,8 @@ rule("objectivesManagement")
 				Global.objectiveResourcePositions = Empty Array;
 				"Max number of active graves "
 				Global.survivorToRescue = 2;
+				Big Message(All Players(All Teams), Custom String("Clear out the{0} graveyard!", Count Of(Global.objectivePositions)
+					== 2 ? Custom String(" final") : Custom String("")));
 			End;
 		End;
 		"Updates global objective entities"
@@ -4581,6 +4583,7 @@ rule("ZOMBIES SPAWN AT GRAVES")
 		Else If(Count Of(Global.objectiveResourcePositions) < Min(Global.survivorToRescue, Count Of(Global.objectiveCaptureValue)));
 			Modify Global Variable(objectiveResourcePositions, Append To Array, Event Player);
 			Event Player.telePos = Global.objectiveCaptureValue[Index Of Array Value(Global.objectiveResourcePositions, Event Player)];
+			Event Player.reviveTimer = -1;
 		Else;
 			Event Player.telePos = Random Value In Array(Array Slice(Global.objectiveCaptureValue, 0, Min(Global.survivorToRescue, Count Of(
 				Global.objectiveCaptureValue))));
