@@ -1051,7 +1051,7 @@ rule("setZombieMode")
 			Global.botSpawnRates = Array(1, 1, 1, 8, 14, 17, 1, 10, 2, 16, 10, 3, 10, 3, 3);
 		End;
 		"TESTING ONLY"
-		disabled Global.botSpawnRates = Array(0, 0, 40, 0, 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0);
+		disabled Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0);
 	}
 }
 
@@ -8203,7 +8203,7 @@ rule("NANOMANCER (RAMATTRA) FIRES NANITE SWARM")
 		Event Player.botTarget != Null;
 		Event Player.crowdControlled != True;
 		Event Player.botSpecialTarget != True;
-		Is Using Ultimate(Event Player) != True;
+		Is Using Ability 1(Event Player) != True;
 		Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget)) < 25;
 	}
 
@@ -8222,7 +8222,7 @@ rule("NANOMANCER (RAMATTRA) FIRES NANITE SWARM")
 			Set Projectile Speed(Event Player, 10);
 			Start Holding Button(Event Player, Button(Primary Fire));
 		End;
-		Wait Until(Event Player.botTarget == Null || Is Using Ultimate(Event Player), 1);
+		Wait Until(Event Player.botTarget == Null || Is Using Ability 1(Event Player), 1);
 		Loop If Condition Is True;
 		Stop Holding Button(Event Player, Button(Primary Fire));
 		Event Player.specialThrottling = False;
@@ -8244,40 +8244,67 @@ rule("NANOMANCER TRANSFORMS")
 	{
 		Event Player.botTarget != Null;
 		Event Player.crowdControlled != True;
-		Is Using Ultimate(Event Player) != True;
+		Is Using Ability 1(Event Player) != True;
 		Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget)) < 12 * Min(1, Event Player.size);
 	}
 
 	actions
 	{
 		Wait Until(Event Player.botTarget != Null && Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget))
-			< 5 * Min(1, Event Player.size), 3);
+			< 5 * Min(1, Event Player.size), 2);
 		Abort If(Event Player.botTarget == Null || Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget))
 			>= 12 * Min(1, Event Player.size));
-		While(!Is Using Ultimate(Event Player));
-			Set Ultimate Charge(Event Player, 100);
-			Press Button(Event Player, Button(Ultimate));
-			Wait Until(Is Using Ultimate(Event Player), 0.250);
+		While(!Is Using Ability 1(Event Player));
+			Set Ability Cooldown(Event Player, Button(Ability 1), 0);
+			Press Button(Event Player, Button(Ability 1));
+			Wait Until(Is Using Ability 1(Event Player), 0.250);
 		End;
 		Event Player.botTempValue = True;
 		"Non-bosses get increased health"
 		If(!Array Contains(Global.bosses, Event Player));
 			Event Player.health *= 6;
-			Event Player.biteDamage *= 2;
 			Start Heal Over Time(Event Player, Null, 3, (Event Player.health - Health(Event Player)) / 3);
 		End;
-		Event Player.damageDealt /= 2;
+		Set Projectile Speed(Event Player, 100);
+		Set Melee Enabled(Event Player, False);
+		Event Player.damageDealt /= 1.5;
 		Set Damage Dealt(Event Player, Event Player.damageDealt * 100);
-		Wait Until(!Is Using Ultimate(Event Player), 30);
-		Event Player.damageDealt *= 2;
+		Wait Until(!Is Using Ability 1(Event Player), 30);
+		Set Melee Enabled(Event Player, True);
+		Event Player.damageDealt *= 1.5;
 		Set Damage Dealt(Event Player, Event Player.damageDealt * 100);
 		If(!Array Contains(Global.bosses, Event Player));
 			Event Player.health /= 6;
-			Event Player.biteDamage /= 2;
-			Wait(3, Ignore Condition);
+			disabled Wait(3, Ignore Condition);
 		End;
 		Event Player.botTempValue = False;
-		Wait(3, Ignore Condition);
+		Wait(4, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("NANOMANCER PUNCHES IN NEMESIS FORM")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		Ramattra;
+	}
+
+	conditions
+	{
+		Event Player.botTarget != Null;
+		Event Player.crowdControlled != True;
+		Event Player.botSpecialTarget != True;
+		Is Using Ability 1(Event Player) == True;
+		Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget)) < 8 * Event Player.size;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Button(Primary Fire));
+		Wait(0.6, Ignore Condition);
 		Loop If Condition Is True;
 	}
 }
