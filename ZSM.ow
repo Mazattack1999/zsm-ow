@@ -6324,10 +6324,13 @@ rule("botEntityManagement")
 					Event Player.chase1 * Event Player.size, Visible To Position and Radius);
 				Modify Player Variable(Event Player, generalPlayerBotEntities, Append To Array, Last Created Entity);
 			Else If(Hero Of(Event Player) == Hero(Ramattra));
-				"Ult will activate aura"
+				"Nemesis will activate aura"
 				Create Effect(Filtered Array(Global.playerTargetList, !Event Player.botTempValue && Is Alive(Event Player)
-					&& Event Player.botTarget && Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget)) < 12 * Min(1,
-					Event Player.size)), Bad Aura, Color(Purple), Event Player, 1 * Event Player.size, Visible To Position and Radius);
+					&& Event Player.botTarget && Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget)) < 12 *
+					Event Player.size), Bad Aura, Color(Purple), Event Player, 1 * Event Player.size, Visible To Position and Radius);
+				Modify Player Variable(Event Player, generalPlayerBotEntities, Append To Array, Last Created Entity);
+				"Angered area of effect"
+				Create Effect(Filtered Array(Global.playerTargetList, Event Player.botTempValue), Ring, Color(Red), Event Player, 12 * Event Player.size, Visible To Position and Radius);
 				Modify Player Variable(Event Player, generalPlayerBotEntities, Append To Array, Last Created Entity);
 			Else If(Hero Of(Event Player) == Hero(Sombra));
 				"Near fog visual"
@@ -8202,7 +8205,7 @@ rule("NANOMANCER (RAMATTRA) FIRES NANITE SWARM")
 	{
 		Event Player.botTarget != Null;
 		Event Player.crowdControlled != True;
-		Event Player.botSpecialTarget != True;
+		Event Player.botTempValue != True;
 		Is Using Ability 1(Event Player) != True;
 		Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget)) < 25;
 	}
@@ -8245,20 +8248,15 @@ rule("NANOMANCER TRANSFORMS")
 		Event Player.botTarget != Null;
 		Event Player.crowdControlled != True;
 		Is Using Ability 1(Event Player) != True;
-		Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget)) < 12 * Min(1, Event Player.size);
+		Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget)) < 12 * Event Player.size;
 	}
 
 	actions
 	{
 		Wait Until(Event Player.botTarget != Null && Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget))
-			< 5 * Min(1, Event Player.size), 2);
+			< 5 * Event Player.size, 3);
 		Abort If(Event Player.botTarget == Null || Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget))
-			>= 12 * Min(1, Event Player.size));
-		While(!Is Using Ability 1(Event Player));
-			Set Ability Cooldown(Event Player, Button(Ability 1), 0);
-			Press Button(Event Player, Button(Ability 1));
-			Wait Until(Is Using Ability 1(Event Player), 0.250);
-		End;
+			>= 12 * Event Player.size);
 		Event Player.botTempValue = True;
 		"Non-bosses get increased health"
 		If(!Array Contains(Global.bosses, Event Player));
@@ -8269,16 +8267,24 @@ rule("NANOMANCER TRANSFORMS")
 		Set Melee Enabled(Event Player, False);
 		Event Player.damageDealt /= 1.5;
 		Set Damage Dealt(Event Player, Event Player.damageDealt * 100);
-		Wait Until(!Is Using Ability 1(Event Player), 30);
+		While(Event Player.botTarget != Null && Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget))
+			< 12 * Event Player.size);
+			While(!Is Using Ability 1(Event Player));
+				Set Ability Cooldown(Event Player, Button(Ability 1), 0);
+				Press Button(Event Player, Button(Ability 1));
+				Wait Until(Is Using Ability 1(Event Player), 0.250);
+			End;
+			Wait Until(!Is Using Ability 1(Event Player), 30);
+			Wait(0.125, Ignore Condition);
+		End;
 		Set Melee Enabled(Event Player, True);
 		Event Player.damageDealt *= 1.5;
 		Set Damage Dealt(Event Player, Event Player.damageDealt * 100);
 		If(!Array Contains(Global.bosses, Event Player));
 			Event Player.health /= 6;
-			disabled Wait(3, Ignore Condition);
 		End;
 		Event Player.botTempValue = False;
-		Wait(4, Ignore Condition);
+		Wait(6, Ignore Condition);
 		Loop If Condition Is True;
 	}
 }
