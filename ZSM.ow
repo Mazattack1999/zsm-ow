@@ -4181,7 +4181,7 @@ rule("MODIFY KILL ZONE SCORE")
 	{
 		If(Distance Between(Position Of(Event Player), Global.objectiveChase1) < Global.objectiveRad || Distance Between(Position Of(
 			Victim), Global.objectiveChase1) < Global.objectiveRad);
-			Victim.reviveTimer = 2;
+			Victim.reviveTimer = 10 - 15 * (Global.objectiveCaptureValue / Global.eliminationsNeededPerObjective);
 			Global.objectiveCaptureValue += Round To Integer(Victim.health / 280, Up);
 			If(Global.objectiveCaptureValue >= Global.eliminationsNeededPerObjective);
 				Global.objectiveComplete = True;
@@ -5441,7 +5441,7 @@ rule("BOT DIES")
 			"Allow for custom revive times"
 			Wait Until(Event Player.reviveTimer != 0, 0.125);
 			If(Event Player.reviveTimer == 0);
-				Event Player.reviveTimer = 1 + (Match Time + Global.matchEndTime) / 60;
+				Event Player.reviveTimer = (Match Time + Global.matchEndTime) / 60;
 			End;
 			If(Count Of(Global.spawnTimes) < Global.numberOfBots);
 				Modify Global Variable(spawnTimes, Append To Array, Event Player.reviveTimer);
