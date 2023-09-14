@@ -4181,7 +4181,7 @@ rule("MODIFY KILL ZONE SCORE")
 	{
 		If(Distance Between(Position Of(Event Player), Global.objectiveChase1) < Global.objectiveRad || Distance Between(Position Of(
 			Victim), Global.objectiveChase1) < Global.objectiveRad);
-			Victim.reviveTimer = 10 - 15 * (Global.objectiveCaptureValue / Global.eliminationsNeededPerObjective);
+			Victim.reviveTimer = 3 - 4.5 * (Global.objectiveCaptureValue / Global.eliminationsNeededPerObjective);
 			Global.objectiveCaptureValue += Round To Integer(Victim.health / 280, Up);
 			If(Global.objectiveCaptureValue >= Global.eliminationsNeededPerObjective);
 				Global.objectiveComplete = True;
