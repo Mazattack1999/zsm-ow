@@ -4982,8 +4982,10 @@ rule("PLAYER PICKS UP HEALTH PACK")
 			Stop All Damage Over Time(Event Player);
 			Clear Status(Event Player, Burning);
 			If(Event Player.infectionLvl > 0);
-				Small Message(Event Player, Custom String("You are cured!"));
-				Event Player.infected = False;
+				If(Event Player.infected);
+					Small Message(Event Player, Custom String("You are cured!"));
+					Event Player.infected = False;
+				End;
 				Event Player.infectionLvl = 0;
 			End;
 		Else If(Event Player.infected);
