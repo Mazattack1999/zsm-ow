@@ -1051,7 +1051,7 @@ rule("setZombieMode")
 			Global.botSpawnRates = Array(1, 1, 1, 8, 14, 17, 1, 10, 2, 16, 10, 3, 10, 3, 3);
 		End;
 		"TESTING ONLY"
-		Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100);
+		disabled Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0);
 	}
 }
 
@@ -8265,7 +8265,7 @@ rule("NANOMANCER TRANSFORMS")
 		End;
 		Set Projectile Speed(Event Player, 100);
 		Set Melee Enabled(Event Player, False);
-		Event Player.damageDealt /= 1.5;
+		Event Player.damageDealt /= 1;
 		Set Damage Dealt(Event Player, Event Player.damageDealt * 100);
 		While(Event Player.botTarget != Null && Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget))
 			< 12 * Event Player.size);
@@ -8278,7 +8278,7 @@ rule("NANOMANCER TRANSFORMS")
 			Wait(0.125, Ignore Condition);
 		End;
 		Set Melee Enabled(Event Player, True);
-		Event Player.damageDealt *= 1.5;
+		Event Player.damageDealt *= 1;
 		Set Damage Dealt(Event Player, Event Player.damageDealt * 100);
 		If(!Array Contains(Global.bosses, Event Player));
 			Event Player.health /= 6;
