@@ -1051,7 +1051,7 @@ rule("setZombieMode")
 			Global.botSpawnRates = Array(1, 1, 1, 8, 14, 17, 1, 10, 2, 16, 10, 3, 10, 3, 3);
 		End;
 		"TESTING ONLY"
-		disabled Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0);
+		Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100);
 	}
 }
 
@@ -8354,18 +8354,18 @@ rule("ILLUISONIST (SOMBRA) ACTIVATES INVISIBILITY ILLUSION")
 				Event Player.botSpecialPotentialTargets = Empty Array;
 			End;
 			Wait Until(Event Player.botTarget || !Is Using Ability 1(Event Player), 9999);
-			If(Event Player.botSpecialPotentialTargets != Filtered Array(Global.playerTargetList, Distance Between(Position Of(Event Player),
-				Position Of(Current Array Element)) < 30 * Event Player.size));
+			If(Event Player.botSpecialPotentialTargets != Filtered Array(Global.playerTargetList, Distance Between(Position Of(Event Player.botTarget),
+				Position Of(Current Array Element)) < 15 * Event Player.size));
 				Event Player.botSpecialPotentialTargets.blinded = False;
 				Event Player.botSpecialPotentialTargets.updateOutlines = True;
-				Event Player.botSpecialPotentialTargets = Filtered Array(Global.playerTargetList, Distance Between(Position Of(Event Player),
-					Position Of(Current Array Element)) < 30 * Event Player.size);
+				Event Player.botSpecialPotentialTargets = Filtered Array(Global.playerTargetList, Distance Between(Position Of(Event Player.botTarget),
+					Position Of(Current Array Element)) < 15 * Event Player.size);
 			End;
 			Event Player.botSpecialPotentialTargets.blinded = True;
 			Event Player.botSpecialPotentialTargets.updateOutlines = True;
 			Wait(0.125, Ignore Condition);
 			Wait Until(!Is Using Ability 1(Event Player) || Is True For Any(Event Player.botSpecialPotentialTargets,
-				!Current Array Element.blinded), 3);
+				!Current Array Element.blinded), 1);
 		End;
 		Event Player.movementSpeed *= 1.600;
 		Set Move Speed(Event Player, Event Player.movementSpeed * 100);
