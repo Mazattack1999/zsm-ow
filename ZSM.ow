@@ -1012,7 +1012,7 @@ rule("determineZombieMode")
 		End;
 		"If all players choose no preference set zombie mode to default"
 		If(Global.zombieSetting == 0);
-			Global.zombieSetting = 2;
+			Global.zombieSetting = 1;
 		End;
 		Start Rule(determineDifficulty, Restart Rule);
 		Start Rule(setZombieMode, Restart Rule);
