@@ -4511,31 +4511,35 @@ rule("fireSatellite")
 			!Current Array Element.teleporting) ? 7.500 : 0, Destination and Rate);
 		"Fire satellite"
 		For Global Variable(objectiveCount1, 40, 0, -1);
-			Stop Chasing Global Variable(objectiveChase1);
-			Global.survivorToRescue = First Of(Sorted Array(Filtered Array(All Living Players(Team 2), !Current Array Element.teleporting),
-				Distance Between(Position Of(Current Array Element), Global.objectiveChase1)));
-			If(Global.survivorToRescue != Null);
-				"Chase closest living zombie"
-				Chase Global Variable At Rate(objectiveChase1, Position Of(Global.survivorToRescue), Is True For Any(All Living Players(Team 2),
-					!Current Array Element.teleporting) ? 7.500 : 0, Destination and Rate);
-			End;
-			Wait(0.500, Ignore Condition);
-			Global.testPos2 = Ray Cast Hit Position(Global.objectiveChase1 + Vector(0, 2, 0), Global.objectiveChase1 + Vector(0, -100, 0),
-				All Players(All Teams), Filtered Array(All Players(All Teams), Is On Ground(Current Array Element)), False) + Vector(0, 0.100,
-				0);
-			Play Effect(All Players(All Teams), Bad Explosion, Color(Sky Blue), Global.testPos2, 5);
-			Play Effect(All Players(All Teams), Ring Explosion Sound, Color(Sky Blue), Global.testPos2, 200);
-			"Damage Zombies"
-			Damage(Filtered Array(All Players(Team 2), Distance Between(Position Of(Current Array Element), Global.testPos2) < 5), Null, 500);
-			"Damage Players"
-			Damage(Filtered Array(All Players(Team 1), Distance Between(Position Of(Current Array Element), Global.testPos2) < 3), Null, 100);
-			If(Global.objectiveCount1 > 5);
-				"Give all bots quick respawn time"
-				All Players(Team 2).reviveTimer = 1;
-			Else;
-				"Give all bots a long respawn time"
-				All Players(Team 2).reviveTimer = 12;
-				Global.spawnTimes = Mapped Array(Global.spawnTimes, 12);
+			"Finish off all of the remaining zombies"
+			While(Count Of(All Living Players(Team 2)) > 0);
+				Stop Chasing Global Variable(objectiveChase1);
+				Global.survivorToRescue = First Of(Sorted Array(Filtered Array(All Living Players(Team 2), !Current Array Element.teleporting),
+					Distance Between(Position Of(Current Array Element), Global.objectiveChase1)));
+				If(Global.survivorToRescue != Null);
+					"Chase closest living zombie"
+					Chase Global Variable At Rate(objectiveChase1, Position Of(Global.survivorToRescue), Is True For Any(All Living Players(Team 2),
+						!Current Array Element.teleporting) ? 7.500 : 0, Destination and Rate);
+				End;
+				Wait(0.500, Ignore Condition);
+				Global.testPos2 = Ray Cast Hit Position(Global.objectiveChase1 + Vector(0, 2, 0), Global.objectiveChase1 + Vector(0, -100, 0),
+					All Players(All Teams), Filtered Array(All Players(All Teams), Is On Ground(Current Array Element)), False) + Vector(0, 0.100,
+					0);
+				Play Effect(All Players(All Teams), Bad Explosion, Color(Sky Blue), Global.testPos2, 5);
+				Play Effect(All Players(All Teams), Ring Explosion Sound, Color(Sky Blue), Global.testPos2, 200);
+				"Damage Zombies"
+				Damage(Filtered Array(All Players(Team 2), Distance Between(Position Of(Current Array Element), Global.testPos2) < 5), Null, 500);
+				"Damage Players"
+				Damage(Filtered Array(All Players(Team 1), Distance Between(Position Of(Current Array Element), Global.testPos2) < 3), Null, 180);
+				If(Global.objectiveCount1 > 1);
+					"Give all bots quick respawn time"
+					All Players(Team 2).reviveTimer = 1;
+					Break;
+				Else;
+					"Give all bots a long respawn time"
+					All Players(Team 2).reviveTimer = 10;
+					Global.spawnTimes = Mapped Array(Global.spawnTimes, 10);
+				End;
 			End;
 		End;
 		Stop Chasing Global Variable(objectiveChase1);
