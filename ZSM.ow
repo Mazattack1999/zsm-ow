@@ -8361,12 +8361,12 @@ rule("ILLUISONIST (SOMBRA) ACTIVATES INVISIBILITY ILLUSION")
 				Event Player.botSpecialPotentialTargets = Empty Array;
 			End;
 			Wait Until(Event Player.botTarget || !Is Using Ability 1(Event Player), 9999);
-			If(Event Player.botSpecialPotentialTargets != Filtered Array(Global.playerTargetList, Distance Between(Position Of(Event Player.botTarget),
-				Position Of(Current Array Element)) < 15 * Event Player.size));
+			If(Event Player.botSpecialPotentialTargets != Filtered Array(Global.playerTargetList, Distance Between(Position Of(Event Player),
+				Position Of(Current Array Element)) < 20 * Event Player.size));
 				Event Player.botSpecialPotentialTargets.blinded = False;
 				Event Player.botSpecialPotentialTargets.updateOutlines = True;
-				Event Player.botSpecialPotentialTargets = Filtered Array(Global.playerTargetList, Distance Between(Position Of(Event Player.botTarget),
-					Position Of(Current Array Element)) < 15 * Event Player.size);
+				Event Player.botSpecialPotentialTargets = Filtered Array(Global.playerTargetList, Distance Between(Position Of(Event Player),
+					Position Of(Current Array Element)) < 20 * Event Player.size);
 			End;
 			Event Player.botSpecialPotentialTargets.blinded = True;
 			Event Player.botSpecialPotentialTargets.updateOutlines = True;
