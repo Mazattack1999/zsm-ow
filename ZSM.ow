@@ -4215,7 +4215,7 @@ rule("SPAWN ZOMBIE EGG")
 		Global.objectiveTypes[0] == 7;
 		Global.objectiveComplete == False;
 		Entity Exists(First Of(Global.bosses)) == False;
-		Is True For Any(All Living Players(Team 2), !Current Array Element.teleporting && !Current Array Element.successfullyTeleported) == True;
+		Is True For Any(All Living Players(Team 2), Has Spawned(Current Array Element) && !Current Array Element.teleporting && !Current Array Element.successfullyTeleported) == True;
 		Count Of(Filtered Array(Global.botHeros, Number Of Heroes(Current Array Element, Team 2) > 0)) < Global.uniqueSkinCap - Max(
 			Number Of Slots(Team 1), Number Of Players(Team 1));
 	}
@@ -4224,7 +4224,7 @@ rule("SPAWN ZOMBIE EGG")
 	{
 		Wait(0.250, Abort When False);
 		Global.bosses[0] = Random Value In Array(Filtered Array(All Living Players(Team 2),
-			!Current Array Element.teleporting && !Current Array Element.successfullyTeleported));
+			Has Spawned(Current Array Element) && !Current Array Element.teleporting && !Current Array Element.successfullyTeleported));
 		Loop If Condition Is True;
 	}
 }
