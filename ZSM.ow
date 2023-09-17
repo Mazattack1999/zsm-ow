@@ -4247,6 +4247,10 @@ rule("BOT BECOMES ZOMBIE EGG")
 
 	actions
 	{
+		If(Event Player.attached);
+			Event Player.attached = False;
+			Detach Players(Event Player);
+		End;
 		Teleport(Event Player, Vector(500, 500, 500));
 		While(Is Dead(Event Player));
 			Resurrect(Event Player);
