@@ -450,7 +450,7 @@ rule("Fix bot health")
 	}
 }
 
-disabled rule("interact test")
+rule("interact test")
 {
 	event
 	{
@@ -466,7 +466,7 @@ disabled rule("interact test")
 	{
 		Heal(Host Player, Null, 100000);
 		Set Damage Dealt(Host Player, 1000);
-		Set Ultimate Charge(Host Player, 100);
+		disabled Set Ultimate Charge(Host Player, 100);
 		Set Status(All Players(Team 1), Null, Unkillable, 9999);
 		Teleport(Remove From Array(All Players(Team 1), Host Player), First Of(Global.objectivePositions));
 		If(Global.objectiveTypes[0] == 1);
@@ -477,7 +477,7 @@ disabled rule("interact test")
 			Global.objectiveCaptureValue = 99;
 		End;
 		If(Is Button Held(Host Player, Button(Primary Fire)));
-			All Players(Team 1).currentPowerUp = 5;
+			All Players(Team 1).currentPowerUp = 12;
 		End;
 	}
 }
@@ -9280,6 +9280,7 @@ rule("ultimateCharger (90-99)")
 		Play Effect(Event Player, Buff Explosion Sound, Color(Red), Position Of(Event Player), 50);
 		"Bounce pad duration"
 		For Player Variable(Event Player, pUltimateChargerCount, 20, 0, -0.125);
+			Wait Until(!Is Using Ultimate(Event Player), 9999);
 			Set Ultimate Charge(Event Player, Ultimate Charge Percent(Event Player) + 2);
 			Wait(0.125, Ignore Condition);
 		End;
