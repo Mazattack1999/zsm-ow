@@ -1051,7 +1051,7 @@ rule("setZombieMode")
 			Global.botSpawnRates = Array(1, 1, 1, 8, 14, 17, 1, 10, 2, 16, 10, 3, 10, 3, 3);
 		End;
 		"TESTING ONLY"
-		disabled Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0);
+		disabled Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100);
 	}
 }
 
@@ -6345,22 +6345,22 @@ rule("botEntityManagement")
 				Modify Player Variable(Event Player, generalPlayerBotEntities, Append To Array, Last Created Entity);
 			Else If(Hero Of(Event Player) == Hero(Sombra));
 				"Near fog visual"
-				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, Event Player.botTempValue), Bad Aura, Color(Gray),
+				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, True), Bad Aura, Color(Gray),
 					Eye Position(Local Player) + Facing Direction Of(Local Player) * (6.750 + Evaluate Once(Random Real(-0.500, 0.500))), 200,
 					Visible To Position and Radius);
 				Modify Player Variable(Event Player, generalPlayerBotEntities, Append To Array, Last Created Entity);
 				"Mid Range fog visual"
-				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, Event Player.botTempValue), Bad Aura, Color(Purple),
+				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, True), Bad Aura, Color(Purple),
 					Eye Position(Local Player) + Facing Direction Of(Local Player) * (20 + Evaluate Once(Random Real(-0.500, 0.500))), 200,
 					Visible To Position and Radius);
 				Modify Player Variable(Event Player, generalPlayerBotEntities, Append To Array, Last Created Entity);
 				"Mid Range fog visual"
-				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, Event Player.botTempValue), Bad Aura, Color(Purple),
+				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, True), Bad Aura, Color(Purple),
 					Eye Position(Local Player) + Facing Direction Of(Local Player) * (30 + Evaluate Once(Random Real(-0.500, 0.500))), 200,
 					Visible To Position and Radius);
 				Modify Player Variable(Event Player, generalPlayerBotEntities, Append To Array, Last Created Entity);
 				"Illusion aura"
-				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, Event Player.botTempValue && Is Using Ability 1(
+				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, True && Is Using Ability 1(
 					Event Player)), Good Aura, Color(Purple), Eye Position(Event Player), 0.250 * Event Player.size,
 					Visible To Position and Radius);
 				Modify Player Variable(Event Player, generalPlayerBotEntities, Append To Array, Last Created Entity);
@@ -8355,35 +8355,10 @@ rule("ILLUISONIST (SOMBRA) ACTIVATES INVISIBILITY ILLUSION")
 		End;
 		Event Player.movementSpeed /= 1.600;
 		Set Move Speed(Event Player, Event Player.movementSpeed * 100);
-		Event Player.botTempValue = True;
-		Wait Until(Event Player.botTarget != Null || !Is Using Ability 1(Event Player), 9999);
-		While(Is Using Ability 1(Event Player));
-			"Sombra does not have a target"
-			If(!Event Player.botTarget);
-				Event Player.botSpecialPotentialTargets.blinded = False;
-				Event Player.botSpecialPotentialTargets.updateOutlines = True;
-				Event Player.botSpecialPotentialTargets = Empty Array;
-			End;
-			Wait Until(Event Player.botTarget || !Is Using Ability 1(Event Player), 9999);
-			If(Event Player.botSpecialPotentialTargets != Filtered Array(Global.playerTargetList, Distance Between(Position Of(Event Player),
-				Position Of(Current Array Element)) < 20 * Event Player.size));
-				Event Player.botSpecialPotentialTargets.blinded = False;
-				Event Player.botSpecialPotentialTargets.updateOutlines = True;
-				Event Player.botSpecialPotentialTargets = Filtered Array(Global.playerTargetList, Distance Between(Position Of(Event Player),
-					Position Of(Current Array Element)) < 20 * Event Player.size);
-			End;
-			Event Player.botSpecialPotentialTargets.blinded = True;
-			Event Player.botSpecialPotentialTargets.updateOutlines = True;
-			Wait(0.125, Ignore Condition);
-			Wait Until(!Is Using Ability 1(Event Player) || Is True For Any(Event Player.botSpecialPotentialTargets,
-				!Current Array Element.blinded), 1);
-		End;
+		Wait Until(!Is Using Ability 1(Event Player), 9999);
 		Event Player.movementSpeed *= 1.600;
 		Set Move Speed(Event Player, Event Player.movementSpeed * 100);
-		Event Player.botSpecialPotentialTargets.blinded = False;
-		Event Player.botSpecialPotentialTargets.updateOutlines = True;
-		Event Player.botTempValue = False;
-		Set Ability Cooldown(Event Player, Button(Ability 1), 5);
+		Set Ability Cooldown(Event Player, Button(Ability 1), 2);
 	}
 }
 
@@ -8399,42 +8374,70 @@ rule("ILLUISONIST USES EMP")
 	conditions
 	{
 		Event Player.botTarget != Null;
-		Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget)) < 20;
-		Array Contains(Global.bosses, Event Player) == True;
+		((Array Contains(Global.bosses, Event Player) && Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget)) < 20) || (Is Using Ability 1(Event Player) && Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget)) > 7.5 && Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget)) < 30)) == True;
 	}
 
 	actions
 	{
 		Set Ultimate Charge(Event Player, 100);
 		Event Player.botSpecialPotentialTargets = Empty Array;
-		Play Effect(All Players(All Teams), Ring Explosion, Color(Purple), Position Of(Event Player), 2 * Event Player.size);
-		Apply Impulse(Event Player, Vector(0, 1, 0), 4 * Event Player.size, To World, Cancel Contrary Motion);
-		Wait(0.125, Ignore Condition);
-		Wait Until(Y Component Of(Velocity Of(Event Player)) <= 0, 5);
+		If(Array Contains(Global.bosses, Event Player));
+			Play Effect(All Players(All Teams), Ring Explosion, Color(Purple), Position Of(Event Player), 2 * Event Player.size);
+			Apply Impulse(Event Player, Vector(0, 1, 0), 4 * Event Player.size, To World, Cancel Contrary Motion);
+			Wait(0.125, Ignore Condition);
+			Wait Until(Y Component Of(Velocity Of(Event Player)) <= 0, 5);
+		Else;
+		 	Event Player.specialFacing = True;
+			Stop Facing(Event Player);
+			Set Facing(Event Player, Direction Towards(Eye Position(Event Player), Eye Position(Event Player.lastTarget) + Vector(0, 10, 0)), To World);
+			Wait(0.125, Ignore Condition);
+			While(!Is Using Ability 2(Event Player));
+				Press Button(Event Player, Button(Ability 2));
+				Wait(0.125, Ignore Condition);
+			End;
+			Event Player.specialFacing = False;
+			Start Rule(restoreDefaultFacingMovement, Do Nothing);
+			Wait(1.5, Ignore Condition);
+			Event Player.botTempValue = Position Of(Event Player);
+			While(Is Using Ability 2(Event Player));
+				Press Button(Event Player, Button(Ability 2));
+				Wait(0.125, Ignore Condition);
+			End;
+			Set Invisible(Event Player, All);
+			Wait(0.25, Ignore Condition);
+		End;
 		Event Player.damageDealt = 0.010;
 		Set Damage Dealt(Event Player, Event Player.damageDealt * 100);
 		While(Ultimate Charge Percent(Event Player) >= 100);
 			Press Button(Event Player, Button(Ultimate));
 			Wait(0.125, Ignore Condition);
 		End;
-		Event Player.botTempValue = True;
 		"EMP Cast"
 		Wait(0.360, Ignore Condition);
 		"Restore normal damage"
 		Event Player.damageDealt = Global.damageDealt[Index Of Array Value(Global.botHeros, Hero Of(Event Player))] / 100;
 		Set Damage Dealt(Event Player, Event Player.damageDealt * 100);
-		Event Player.pForceFieldCount2_bCount1 = 0;
-		While(Is Alive(Event Player) && Event Player.pForceFieldCount2_bCount1 < 10);
+		If(!Array Contains(Global.bosses, Event Player));
+			Wait(0.125, Ignore Condition);
+			Teleport(Event Player, Event Player.botTempValue);
+			Set Invisible(Event Player, None);
+			Event Player.pForceFieldCount2_bCount1 = 5;
+			Set Ability Cooldown(Event Player, Button(Ability 1), 0);
+		Else;
+			Event Player.pForceFieldCount2_bCount1 = 10;
+		End;
+		While(Is Alive(Event Player) && Event Player.pForceFieldCount2_bCount1 > 0);
 			Event Player.botSpecialPotentialTargets.blinded = True;
 			Event Player.botSpecialPotentialTargets.updateOutlines = True;
 			Wait(0.500, Ignore Condition);
-			Event Player.pForceFieldCount2_bCount1 += 0.500;
+			Event Player.pForceFieldCount2_bCount1 -= 0.500;
 		End;
 		Event Player.botSpecialPotentialTargets.blinded = False;
 		Event Player.botSpecialPotentialTargets.updateOutlines = True;
-		Event Player.botTempValue = False;
 		Event Player.botSpecialPotentialTargets = Empty Array;
-		Wait(5, Ignore Condition);
+		If(Array Contains(Global.bosses, Event Player));
+			Wait(5, Ignore Condition);
+		End;
 		Loop If Condition Is True;
 	}
 }
