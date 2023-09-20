@@ -2355,7 +2355,7 @@ rule("EFFECTS/TEXTS")
 			Visible To and Position, Color(Green), True);
 		"SERVER LOAD"
 		Create HUD Text(String Contains(Custom String("{0}", Local Player), Custom String("Mazattack")) ? Local Player : Empty Array,
-			Custom String("Spawn Array: {0}, {1}, Bot Count: {2}", Global.spawnTimes[0], Global.spawnTimes[1], Number of Players(Team 2)), Custom String(
+			Custom String("Spawn Array: {0}, {1}, {2}", Global.spawnTimes[0], Global.spawnTimes[1],  Global.spawnTimes[2]), Custom String(
 			"SERVER LOAD AVERAGE: {0}", Server Load Average), Custom String("SERVER LOAD PEAK: {0}", Server Load Peak), Right, 0, Color(
 			White), Color(White), Color(White), Visible To and String, Default Visibility);
 		If(Global.difficultySetting == 1);
@@ -5349,7 +5349,6 @@ rule("BOT INITIALIZATION")
 
 	actions
 	{
-		Wait(1, Abort When False);
 		Start Heal Over Time(Event Player, Null, 9999, 9999);
 		Event Player.reviveTimer = 0;
 		If(Count Of(Global.customTelePositions) > 0);
