@@ -5582,7 +5582,6 @@ rule("UPDATE SUCCESSFUL TELEPORT STATUS")
 		Wait(0.500, Abort When False);
 		If(!Event Player.successfullyTeleported);
 			Event Player.successfullyTeleported = True;
-			All Players(Team 1).updateOutlines = True;
 		End;
 		If(Distance Between(Event Player.telePos, Event Player.averagePlayersPos) < Global.botMaxTeleportRange[1]);
 			Event Player.waypoint = Position Of(Event Player);
@@ -6230,6 +6229,8 @@ rule("botRespawnInitialization")
 		Stop All Heal Over Time(Event Player);
 		Set Player Health(Event Player, Event Player.health);
 		Event Player.initializing = False;
+		Wait Until(Event Player.botTarget != Null, 5);
+		All Players(Team 1).updateOutlines = True;
 	}
 }
 
