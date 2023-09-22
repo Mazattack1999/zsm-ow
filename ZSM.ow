@@ -6230,7 +6230,17 @@ rule("botRespawnInitialization")
 		Set Player Health(Event Player, Event Player.health);
 		Event Player.initializing = False;
 		Wait Until(Event Player.botTarget != Null, 5);
-		All Players(Team 1).updateOutlines = True;
+		"Initial Outline Control"
+		If(Event Player.defaultOutlineColor == Null);
+			Stop Forcing Player Outlines(Event Player, Filtered Array(All Players(Team 1), !Current Array Element.blinded));
+		Else;
+			"Mutation outline for non-blinded players"
+			Start Forcing Player Outlines(Event Player, Filtered Array(All Players(Team 1), !Current Array Element.blinded), True,
+				Event Player.defaultOutlineColor, Default);
+		End;
+		"Disable outline for blinded players"
+		Start Forcing Player Outlines(Event Player, Filtered Array(All Players(Team 1), Current Array Element.blinded), False, Color(
+			White), Default);
 	}
 }
 
