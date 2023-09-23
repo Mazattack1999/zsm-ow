@@ -572,7 +572,7 @@ rule("botHeroRandomization")
 			Global.randVal = Random Real(0, 100);
 			Global.botCurrentSpawnRate = 0;
 			Global.botRespawnCount = -1;
-			While(Global.randVal > Global.botCurrentSpawnRate);
+			While(Global.randVal > Global.botCurrentSpawnRate || Global.botRespawnCount < 0);
 				Global.botRespawnCount += 1;
 				Global.botCurrentSpawnRate += Global.botSpawnRates[Global.botRespawnCount];
 			End;
