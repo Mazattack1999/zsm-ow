@@ -92,6 +92,7 @@ settings
 			First Active Control Point: A
 			Score To Win: 10
 			Scoring Speed Modifier: 10%
+			Tank Role Passive Health Bonus: Always Enabled
 		}
 
 		Hybrid
