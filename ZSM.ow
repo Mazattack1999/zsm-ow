@@ -2683,23 +2683,27 @@ rule("objectivesManagement")
 					== 2 ? Custom String(" final") : Custom String("")));
 			Else If(First Of(Global.objectiveTypes) == 9);
 				Global.objectiveDescription = Custom String("Destroy the graves");
-				Global.objectiveRad = 15;
+				Global.objectiveRad = 30;
 				Global.objectiveColor = Color(Turquoise);
+				Global.eliminationsNeededPerObjective = 50;
 				"All Grave Locations"
 				Global.objectiveCaptureValue = Empty Array;
 				"Number of graves"
-				While(Count Of(Global.objectiveCaptureValue) < 30);
+				While(Count Of(Global.objectiveCaptureValue) < Global.eliminationsNeededPerObjective);
 					Global.objectiveRad += 2;
 					"All Grave Locations"
 					Global.objectiveCaptureValue = Filtered Array(Global.mapGrid, Distance Between(First Of(Global.objectivePositions),
-						Current Array Element) < Global.objectiveRad - 10);
+						Current Array Element) < Global.objectiveRad - 15);
+						Global.testPos2 = Last Of(Sorted Array(Global.objectiveCaptureValue, Distance Between(First Of(Global.objectivePositions), Current Array Element)));
+						Global.objectiveCaptureValue = Filtered Array(Global.objectiveCaptureValue, Distance Between(Current Array Element, Global.testPos2 + (Direction Towards(Global.testPos2, First Of(Global.objectivePositions)) * Distance Between(Global.testPos2, Current Array Element))) < 15);
 					Wait(0.016, Ignore Condition);
 				End;
-				Global.objectiveCaptureValue = Filtered Array(Global.objectiveCaptureValue, Current Array Index < 30);
+				Global.objectiveCaptureValue = Sorted Array(Global.objectiveCaptureValue, Distance Between(Global.testPos2, Vector(X Component Of(Current Array Element), Y Component Of(Global.testPos2), Z Component Of(Current Array Element))));
+				Global.objectiveCaptureValue = Filtered Array(Global.objectiveCaptureValue, Current Array Index < Global.eliminationsNeededPerObjective);
 				"Active Grave Locations"
 				Global.objectiveResourcePositions = Empty Array;
 				"Max number of active graves "
-				Global.survivorToRescue = 2;
+				Global.survivorToRescue = Min(6, Global.numberOfBots);
 				Big Message(All Players(All Teams), Custom String("Clear out the{0} graveyard!", Count Of(Global.objectivePositions)
 					== 2 ? Custom String(" final") : Custom String("")));
 			End;
@@ -4576,8 +4580,8 @@ rule("ZOMBIES SPAWN AT GRAVES")
 		Event Player.teleporting != True;
 		Event Player.successfullyTeleported != True;
 		Is Alive(Event Player) == True;
-		Is True For Any(Global.playerTargetList, Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element))
-			< Global.objectiveRad) == True;
+		(Array Contains(Global.objectiveResourcePositions, Event Player) || Is True For Any(Global.playerTargetList, Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element))
+			< Global.objectiveRad)) == True;
 	}
 
 	actions
@@ -4592,7 +4596,7 @@ rule("ZOMBIES SPAWN AT GRAVES")
 		Else If(Count Of(Global.objectiveResourcePositions) < Min(Global.survivorToRescue, Count Of(Global.objectiveCaptureValue)));
 			Modify Global Variable(objectiveResourcePositions, Append To Array, Event Player);
 			Event Player.telePos = Global.objectiveCaptureValue[Index Of Array Value(Global.objectiveResourcePositions, Event Player)];
-			Event Player.reviveTimer = -1;
+			Event Player.reviveTimer = 2;
 		Else;
 			Event Player.telePos = Random Value In Array(Array Slice(Global.objectiveCaptureValue, 0, Min(Global.survivorToRescue, Count Of(
 				Global.objectiveCaptureValue))));
