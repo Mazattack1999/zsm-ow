@@ -5047,7 +5047,8 @@ rule("PLAYER INFECTION DAMAGE MANAGEMENT")
 		If(Event Player.infectionLvl < 1);
 			Event Player.infected = False;
 		End;
-		Start Damage Over Time(Event Player, Null, 1, Round To Integer(Event Player.infectionLvl, Down) ^ 4 / 16);
+		"Infection must deal at least 0.5 damage per second"
+		Start Damage Over Time(Event Player, Null, 1, Max(0.5, Round To Integer(Event Player.infectionLvl, Down) ^ 4 / 16));
 		Wait(1, Ignore Condition);
 		Loop If Condition Is True;
 	}
