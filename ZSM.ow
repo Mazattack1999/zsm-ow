@@ -2596,8 +2596,8 @@ rule("objectivesManagement")
 				Big Message(All Players(All Teams), Custom String("Firing sequence complete!"));
 			"Checks if current objective is Graveyard"
 			Else If(First Of(Global.objectiveTypes) == 9);
-				Play Effect(All Players(All Teams), Ring Explosion Sound, Color(Turquoise), Global.objectiveChase1, 200);
-				Play Effect(All Players(All Teams), Ring Explosion, Color(Turquoise), Global.objectiveChase1, Global.objectiveRad * 2);
+				Play Effect(All Players(All Teams), Ring Explosion Sound, Color(Turquoise), First Of(Global.objectivePositions), 200);
+				Play Effect(All Players(All Teams), Bad Explosion, Color(Turquoise), First Of(Global.objectivePositions), Global.objectiveRad);
 				Big Message(All Players(All Teams), Custom String("All graves have been destroyed!"));
 			End;
 			Wait(0.016, Ignore Condition);
@@ -2689,7 +2689,7 @@ rule("objectivesManagement")
 				"All Grave Locations"
 				Global.objectiveCaptureValue = Empty Array;
 				"Number of graves"
-				While(Count Of(Global.objectiveCaptureValue) < Global.eliminationsNeededPerObjective);
+				While(Count Of(Global.objectiveCaptureValue) < Global.eliminationsNeededPerObjective && Global.objectiveRad < 100);
 					Global.objectiveRad += 2;
 					"All Grave Locations"
 					Global.objectiveCaptureValue = Filtered Array(Global.mapGrid, Distance Between(First Of(Global.objectivePositions),
