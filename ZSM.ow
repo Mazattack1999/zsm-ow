@@ -5389,8 +5389,7 @@ rule("BOT INITIALIZATION")
 		"TESTING ONLY"
 		disabled Create In-World Text(All Players(All Teams), Custom String("Current Health:{0}, Recorded Max Health:{1}", Health(Event Player),
 			Event Player.health), Event Player, 2, Do Not Clip, Visible To Position and String, Color(Green), Default Visibility);
-
-			Wait Until(Event Player.botTarget != Null, 5);
+		Wait(1, Ignore Condition);
 		"Initial Outline Control"
 		If(Event Player.defaultOutlineColor == Null);
 			Stop Forcing Player Outlines(Event Player, Filtered Array(All Players(Team 1), !Current Array Element.blinded));
