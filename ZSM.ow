@@ -1037,19 +1037,19 @@ rule("setZombieMode")
 		Global.nonBossZombies = Array(Hero(Genji), Hero(Widowmaker), Hero(D.Va), Hero(Ramattra));
 		"Wave 1"
 		If(Global.zombieSetting == 1);
-			Global.botSpawnRates = Array(60, 12, 6, 0, 0, 5, 4, 0, 3, 0, 3, 0, 4, 0, 3);
+			Global.botSpawnRates = Array(60, 10, 8, 0, 0, 5, 4, 0, 3, 0, 3, 0, 4, 0, 3);
 		"Wave 2"
 		Else If(Global.zombieSetting == 2);
-			Global.botSpawnRates = Array(50, 5, 8, 3, 2, 8, 3, 2, 3, 1, 7, 1, 2, 2, 3);
+			Global.botSpawnRates = Array(50, 10, 8, 3, 2, 5, 3, 2, 3, 1, 5, 1, 2, 2, 3);
 		"Wave 3"
 		Else If(Global.zombieSetting == 3);
-			Global.botSpawnRates = Array(5, 7, 13, 3, 2, 20, 8, 5, 3, 5, 15, 3, 5, 3, 3);
+			Global.botSpawnRates = Array(5, 50, 8, 3, 2, 5, 4, 3, 3, 2, 5, 2, 3, 2, 3);
 		"Wave 4"
 		Else If(Global.zombieSetting == 4);
-			Global.botSpawnRates = Array(3, 3, 4, 3, 2, 17, 3, 16, 2, 16, 10, 10, 5, 3, 3);
+			Global.botSpawnRates = Array(3, 5, 52, 3, 2, 7, 2, 4, 2, 3, 6, 3, 3, 2, 3);
 		"Wave 5"
 		Else If(Global.zombieSetting == 5);
-			Global.botSpawnRates = Array(1, 1, 1, 8, 14, 17, 1, 10, 2, 16, 10, 3, 10, 3, 3);
+			Global.botSpawnRates = Array(1, 5, 5, 4, 2, 25, 2, 7, 2, 7, 18, 3, 12, 4, 3);
 		End;
 		"TESTING ONLY"
 		disabled Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100);
@@ -1510,7 +1510,7 @@ rule("EFFECTS/TEXTS")
 			1, Color(Red), Color(White), Color(Red), Visible To and String, Default Visibility);
 		"Vote zombie mode text: Wave 5 - The Final Days"
 		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[3] == 5), Custom String(
-			"Wave 5 - The Final Days"), Custom String("The outbreak is nearly over. Only the strongest zombies remain."),
+			"Wave 5 - The Final Days"), Custom String("The outbreak is nearly over. Only the deadliest zombies remain."),
 			Global.voting ? Custom String("Change Vote (Press [{0}])", Input Binding String(Button(Ability 1))) : Custom String(""), Left,
 			1, Global.specialEffectsTiming ? Color(White) : Color(Turquoise), Color(White), Global.specialEffectsTiming ? Color(White)
 			: Color(Turquoise), Visible To String and Color, Default Visibility);
