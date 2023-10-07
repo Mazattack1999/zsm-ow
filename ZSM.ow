@@ -3494,7 +3494,6 @@ rule("BOT BECOMES BOSS")
 		Wait Until(Event Player.botTarget != Null || Health(Event Player) < Event Player.health, 9999);
 		Clear Status(Event Player, Rooted);
 		Global.bosses[1] = Distance Between(Position Of(Event Player), Eye Position(Event Player));
-		Wait(1, Ignore Condition);
 		Enable Movement Collision With Environment(Event Player);
 		Event Player.wallCollisionEnabled = True;
 	}
@@ -5830,12 +5829,9 @@ rule("BOTS MOVE THROUGH SPAWN DOORS")
 		Is Alive(Event Player) == True;
 		Has Status(Event Player, Rooted) == False;
 		Throttle Of(Event Player) != Vector(0, 0, 0);
-		(Is On Ground(Event Player) || (Array Contains(Global.bosses, Event Player) && Altitude Of(Event Player) < 10)) == True;
+		Is On Ground(Event Player) == True;
 		"Allows if bot bumps into something"
-		Speed Of In Direction(Event Player, World Vector Of(Throttle Of(Event Player), Event Player, Rotation))
-			< Event Player.botThrottleSpeed * Event Player.movementSpeed * 3;
-		"Makes sure bot is moving forward"
-		Speed Of In Direction(Event Player, World Vector Of(Throttle Of(Event Player), Event Player, Rotation)) >= 0;
+		Horizontal Speed Of(Event Player) < Event Player.botThrottleSpeed * Event Player.movementSpeed * 3;
 		Is In Line of Sight(Position Of(Event Player) + Vector(0, 0.750, 0) * Event Player.size, Position Of(Event Player) + Vector(0,
 			0.750, 0) * Event Player.size + Normalize(World Vector Of(Throttle Of(Event Player), Event Player, Rotation))
 			* 3 * Event Player.size, Barriers Do Not Block LOS) == True;
@@ -5847,9 +5843,9 @@ rule("BOTS MOVE THROUGH SPAWN DOORS")
 		Disable Movement Collision With Environment(Event Player, False);
 		Event Player.wallCollisionEnabled = False;
 		If(Array Contains(Global.bosses, Event Player));
-			Wait(2, Restart When True);
+			Wait Until(!Is On Ground(Event Player), 3);
 		Else;
-			Wait(1, Ignore Condition);
+			Wait Until(!Is On Ground(Event Player), 1);
 		End;
 		Loop If Condition Is True;
 		Enable Movement Collision With Environment(Event Player);
