@@ -927,7 +927,7 @@ rule("START GAME")
 		Disable Built-In Game Mode Scoring;
 		Disable Built-In Game Mode Announcer;
 		Disable Inspector Recording;
-		disabled Enable Inspector Recording;
+		Enable Inspector Recording;
 		Destroy All Dummy Bots;
 		Destroy All Effects;
 		Destroy All HUD Text;
@@ -3513,6 +3513,7 @@ rule("BOSS STUCK")
 		Event Player.wallCollisionEnabled == True;
 		Event Player.canWallPhase == True;
 		Event Player.botTarget != Null;
+		Is On Ground(Event Player) == True;
 		Is Crouching(Event Player) == False;
 		Array Contains(Global.bosses, Event Player) == True;
 		Distance Between(Position Of(Event Player), Eye Position(Event Player)) < Global.bosses[1] - 0.250;
@@ -3582,28 +3583,18 @@ rule("BOSS DIES (ALL BOSS OBJECTIVES)")
 					If(Y Component Of(Position Of(Event Player)) - Y Component Of(Nearest Walkable Position(Position Of(Event Player))) < -50);
 						"Teleport boss if they fall very far below the map"
 						Teleport(Event Player, Nearest Walkable Position(Position Of(Event Player)));
-					Else If(Y Component Of(Position Of(Event Player)) - Y Component Of(Nearest Walkable Position(Position Of(Event Player))) < -30);
-						Apply Impulse(Event Player, Vector(0, 1, 0), 40, To World, Cancel Contrary Motion);
-					Else If(Y Component Of(Position Of(Event Player)) - Y Component Of(Nearest Walkable Position(Position Of(Event Player))) < -15);
-						Apply Impulse(Event Player, Vector(0, 1, 0), 32, To World, Cancel Contrary Motion);
 					Else;
-						Apply Impulse(Event Player, Vector(0, 1, 0), 25, To World, Cancel Contrary Motion);
+						"17.532 is acceleration due to gravity constant"
+						Apply Impulse(Event Player, Direction From Angles(Horizontal Angle From Direction(Direction Towards(Position Of(Event Player), Position Of(Event Player.lastTarget))), -75), Max(1, Square Root(2 * 17.532 * (Y Component Of(Position Of(Event Player.lastTarget)) + 3 - Y Component Of(Position Of(Event Player))))), To World, Cancel Contrary Motion);
 					End;
-					Wait(0.016, Restart When True);
+					Wait(0.016, Ignore Condition);
 					Resurrect(Event Player);
-					Wait Until(Is Alive(Event Player), 5);
-					Set Player Health(Event Player, Event Player.bossHealth);
-					Disable Movement Collision With Environment(Event Player, True);
-					Event Player.wallCollisionEnabled = False;
+					Wait Until(Is Alive(Event Player), 0.25);
 				End;
+				Set Player Health(Event Player, Event Player.bossHealth);
 				If(Event Player.botTarget == Null);
-					Start Throttle In Direction(Event Player, Direction Towards(Position Of(Event Player), Nearest Walkable Position(Position Of(
-						Event Player))), Event Player.botThrottleSpeed, To World, Replace existing throttle, None);
+					Start Throttle In Direction(Event Player, Direction Towards(Position Of(Event Player), Position Of(Event Player.lastTarget)), Event Player.botThrottleSpeed, To World, Replace existing throttle, None);
 				End;
-				Wait Until(Is On Ground(Event Player) || Y Component Of(Nearest Walkable Position(Position Of(Event Player))) < Y Component Of(
-					Position Of(Event Player)), 5);
-				Enable Movement Collision With Environment(Event Player);
-				Event Player.wallCollisionEnabled = True;
 			Else;
 				Global.objectiveComplete = True;
 				Global.bosses[Index Of Array Value(Global.bosses, Event Player)] = 0;
@@ -3620,7 +3611,7 @@ rule("BOSS DIES (ALL BOSS OBJECTIVES)")
 			Global.bosses[Index Of Array Value(Global.bosses, Event Player)] = 0;
 			Event Player.reviveTimer = 10;
 		End;
-		Wait(0.250, Ignore Condition);
+		Wait(0.250, Restart When True);
 		Loop If Condition Is True;
 	}
 }
@@ -5760,6 +5751,7 @@ rule("BOT WANDERS")
 		Event Player.specialFacing != True;
 		Event Player.crowdControlled != True;
 		Has Status(Event Player, Rooted) == False;
+		Is Alive(Event Player) == True;
 		"Allows if bot bumps into something"
 		Horizontal Speed Of(Event Player) < Event Player.botThrottleSpeed * Event Player.movementSpeed * 3.500;
 		Global.specialGameModeSetup != True;
@@ -5831,8 +5823,8 @@ rule("BOTS MOVE THROUGH SPAWN DOORS")
 		Is On Ground(Event Player) == True;
 		"Allows if bot bumps into something"
 		Horizontal Speed Of(Event Player) < Event Player.botThrottleSpeed * Event Player.movementSpeed * 3;
-		Is In Line of Sight(Position Of(Event Player) + Vector(0, 0.750, 0) * Event Player.size, Position Of(Event Player) + Vector(0,
-			0.750, 0) * Event Player.size + Normalize(World Vector Of(Throttle Of(Event Player), Event Player, Rotation))
+		Is In Line of Sight(Position Of(Event Player) + Vector(0, 0.750, 0), Position Of(Event Player) + Vector(0,
+			0.750, 0) + Normalize(World Vector Of(Throttle Of(Event Player), Event Player, Rotation))
 			* 3 * Event Player.size, Barriers Do Not Block LOS) == True;
 	}
 
