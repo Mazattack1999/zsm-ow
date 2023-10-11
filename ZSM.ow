@@ -26,7 +26,6 @@ settings
 			Capture Speed Modifier: 10%
 			Game Mode Start: Manual
 			Kill Cam: Off
-			Tank Role Passive Health Bonus: Always Enabled
 
 			disabled maps
 			{
@@ -45,7 +44,6 @@ settings
 			Flag Score Respawn Time: 20.0
 			Game Mode Start: Manual
 			Kill Cam: Off
-			Tank Role Passive Health Bonus: Always Enabled
 
 			disabled maps
 			{
@@ -67,13 +65,13 @@ settings
 			Game Mode Start: Manual
 			Kill Cam: Off
 			Scoring Speed Modifier: 10%
-			Tank Role Passive Health Bonus: Always Enabled
 
-			enabled maps
+			disabled maps
 			{
-				Antarctic Peninsula 972777519512068153
-				Busan 972777519512068194 972777519512068153 972777519512068154
-				Oasis 972777519512068292 972777519512068153 972777519512068154
+				Ilios
+				Lijiang Tower
+				Lijiang Tower Lunar New Year
+				Nepal
 			}
 		}
 
@@ -83,7 +81,6 @@ settings
 			Game Mode Start: Manual
 			Kill Cam: Off
 			Payload Speed Modifier: 10%
-			Tank Role Passive Health Bonus: Always Enabled
 		}
 
 		Flashpoint
@@ -92,7 +89,6 @@ settings
 			First Active Control Point: A
 			Score To Win: 10
 			Scoring Speed Modifier: 10%
-			Tank Role Passive Health Bonus: Always Enabled
 		}
 
 		Hybrid
@@ -102,7 +98,6 @@ settings
 			Game Mode Start: Manual
 			Kill Cam: Off
 			Payload Speed Modifier: 10%
-			Tank Role Passive Health Bonus: Always Enabled
 
 			disabled maps
 			{
@@ -115,7 +110,6 @@ settings
 			Allow Hero Switching: Off
 			Game Mode Start: Manual
 			Kill Cam: Off
-			Tank Role Passive Health Bonus: Always Enabled
 			TS-1 Push Speed Modifier: 10%
 			TS-1 Walk Speed Modifier: 10%
 		}
@@ -125,7 +119,6 @@ settings
 			Allow Hero Switching: Off
 			Game Mode Start: Manual
 			Kill Cam: Off
-			Tank Role Passive Health Bonus: Always Enabled
 
 			enabled maps
 			{
@@ -134,13 +127,17 @@ settings
 				Castillo 972777519512063901
 				Château Guillard 972777519512063901
 				Château Guillard Halloween 972777519512063901
-				Ecopoint: Antarctica 972777519512063901
 				Ecopoint: Antarctica Winter 972777519512063901
 				Kanezaka 972777519512063901
 				Malevento 972777519512063901
 				Necropolis 972777519512068153
 				Petra 972777519512068154
 			}
+		}
+
+		General
+		{
+			Tank Role Passive Health Bonus: Always Enabled
 		}
 	}
 
@@ -1188,7 +1185,7 @@ rule("setDifficulty")
 			"Bot bite durations"
 			Global.biteDurations = Array(3, 3, 3, 3, 0, 1.500, 4, 2, 2, 2, 1, 1.500, 0, 0, 3);
 			"Bot throttle speeds"
-			Global.throttleSpeeds = Array(1, 1, 1, 1, 1, 1, 0.99, 1, 1, 1, 1, 1, 1, 1, 1);
+			Global.throttleSpeeds = Array(1, 1, 1, 1, 1, 1, 0.990, 1, 1, 1, 1, 1, 1, 1, 1);
 			"Bot damage dealt"
 			Global.damageDealt = Array(300, 300, 250, 150, 230, 450, 150, 400, 300, 350, 200, 250, 150, 200, 200);
 		End;
@@ -2356,7 +2353,7 @@ rule("EFFECTS/TEXTS")
 			Visible To and Position, Color(Green), True);
 		"SERVER LOAD"
 		Create HUD Text(String Contains(Custom String("{0}", Local Player), Custom String("Mazattack")) ? Local Player : Empty Array,
-			Custom String("Spawn Array: {0}, {1}, {2}", Global.spawnTimes[0], Global.spawnTimes[1],  Global.spawnTimes[2]), Custom String(
+			Custom String("Spawn Array: {0}, {1}, {2}", Global.spawnTimes[0], Global.spawnTimes[1], Global.spawnTimes[2]), Custom String(
 			"SERVER LOAD AVERAGE: {0}", Server Load Average), Custom String("SERVER LOAD PEAK: {0}", Server Load Peak), Right, 0, Color(
 			White), Color(White), Color(White), Visible To and String, Default Visibility);
 		If(Global.difficultySetting == 1);
@@ -2694,12 +2691,17 @@ rule("objectivesManagement")
 					"All Grave Locations"
 					Global.objectiveCaptureValue = Filtered Array(Global.mapGrid, Distance Between(First Of(Global.objectivePositions),
 						Current Array Element) < Global.objectiveRad - 15);
-						Global.testPos2 = Last Of(Sorted Array(Global.objectiveCaptureValue, Distance Between(First Of(Global.objectivePositions), Current Array Element)));
-						Global.objectiveCaptureValue = Filtered Array(Global.objectiveCaptureValue, Distance Between(Current Array Element, Global.testPos2 + (Direction Towards(Global.testPos2, First Of(Global.objectivePositions)) * Distance Between(Global.testPos2, Current Array Element))) < 15);
+					Global.testPos2 = Last Of(Sorted Array(Global.objectiveCaptureValue, Distance Between(First Of(Global.objectivePositions),
+						Current Array Element)));
+					Global.objectiveCaptureValue = Filtered Array(Global.objectiveCaptureValue, Distance Between(Current Array Element,
+						Global.testPos2 + Direction Towards(Global.testPos2, First Of(Global.objectivePositions)) * Distance Between(Global.testPos2,
+						Current Array Element)) < 15);
 					Wait(0.016, Ignore Condition);
 				End;
-				Global.objectiveCaptureValue = Sorted Array(Global.objectiveCaptureValue, Distance Between(Global.testPos2, Vector(X Component Of(Current Array Element), Y Component Of(Global.testPos2), Z Component Of(Current Array Element))));
-				Global.objectiveCaptureValue = Filtered Array(Global.objectiveCaptureValue, Current Array Index < Global.eliminationsNeededPerObjective);
+				Global.objectiveCaptureValue = Sorted Array(Global.objectiveCaptureValue, Distance Between(Global.testPos2, Vector(X Component Of(
+					Current Array Element), Y Component Of(Global.testPos2), Z Component Of(Current Array Element))));
+				Global.objectiveCaptureValue = Filtered Array(Global.objectiveCaptureValue,
+					Current Array Index < Global.eliminationsNeededPerObjective);
 				"Active Grave Locations"
 				Global.objectiveResourcePositions = Empty Array;
 				"Max number of active graves "
@@ -3063,17 +3065,20 @@ rule("globalObjectiveEntityManagement")
 			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 			"Good Aura Ambiance"
 			Create Effect(Filtered Array(All Players(Team 1), Distance Between(First Of(Global.objectivePositions), Position Of(
-				Current Array Element)) < Global.objectiveRad), Good Aura, Global.objectiveColor, Local Player, 10, Visible To Position and Radius);
+				Current Array Element)) < Global.objectiveRad), Good Aura, Global.objectiveColor, Local Player, 10,
+				Visible To Position and Radius);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 			"Graveyard sphere"
 			Create Effect(Filtered Array(All Players(Team 1), Distance Between(First Of(Global.objectivePositions), Eye Position(
-				Current Array Element)) < Global.objectiveRad - 10), Sphere, Global.objectiveColor, First Of(Global.objectivePositions), Global.objectiveRad, Visible To Position and Radius);
+				Current Array Element)) < Global.objectiveRad - 10), Sphere, Global.objectiveColor, First Of(Global.objectivePositions),
+				Global.objectiveRad, Visible To Position and Radius);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 			"Graveyard Ring"
-			Create Effect(Filtered Array(All Players(All Teams), Distance Between(Position Of(Current Array Element), First Of(Global.objectivePositions))
-				< Global.objectiveRad), Ring, Global.objectiveColor, Vector(X Component Of(First Of(Global.objectivePositions)), Y Component Of(Position Of(
-				Local Player)), Z Component Of(First Of(Global.objectivePositions))), Square Root(Global.objectiveRad ^ 2 - Absolute Value(Y Component Of(
-				Position Of(Local Player)) - Y Component Of(First Of(Global.objectivePositions))) ^ 2), Visible To Position and Radius);
+			Create Effect(Filtered Array(All Players(All Teams), Distance Between(Position Of(Current Array Element), First Of(
+				Global.objectivePositions)) < Global.objectiveRad), Ring, Global.objectiveColor, Vector(X Component Of(First Of(
+				Global.objectivePositions)), Y Component Of(Position Of(Local Player)), Z Component Of(First Of(Global.objectivePositions))),
+				Square Root(Global.objectiveRad ^ 2 - Absolute Value(Y Component Of(Position Of(Local Player)) - Y Component Of(First Of(
+				Global.objectivePositions))) ^ 2), Visible To Position and Radius);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Created Entity);
 			"Grave effects"
 			For Global Variable(objectiveEntityCount, 0, Global.survivorToRescue, 1);
@@ -3585,15 +3590,18 @@ rule("BOSS DIES (ALL BOSS OBJECTIVES)")
 						Teleport(Event Player, Nearest Walkable Position(Position Of(Event Player)));
 					Else;
 						"17.532 is acceleration due to gravity constant"
-						Apply Impulse(Event Player, Direction From Angles(Horizontal Angle From Direction(Direction Towards(Position Of(Event Player), Position Of(Event Player.lastTarget))), -75), Max(1, Square Root(2 * 17.532 * (Y Component Of(Position Of(Event Player.lastTarget)) + 3 - Y Component Of(Position Of(Event Player))))), To World, Cancel Contrary Motion);
+						Apply Impulse(Event Player, Direction From Angles(Horizontal Angle From Direction(Direction Towards(Position Of(Event Player),
+							Position Of(Event Player.lastTarget))), -75), Max(1, Square Root(2 * 17.532 * (Y Component Of(Position Of(
+							Event Player.lastTarget)) + 3 - Y Component Of(Position Of(Event Player))))), To World, Cancel Contrary Motion);
 					End;
 					Wait(0.016, Ignore Condition);
 					Resurrect(Event Player);
-					Wait Until(Is Alive(Event Player), 0.25);
+					Wait Until(Is Alive(Event Player), 0.250);
 				End;
 				Set Player Health(Event Player, Event Player.bossHealth);
 				If(Event Player.botTarget == Null);
-					Start Throttle In Direction(Event Player, Direction Towards(Position Of(Event Player), Position Of(Event Player.lastTarget)), Event Player.botThrottleSpeed, To World, Replace existing throttle, None);
+					Start Throttle In Direction(Event Player, Direction Towards(Position Of(Event Player), Position Of(Event Player.lastTarget)),
+						Event Player.botThrottleSpeed, To World, Replace existing throttle, None);
 				End;
 			Else;
 				Global.objectiveComplete = True;
@@ -4175,7 +4183,7 @@ rule("MODIFY KILL ZONE SCORE")
 	{
 		If(Distance Between(Position Of(Event Player), Global.objectiveChase1) < Global.objectiveRad || Distance Between(Position Of(
 			Victim), Global.objectiveChase1) < Global.objectiveRad);
-			Victim.reviveTimer = 3 - 4.5 * (Global.objectiveCaptureValue / Global.eliminationsNeededPerObjective);
+			Victim.reviveTimer = 3 - 4.500 * (Global.objectiveCaptureValue / Global.eliminationsNeededPerObjective);
 			Global.objectiveCaptureValue += Round To Integer(Victim.health / 280, Up);
 			If(Global.objectiveCaptureValue >= Global.eliminationsNeededPerObjective);
 				Global.objectiveComplete = True;
@@ -4209,7 +4217,8 @@ rule("SPAWN ZOMBIE EGG")
 		Global.objectiveTypes[0] == 7;
 		Global.objectiveComplete == False;
 		Entity Exists(First Of(Global.bosses)) == False;
-		Is True For Any(All Living Players(Team 2), Has Spawned(Current Array Element) && !Current Array Element.teleporting && !Current Array Element.successfullyTeleported) == True;
+		Is True For Any(All Living Players(Team 2), Has Spawned(Current Array Element)
+			&& !Current Array Element.teleporting && !Current Array Element.successfullyTeleported) == True;
 		Count Of(Filtered Array(Global.botHeros, Number Of Heroes(Current Array Element, Team 2) > 0)) < Global.uniqueSkinCap - Max(
 			Number Of Slots(Team 1), Number Of Players(Team 1));
 	}
@@ -4217,8 +4226,8 @@ rule("SPAWN ZOMBIE EGG")
 	actions
 	{
 		Wait(0.250, Abort When False);
-		Global.bosses[0] = Random Value In Array(Filtered Array(All Living Players(Team 2),
-			Has Spawned(Current Array Element) && !Current Array Element.teleporting && !Current Array Element.successfullyTeleported));
+		Global.bosses[0] = Random Value In Array(Filtered Array(All Living Players(Team 2), Has Spawned(Current Array Element)
+			&& !Current Array Element.teleporting && !Current Array Element.successfullyTeleported));
 		Loop If Condition Is True;
 	}
 }
@@ -4569,8 +4578,8 @@ rule("ZOMBIES SPAWN AT GRAVES")
 		Event Player.teleporting != True;
 		Event Player.successfullyTeleported != True;
 		Is Alive(Event Player) == True;
-		(Array Contains(Global.objectiveResourcePositions, Event Player) || Is True For Any(Global.playerTargetList, Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element))
-			< Global.objectiveRad)) == True;
+		(Array Contains(Global.objectiveResourcePositions, Event Player) || Is True For Any(Global.playerTargetList, Distance Between(
+			First Of(Global.objectivePositions), Position Of(Current Array Element)) < Global.objectiveRad)) == True;
 	}
 
 	actions
@@ -5037,7 +5046,7 @@ rule("PLAYER INFECTION DAMAGE MANAGEMENT")
 			Event Player.infected = False;
 		End;
 		"Infection must deal at least 0.5 damage per second"
-		Start Damage Over Time(Event Player, Null, 1, Max(0.5, Round To Integer(Event Player.infectionLvl, Down) ^ 4 / 16));
+		Start Damage Over Time(Event Player, Null, 1, Max(0.500, Round To Integer(Event Player.infectionLvl, Down) ^ 4 / 16));
 		Wait(1, Ignore Condition);
 		Loop If Condition Is True;
 	}
@@ -5282,31 +5291,6 @@ disabled rule("============================================== HERO TUNING ======
 	event
 	{
 		Ongoing - Global;
-	}
-}
-
-rule("SOMBRA INVISIBILITY")
-{
-	event
-	{
-		Ongoing - Each Player;
-		Team 1;
-		Sombra;
-	}
-
-	conditions
-	{
-		Is Game In Progress == True;
-		Event Player.invisible == False;
-		Is Using Ability 1(Event Player) == True;
-	}
-
-	actions
-	{
-		Event Player.invisible = True;
-		Wait Until(!Is Using Ability 1(Event Player) || !Event Player.invisible, 9999);
-		Loop If Condition Is True;
-		Event Player.invisible = False;
 	}
 }
 
@@ -5889,9 +5873,9 @@ rule("BOTS MOVE THROUGH SPAWN DOORS")
 		Is On Ground(Event Player) == True;
 		"Allows if bot bumps into something"
 		Horizontal Speed Of(Event Player) < Event Player.botThrottleSpeed * Event Player.movementSpeed * 3;
-		Is In Line of Sight(Position Of(Event Player) + Vector(0, 0.750, 0), Position Of(Event Player) + Vector(0,
-			0.750, 0) + Normalize(World Vector Of(Throttle Of(Event Player), Event Player, Rotation))
-			* 3 * Event Player.size, Barriers Do Not Block LOS) == True;
+		Is In Line of Sight(Position Of(Event Player) + Vector(0, 0.750, 0), Position Of(Event Player) + Vector(0, 0.750, 0) + Normalize(
+			World Vector Of(Throttle Of(Event Player), Event Player, Rotation)) * 3 * Event Player.size, Barriers Do Not Block LOS)
+			== True;
 	}
 
 	actions
@@ -6407,32 +6391,30 @@ rule("botEntityManagement")
 			Else If(Hero Of(Event Player) == Hero(Ramattra));
 				"Nemesis will activate aura"
 				Create Effect(Filtered Array(Global.playerTargetList, !Event Player.botTempValue && Is Alive(Event Player)
-					&& Event Player.botTarget && Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget)) < 12 *
-					Event Player.size), Bad Aura, Color(Purple), Event Player, 1 * Event Player.size, Visible To Position and Radius);
+					&& Event Player.botTarget && Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget))
+					< 12 * Event Player.size), Bad Aura, Color(Purple), Event Player, 1 * Event Player.size, Visible To Position and Radius);
 				Modify Player Variable(Event Player, generalPlayerBotEntities, Append To Array, Last Created Entity);
 				"Angered area of effect"
-				Create Effect(Filtered Array(Global.playerTargetList, Event Player.botTempValue), Ring, Color(Red), Event Player, 12 * Event Player.size, Visible To Position and Radius);
+				Create Effect(Filtered Array(Global.playerTargetList, Event Player.botTempValue), Ring, Color(Red), Event Player,
+					12 * Event Player.size, Visible To Position and Radius);
 				Modify Player Variable(Event Player, generalPlayerBotEntities, Append To Array, Last Created Entity);
 			Else If(Hero Of(Event Player) == Hero(Sombra));
 				"Near fog visual"
-				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, True), Bad Aura, Color(Gray),
-					Eye Position(Local Player) + Facing Direction Of(Local Player) * (6.750 + Evaluate Once(Random Real(-0.500, 0.500))), 200,
+				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, True), Bad Aura, Color(Gray), Eye Position(Local Player)
+					+ Facing Direction Of(Local Player) * (6.750 + Evaluate Once(Random Real(-0.500, 0.500))), 200,
 					Visible To Position and Radius);
 				Modify Player Variable(Event Player, generalPlayerBotEntities, Append To Array, Last Created Entity);
 				"Mid Range fog visual"
-				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, True), Bad Aura, Color(Purple),
-					Eye Position(Local Player) + Facing Direction Of(Local Player) * (20 + Evaluate Once(Random Real(-0.500, 0.500))), 200,
-					Visible To Position and Radius);
+				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, True), Bad Aura, Color(Purple), Eye Position(Local Player)
+					+ Facing Direction Of(Local Player) * (20 + Evaluate Once(Random Real(-0.500, 0.500))), 200, Visible To Position and Radius);
 				Modify Player Variable(Event Player, generalPlayerBotEntities, Append To Array, Last Created Entity);
 				"Mid Range fog visual"
-				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, True), Bad Aura, Color(Purple),
-					Eye Position(Local Player) + Facing Direction Of(Local Player) * (30 + Evaluate Once(Random Real(-0.500, 0.500))), 200,
-					Visible To Position and Radius);
+				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, True), Bad Aura, Color(Purple), Eye Position(Local Player)
+					+ Facing Direction Of(Local Player) * (30 + Evaluate Once(Random Real(-0.500, 0.500))), 200, Visible To Position and Radius);
 				Modify Player Variable(Event Player, generalPlayerBotEntities, Append To Array, Last Created Entity);
 				"Illusion aura"
-				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, True && Is Using Ability 1(
-					Event Player)), Good Aura, Color(Purple), Eye Position(Event Player), 0.250 * Event Player.size,
-					Visible To Position and Radius);
+				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, True && Is Using Ability 1(Event Player)), Good Aura, Color(
+					Purple), Eye Position(Event Player), 0.250 * Event Player.size, Visible To Position and Radius);
 				Modify Player Variable(Event Player, generalPlayerBotEntities, Append To Array, Last Created Entity);
 			End;
 		End;
@@ -7239,8 +7221,9 @@ rule("RIDER ATTACH TO TEAMMATES")
 		Is Alive(Event Player) == True;
 		Array Contains(Global.bosses, Event Player) == False;
 		"If any valid teammates are within range"
-		Is True For Any(Remove From Array(All Living Players(Team 2), Event Player), !Current Array Element.teleporting && Current Array Element.botThrottleSpeed > Event Player.botThrottleSpeed && Distance Between(Position Of(Event Player), Position Of(Current Array Element))
-			< 4 * Event Player.size) == True;
+		Is True For Any(Remove From Array(All Living Players(Team 2), Event Player),
+			!Current Array Element.teleporting && Current Array Element.botThrottleSpeed > Event Player.botThrottleSpeed && Distance Between(
+			Position Of(Event Player), Position Of(Current Array Element)) < 4 * Event Player.size) == True;
 		(Event Player.botTarget == Null || Distance Between(Eye Position(Event Player), Event Player.botTarget) > 20 || (Ability Cooldown(
 			Event Player, Button(Ability 1)) > 0 && Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget))
 			> 7.500)) == True;
@@ -7250,8 +7233,8 @@ rule("RIDER ATTACH TO TEAMMATES")
 	{
 		Wait(0.250, Abort When False);
 		Event Player.botSpecialTarget = First Of(Sorted Array(Filtered Array(Remove From Array(All Living Players(Team 2), Event Player),
-			!Current Array Element.teleporting && Current Array Element.botThrottleSpeed > Event Player.botThrottleSpeed), Distance Between(Position Of(
-			Event Player), Position Of(Current Array Element))));
+			!Current Array Element.teleporting && Current Array Element.botThrottleSpeed > Event Player.botThrottleSpeed),
+			Distance Between(Position Of(Event Player), Position Of(Current Array Element))));
 		Attach Players(Event Player, Event Player.botSpecialTarget, Event Player.botSpecialTarget.size * Vector(Random Real(-0.500, 0.500),
 			0.250, -0.750));
 		Event Player.attached = True;
@@ -8382,7 +8365,7 @@ rule("NANOMANCER PUNCHES IN NEMESIS FORM")
 	actions
 	{
 		Press Button(Event Player, Button(Primary Fire));
-		Wait(0.6, Ignore Condition);
+		Wait(0.600, Ignore Condition);
 		Loop If Condition Is True;
 	}
 }
@@ -8435,7 +8418,9 @@ rule("ILLUISONIST USES EMP")
 	conditions
 	{
 		Event Player.botTarget != Null;
-		((Array Contains(Global.bosses, Event Player) && Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget)) < 20) || (Is Using Ability 1(Event Player) && Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget)) > 7.5 && Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget)) < 30)) == True;
+		((Array Contains(Global.bosses, Event Player) && Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget))
+			< 20) || (Is Using Ability 1(Event Player) && Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget))
+			> 7.500 && Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget)) < 30)) == True;
 	}
 
 	actions
@@ -8448,9 +8433,10 @@ rule("ILLUISONIST USES EMP")
 			Wait(0.125, Ignore Condition);
 			Wait Until(Y Component Of(Velocity Of(Event Player)) <= 0, 5);
 		Else;
-		 	Event Player.specialFacing = True;
+			Event Player.specialFacing = True;
 			Stop Facing(Event Player);
-			Set Facing(Event Player, Direction Towards(Eye Position(Event Player), Eye Position(Event Player.lastTarget) + Vector(0, 10, 0)), To World);
+			Set Facing(Event Player, Direction Towards(Eye Position(Event Player), Eye Position(Event Player.lastTarget) + Vector(0, 10, 0)),
+				To World);
 			Wait(0.125, Ignore Condition);
 			While(!Is Using Ability 2(Event Player));
 				Press Button(Event Player, Button(Ability 2));
@@ -8458,14 +8444,14 @@ rule("ILLUISONIST USES EMP")
 			End;
 			Event Player.specialFacing = False;
 			Start Rule(restoreDefaultFacingMovement, Do Nothing);
-			Wait(1.5, Ignore Condition);
+			Wait(1.500, Ignore Condition);
 			Event Player.botTempValue = Position Of(Event Player);
 			While(Is Using Ability 2(Event Player));
 				Press Button(Event Player, Button(Ability 2));
 				Wait(0.125, Ignore Condition);
 			End;
 			Set Invisible(Event Player, All);
-			Wait(0.25, Ignore Condition);
+			Wait(0.250, Ignore Condition);
 		End;
 		"Is boss or translocator has not been destroyed"
 		If(Array Contains(Global.bosses, Event Player) || Distance Between(Position Of(Event Player), Event Player.botTempValue) > 1);
@@ -8490,7 +8476,7 @@ rule("ILLUISONIST USES EMP")
 		Else;
 			Event Player.pForceFieldCount2_bCount1 = 10;
 		End;
-		Event Player.damageOverTimeDuration = EventPlayer.pForceFieldCount2_bCount1 + 0.5;
+		Event Player.damageOverTimeDuration = Event Player.pForceFieldCount2_bCount1 + 0.500;
 		While(Event Player.pForceFieldCount2_bCount1 > 0);
 			Event Player.botSpecialPotentialTargets.blinded = True;
 			Event Player.botSpecialPotentialTargets.updateOutlines = True;
