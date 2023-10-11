@@ -6412,7 +6412,7 @@ rule("botEntityManagement")
 					+ Facing Direction Of(Local Player) * (30 + Evaluate Once(Random Real(-0.500, 0.500))), 200, Visible To Position and Radius);
 				Modify Player Variable(Event Player, generalPlayerBotEntities, Append To Array, Last Created Entity);
 				"Illusion aura"
-				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, True), Good Aura, Color(
+				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, Is Alive(Event Player)), Good Aura, Color(
 					Purple), Eye Position(Event Player), 0.250 * Event Player.size, Visible To Position and Radius);
 				Modify Player Variable(Event Player, generalPlayerBotEntities, Append To Array, Last Created Entity);
 			End;
