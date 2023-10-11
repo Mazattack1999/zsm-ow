@@ -923,7 +923,7 @@ rule("START GAME")
 		Disable Built-In Game Mode Scoring;
 		Disable Built-In Game Mode Announcer;
 		Disable Inspector Recording;
-		Enable Inspector Recording;
+		disabled Enable Inspector Recording;
 		Destroy All Dummy Bots;
 		Destroy All Effects;
 		Destroy All HUD Text;
