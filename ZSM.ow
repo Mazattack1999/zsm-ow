@@ -447,7 +447,7 @@ rule("Fix bot health")
 	}
 }
 
-disabled rule("interact test")
+rule("interact test")
 {
 	event
 	{
@@ -4679,7 +4679,7 @@ rule("PLAYER INITIALIZATION")
 		Disable Game Mode In-World UI(Event Player);
 		Disable Game Mode HUD(Event Player);
 		Wait(0.250, Abort When False);
-		Event Player.invisible = False;
+		Event Player.invisible = 0;
 		Event Player.reviving = False;
 		Disable Built-In Game Mode Respawning(Event Player);
 		Wait(0.016, Ignore Condition);
@@ -5293,6 +5293,8 @@ disabled rule("============================================== HERO TUNING ======
 	}
 }
 
+
+
 rule("DOOMFIST INVIS WHILE ULTING")
 {
 	event
@@ -5305,16 +5307,14 @@ rule("DOOMFIST INVIS WHILE ULTING")
 	conditions
 	{
 		Is Game In Progress == True;
-		Event Player.invisible == False;
 		Is Using Ultimate(Event Player) == True;
 	}
 
 	actions
 	{
-		Event Player.invisible = True;
-		Wait Until(!Is Using Ultimate(Event Player) || !Event Player.invisible, 9999);
-		Loop If Condition Is True;
-		Event Player.invisible = False;
+		Event Player.invisible += 1;
+		Wait Until(!Is Using Ultimate(Event Player), 9999);
+		Event Player.invisible -= 1;
 	}
 }
 
@@ -5330,16 +5330,14 @@ rule("MOIRA INVIS WHILE FADING")
 	conditions
 	{
 		Is Game In Progress == True;
-		Event Player.invisible == False;
 		Is Using Ability 1(Event Player) == True;
 	}
 
 	actions
 	{
-		Event Player.invisible = True;
-		Wait Until(!Is Using Ability 1(Event Player) || !Event Player.invisible, 9999);
-		Loop If Condition Is True;
-		Event Player.invisible = False;
+		Event Player.invisible += 1;
+		Wait Until(!Is Using Ability 1(Event Player), 9999);
+		Event Player.invisible -= 1;
 	}
 }
 
@@ -5355,16 +5353,15 @@ rule("TRACER INVIS WHILE RECALLING")
 	conditions
 	{
 		Is Game In Progress == True;
-		Event Player.invisible == False;
 		Is Using Ability 2(Event Player) == True;
 	}
 
 	actions
 	{
-		Event Player.invisible = True;
-		Wait Until(!Is Using Ability 2(Event Player) || !Event Player.invisible, 9999);
+		Event Player.invisible += 1;
+		Wait Until(!Is Using Ability 2(Event Player), 9999);
 		Loop If Condition Is True;
-		Event Player.invisible = False;
+		Event Player.invisible -= 1;
 	}
 }
 
@@ -9142,6 +9139,7 @@ rule("cloakingDevice (60-69)")
 				Crouch)), Input Binding String(Button(Interact))) : Custom String(""), Right, 0.200, Color(Blue), Color(Blue), Color(Blue),
 				Visible To and String, Default Visibility);
 			Event Player.powerUpEffects[61] = Last Text ID;
+			Event Player.invisible += 1;
 		End;
 		If(!Event Player.invisible);
 			Small Message(Event Player, Custom String("Cloaking activated. You are now invisible."));
@@ -9150,8 +9148,7 @@ rule("cloakingDevice (60-69)")
 			Event Player), Position Of(Event Player)) * 0.950);
 		Play Effect(All Players(All Teams), Buff Impact Sound, Color(Blue), Position Of(Event Player), 50);
 		"Cloaking Duration"
-		For Player Variable(Event Player, pCloakingDeviceCount, 25, 0, -0.032);
-			Event Player.invisible = True;
+		For Player Variable(Event Player, pCloakingDeviceCount, 25, 0, -1);
 			If(Event Player.pCloakingDeviceCount < 23 && Is Button Held(Event Player, Button(Crouch)) && Is Button Held(Event Player, Button(
 				Interact)));
 				Small Message(Event Player, Custom String("Cloaking deactivated"));
@@ -9160,9 +9157,10 @@ rule("cloakingDevice (60-69)")
 			If(Is Dead(Event Player));
 				Break;
 			End;
-			Wait(0.032, Ignore Condition);
+			Wait Until(Event Player.pCloakingDeviceCount < 23 && Is Button Held(Event Player, Button(Crouch)) && Is Button Held(Event Player, Button(
+				Interact)), 1);
 		End;
-		Event Player.invisible = False;
+		Event Player.invisible -= 1;
 		Wait(0.250, Ignore Condition);
 		Destroy Effect(Event Player.powerUpEffects[60]);
 		Destroy HUD Text(Event Player.powerUpEffects[61]);
