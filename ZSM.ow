@@ -447,7 +447,7 @@ rule("Fix bot health")
 	}
 }
 
-rule("interact test")
+disabled rule("interact test")
 {
 	event
 	{
@@ -4679,7 +4679,6 @@ rule("PLAYER INITIALIZATION")
 		Disable Game Mode In-World UI(Event Player);
 		Disable Game Mode HUD(Event Player);
 		Wait(0.250, Abort When False);
-		Event Player.invisible = 0;
 		Event Player.reviving = False;
 		Disable Built-In Game Mode Respawning(Event Player);
 		Wait(0.016, Ignore Condition);
@@ -5293,7 +5292,120 @@ disabled rule("============================================== HERO TUNING ======
 	}
 }
 
+rule("SOMBRA INITIALIZE")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Sombra;
+	}
 
+	conditions
+	{
+		Is Game In Progress == True;
+	}
+
+	actions
+	{
+		Event Player.damageOverTimeDuration = 3;
+		Chase Player Variable At Rate(Event Player, damageOverTimeDuration, 0, Event Player.infected ? 0 : 1, Destination And Rate);
+	}
+}
+
+rule("SOMBRA IN COMBAT (TOOK DAMAGE)")
+{
+	event
+	{
+		Player Took Damage;
+		Team 1;
+		Sombra;
+	}
+
+	conditions
+	{
+		Event Player.infected != True;
+		Event Player.damageOverTimeDuration < Attacker.damageOverTimeDuration + 4;
+	}
+
+	actions
+	{
+		Event Player.damageOverTimeDuration = Attacker.damageOverTimeDuration + 4;
+	}
+}
+
+rule("SOMBRA IN COMBAT (BUTTON PRESSES)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Sombra;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Event Player.damageOverTimeDuration < 4;
+		(Is True For Any(Array(Button(Primary Fire), Button(Secondary Fire), Button(Ability 1), Button(Melee)), Is Button Held(Event Player, Current Array Element) && Ability Cooldown(Event Player, Current Array Element) == 0)) == True;
+	}
+
+	actions
+	{
+		Event Player.damageOverTimeDuration = 4;
+		Wait(0.25, Restart When True);
+		Loop If Condition Is True;
+	}
+}
+
+rule("SOMBRA USES TRANSLOCATOR")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Sombra;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Event Player.damageOverTimeDuration > 0;
+		Ability Cooldown(Event Player, Button(Ability 2)) > 0;
+	}
+
+	actions
+	{
+		If(Event Player.damageOverTimeDuration > 3);
+			Event Player.damageOverTimeDuration = 1;
+		Else;
+			Event Player.damageOverTimeDuration = 0;
+		End;
+	}
+}
+
+rule("SOMBRA INVISIBLE")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Sombra;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Event Player.damageOverTimeDuration == 0;
+	}
+
+	actions
+	{
+		Event Player.invisible += 1;
+		Wait Until(Event Player.damageOverTimeDuration > 0, 9999);
+		Event Player.invisible -= 1;
+	}
+}
 
 rule("DOOMFIST INVIS WHILE ULTING")
 {
