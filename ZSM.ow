@@ -5539,9 +5539,7 @@ rule("BOT INITIALIZATION")
 			Event Player.health), Event Player, 2, Do Not Clip, Visible To Position and String, Color(Green), Default Visibility);
 		Wait(1, Ignore Condition);
 		"Initial Outline Control"
-		If(Event Player.defaultOutlineColor == Null);
-			Stop Forcing Player Outlines(Event Player, Filtered Array(All Players(Team 1), !Current Array Element.blinded));
-		Else;
+		If(Event Player.defaultOutlineColor != Null);
 			"Mutation outline for non-blinded players"
 			Start Forcing Player Outlines(Event Player, Filtered Array(All Players(Team 1), !Current Array Element.blinded), True,
 				Event Player.defaultOutlineColor, Default);
@@ -6648,6 +6646,7 @@ rule("mutations")
 		Else;
 			Event Player.mutationValue = 0;
 			Event Player.defaultOutlineColor = Null;
+			Stop Forcing Player Outlines(Event Player, Filtered Array(All Players(Team 1), !Current Array Element.blinded));
 			Stop Forcing Dummy Bot Name(Event Player);
 		End;
 	}
