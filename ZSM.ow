@@ -447,7 +447,7 @@ rule("Fix bot health")
 	}
 }
 
-rule("interact test")
+disabled rule("interact test")
 {
 	event
 	{
@@ -5304,7 +5304,6 @@ rule("SOMBRA INITIALIZE")
 	conditions
 	{
 		Is Game In Progress == True;
-		Is Alive(Event Player) == True;
 	}
 
 	actions
@@ -5348,6 +5347,7 @@ rule("SOMBRA IN COMBAT (BUTTON PRESSES)")
 	{
 		Is Game In Progress == True;
 		Event Player.damageOverTimeDuration < 3.5;
+		Is Alive(Event Player) == True;
 		(Is True For Any(Array(Button(Primary Fire), Button(Secondary Fire), Button(Ability 1), Button(Melee)), Is Button Held(Event Player, Current Array Element) && Ability Cooldown(Event Player, Current Array Element) == 0)) == True;
 	}
 
@@ -9272,7 +9272,6 @@ rule("cloakingDevice (60-69)")
 				Interact)), 1);
 		End;
 		Event Player.invisible -= 1;
-		Wait(0.250, Ignore Condition);
 		Destroy Effect(Event Player.powerUpEffects[60]);
 		Destroy HUD Text(Event Player.powerUpEffects[61]);
 		Event Player.powerUpEffects[60] = 0;
