@@ -275,6 +275,7 @@ variables
 		99: botCurrentSpawnRate
 		100: botRespawnCount
 		101: botSpawnPointTimers
+		102: zombieSource
 
 	player:
 		0: averagePlayersPos
@@ -419,6 +420,7 @@ subroutines
 	45: selectTarget
 	46: restoreDefaultFacingMovement
 	47: setPrematchTimer
+	48: useZombieSource
 }
 
 rule("Fix bot health")
@@ -1290,6 +1292,9 @@ rule("setObjectiveType")
 		Global.objectiveTypes[Count Of(Global.objectiveTypes) - 1] = 1;
 		Call Subroutine(objectivesManagement);
 		Global.gameStatus = True;
+		Wait Until(Count Of(Global.playerTargetList) > 0, 9999);
+		Global.zombieSource = Random Value In Array(Global.mapGrid);
+		Chase Global Variable At Rate(zombieSource, Position Of(First Of(Global.playerTargetList)), 1, Destination And Rate);
 	}
 }
 
@@ -2373,6 +2378,9 @@ rule("EFFECTS/TEXTS")
 				0.100, Color(White), Color(White), Global.specialEffectsTiming ? Color(White) : Color(Turquoise), Visible To and Color,
 				Default Visibility);
 		End;
+		"Zombie Source Icon"
+		Create Icon(Host Player, Global.zombieSource, Skull,
+			Visible To and Position, Color(Turquoise), True);
 	}
 }
 
@@ -2608,6 +2616,10 @@ rule("objectivesManagement")
 				Global.objectivePositions = Array(Last Of(Global.objectivePositions));
 				Global.objectiveTypes = Array(Last Of(Global.objectiveTypes));
 			End;
+			Global.zombieSource = Random Value In Array(Filtered Array(Global.mapGrid, Distance Between(First Of(Global.objectivePositions), Current Array Element) > 100 && Distance Between(First Of(Global.objectivePositions), Current Array Element) < 120));
+			If(!Global.zombieSource);
+				Global.zombieSource = Last Of(Sorted Array(Global.mapGrid, Distance Between(First Of(Global.objectivePositions), Current Array Element)));
+			End;
 		End;
 		Wait(0.250, Ignore Condition);
 		If(Count Of(Global.objectivePositions) == 1);
@@ -2617,6 +2629,7 @@ rule("objectivesManagement")
 			Chase Global Variable Over Time(extractionZoneRad, 0, 120, Destination and Duration);
 			Global.objectiveRad = 10;
 			Big Message(All Players(All Teams), Custom String("Get to the extraction point!"));
+			Global.zombieSource = Random Value In Array(First Of(Global.objectivePositions));
 		Else;
 			If(First Of(Global.objectiveTypes) == 1);
 				Global.objectiveDescription = Custom String("Secure the capture point");
@@ -6272,6 +6285,21 @@ rule("botTeleportCenter")
 		Else;
 			Call Subroutine(locateAveragePlayerLocation);
 		End;
+		Call Subroutine(useZombieSource);
+	}
+}
+
+rule("useZombieSource")
+{
+	event
+	{
+		Subroutine;
+		useZombieSource;
+	}
+
+	actions
+	{
+		Event Player.averagePlayersPos += Direction Towards(Event Player.averagePlayersPos, Global.zombieSource) * Min(20, Distance Between(Event Player.averagePlayersPos, Global.zombieSource));
 	}
 }
 
