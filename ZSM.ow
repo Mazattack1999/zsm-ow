@@ -447,7 +447,7 @@ rule("Fix bot health")
 	}
 }
 
-disabled rule("interact test")
+rule("interact test")
 {
 	event
 	{
@@ -463,7 +463,7 @@ disabled rule("interact test")
 	{
 		Heal(Host Player, Null, 100000);
 		Set Damage Dealt(Host Player, 1000);
-		Set Ultimate Charge(Host Player, 100);
+		disabled Set Ultimate Charge(Host Player, 100);
 		Set Status(All Players(Team 1), Null, Unkillable, 9999);
 		Resurrect(Host Player);
 		If(Global.objectiveTypes[0] == 1);
@@ -474,7 +474,7 @@ disabled rule("interact test")
 			Global.objectiveCaptureValue = 99;
 		End;
 		If(Is Button Held(Host Player, Button(Primary Fire)));
-			All Players(Team 1).currentPowerUp = 9;
+			All Players(Team 1).currentPowerUp = 12;
 		End;
 	}
 }
@@ -9395,16 +9395,20 @@ rule("ultimateCharger (90-99)")
 	actions
 	{
 		If(Event Player.powerUpEffects[90] == 0);
-			Create HUD Text(Event Player, Custom String("Ultimate Charger: {0}s", Round To Integer(Event Player.pUltimateChargerCount, Up)),
+			Create HUD Text(Event Player, Custom String("Ultimate Charger: {0}%", Round To Integer(Event Player.pUltimateChargerCount, Up)),
 				Null, Null, Right, 0.200, Color(Red), Color(Red), Color(Red), Visible To and String, Default Visibility);
 			Event Player.powerUpEffects[90] = Last Text ID;
 		End;
 		Play Effect(Event Player, Buff Explosion Sound, Color(Red), Position Of(Event Player), 50);
 		"Bounce pad duration"
-		For Player Variable(Event Player, pUltimateChargerCount, 20, 0, -0.125);
-			Wait Until(!Is Using Ultimate(Event Player), 9999);
-			Set Ultimate Charge(Event Player, Ultimate Charge Percent(Event Player) + 2);
-			Wait(0.125, Ignore Condition);
+		For Player Variable(Event Player, pUltimateChargerCount, 500, 0, -2);
+			Wait Until((!Is Using Ultimate(Event Player) && Ultimate Charge Percent(Event Player) < 100) || !Is Alive(Event Player), 9999);
+			If(Is Alive(Event Player));
+				Set Ultimate Charge(Event Player, Ultimate Charge Percent(Event Player) + 2);
+			Else;
+				Break;
+			End;
+			Wait(0.1, Ignore Condition);
 		End;
 		Wait(0.250, Ignore Condition);
 		Destroy HUD Text(Event Player.powerUpEffects[90]);
