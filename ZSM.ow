@@ -1913,6 +1913,8 @@ rule("PLAYER SELECTS/RESELECTS HERO")
 			Teleport(Event Player, Event Player.startPos);
 		End;
 		Wait(0.016, Ignore Condition);
+		"Set invisiblity status to 0 each time hero is selected/reselected"
+		Event Player.invisible = 0;
 		Set Facing(Event Player, Direction Towards(Event Player.startPos, Vector(X Component Of(Global.startCamPos), Y Component Of(
 			Event Player.startPos), Z Component Of(Global.startCamPos))), To World);
 		Wait(0.016, Ignore Condition);
@@ -5475,7 +5477,6 @@ rule("TRACER INVIS WHILE RECALLING")
 	{
 		Event Player.invisible += 1;
 		Wait Until(!Is Using Ability 2(Event Player), 9999);
-		Loop If Condition Is True;
 		Event Player.invisible -= 1;
 	}
 }
