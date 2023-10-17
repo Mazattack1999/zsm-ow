@@ -10151,7 +10151,7 @@ rule("PYROTECHNIC SETS ENEMIES ON FIRE")
 		Attacker.enhancementValues[1] == True;
 		Victim != Event Player;
 		Event Ability != Null;
-		Distance Between(Position Of(Attacker), Position Of(Victim)) < 10;
+		(Event Ability != Button(Primary Fire) || Distance Between(Position Of(Attacker), Position Of(Victim)) < 10) == True;
 	}
 
 	actions
