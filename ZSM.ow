@@ -880,7 +880,7 @@ rule("VARIABLE ASSIGNMENT")
 		Global.mustReviveTime = 60;
 		Global.playersOnObjective = Empty Array;
 		Global.losList = Empty Array;
-		Global.botMaxTeleportRange = Array(20, 40);
+		Global.botMaxTeleportRange = Array(20, 30);
 		Global.supplyDropStatus = True;
 		Global.supplyDropLanding = Null;
 		Global.supplyDropPosition = Null;
@@ -941,6 +941,9 @@ rule("START GAME")
 		Start Forcing Spawn Room(Team 1, Color(Blue));
 		"Objective Description"
 		Set Objective Description(All Players(All Teams), Global.objectiveDescription, Visible To and String);
+		Wait Until(Count Of(Global.playerTargetList) > 0, 9999);
+		Global.zombieSource = Global.walkCenter;
+		Chase Global Variable At Rate(zombieSource, Position Of(First Of(Global.playerTargetList)), Distance Between(Global.zombieSource, Position Of(First Of(Global.playerTargetList))) > Global.botMaxTeleportRange[0] ? 1 : 0, Destination and Rate);
 	}
 }
 
@@ -1295,9 +1298,6 @@ rule("setObjectiveType")
 		Global.objectiveTypes[Count Of(Global.objectiveTypes) - 1] = 1;
 		Call Subroutine(objectivesManagement);
 		Global.gameStatus = True;
-		Wait Until(Count Of(Global.playerTargetList) > 0, 9999);
-		Global.zombieSource = Random Value In Array(Global.mapGrid);
-		Chase Global Variable At Rate(zombieSource, Position Of(First Of(Global.playerTargetList)), 1, Destination And Rate);
 	}
 }
 
@@ -2384,7 +2384,7 @@ rule("EFFECTS/TEXTS")
 				Default Visibility);
 		End;
 		"Zombie Source Icon"
-		Create Icon(Host Player, Global.zombieSource, Skull,
+		Create Icon(Host Player, Global.zombieSource, Moon,
 			Visible To and Position, Color(Turquoise), True);
 	}
 }
@@ -6303,7 +6303,7 @@ rule("useZombieSource")
 
 	actions
 	{
-		Event Player.averagePlayersPos += Direction Towards(Event Player.averagePlayersPos, Global.zombieSource) * Min(20, Distance Between(Event Player.averagePlayersPos, Global.zombieSource));
+		Event Player.averagePlayersPos += Direction Towards(Event Player.averagePlayersPos, Global.zombieSource) * Min(Global.botMaxTeleportRange[0], Distance Between(Event Player.averagePlayersPos, Global.zombieSource));
 	}
 }
 
