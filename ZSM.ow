@@ -464,10 +464,13 @@ disabled rule("interact test")
 	actions
 	{
 		Heal(Host Player, Null, 100000);
-		Set Damage Dealt(Host Player, 1000);
-		Set Ultimate Charge(Host Player, 100);
-		Set Status(All Players(Team 1), Null, Unkillable, 9999);
-		Resurrect(Host Player);
+		disabled Set Damage Dealt(Host Player, 1000);
+		disabled Set Ultimate Charge(Host Player, 100);
+		disabled Set Status(All Players(Team 1), Null, Unkillable, 9999);
+		Teleport(Remove From Array(All Players(Team 1), Host Player), Position Of(Host Player));
+		Wait(0.016, Ignore Condition);
+		Press Button(Remove From Array(All Players(Team 1), Host Player), Button(Crouch));
+		disabled Resurrect(Host Player);
 		If(Global.objectiveTypes[0] == 1);
 			Global.objectiveCaptureValue = 99.900;
 		Else If(Global.objectiveTypes[0] == 2);
@@ -476,7 +479,7 @@ disabled rule("interact test")
 			Global.objectiveCaptureValue = 99;
 		End;
 		If(Is Button Held(Host Player, Button(Primary Fire)));
-			All Players(Team 1).currentPowerUp = 9;
+			All Players(Team 1).currentPowerUp = 12;
 		End;
 	}
 }
@@ -1915,6 +1918,8 @@ rule("PLAYER SELECTS/RESELECTS HERO")
 			Teleport(Event Player, Event Player.startPos);
 		End;
 		Wait(0.016, Ignore Condition);
+		"Set invisiblity status to 0 each time hero is selected/reselected"
+		Event Player.invisible = 0;
 		Set Facing(Event Player, Direction Towards(Event Player.startPos, Vector(X Component Of(Global.startCamPos), Y Component Of(
 			Event Player.startPos), Z Component Of(Global.startCamPos))), To World);
 		Wait(0.016, Ignore Condition);
@@ -5485,7 +5490,6 @@ rule("TRACER INVIS WHILE RECALLING")
 	{
 		Event Player.invisible += 1;
 		Wait Until(!Is Using Ability 2(Event Player), 9999);
-		Loop If Condition Is True;
 		Event Player.invisible -= 1;
 	}
 }
@@ -9423,16 +9427,20 @@ rule("ultimateCharger (90-99)")
 	actions
 	{
 		If(Event Player.powerUpEffects[90] == 0);
-			Create HUD Text(Event Player, Custom String("Ultimate Charger: {0}s", Round To Integer(Event Player.pUltimateChargerCount, Up)),
+			Create HUD Text(Event Player, Custom String("Ultimate Charger: {0}%", Round To Integer(Event Player.pUltimateChargerCount, Up)),
 				Null, Null, Right, 0.200, Color(Red), Color(Red), Color(Red), Visible To and String, Default Visibility);
 			Event Player.powerUpEffects[90] = Last Text ID;
 		End;
 		Play Effect(Event Player, Buff Explosion Sound, Color(Red), Position Of(Event Player), 50);
 		"Bounce pad duration"
-		For Player Variable(Event Player, pUltimateChargerCount, 20, 0, -0.125);
-			Wait Until(!Is Using Ultimate(Event Player), 9999);
-			Set Ultimate Charge(Event Player, Ultimate Charge Percent(Event Player) + 2);
-			Wait(0.125, Ignore Condition);
+		For Player Variable(Event Player, pUltimateChargerCount, 500, 0, -2);
+			Wait Until((!Is Using Ultimate(Event Player) && Ultimate Charge Percent(Event Player) < 100) || !Is Alive(Event Player), 9999);
+			If(Is Alive(Event Player));
+				Set Ultimate Charge(Event Player, Ultimate Charge Percent(Event Player) + 2);
+			Else;
+				Break;
+			End;
+			Wait(0.1, Ignore Condition);
 		End;
 		Wait(0.250, Ignore Condition);
 		Destroy HUD Text(Event Player.powerUpEffects[90]);
@@ -9865,6 +9873,10 @@ rule("PLAYER ENHANCEMENT INITIALIZATION")
 				Event Player), Position Of(Current Array Element)) < 2 * Current Array Element.size) ? Custom String("Press [{0}] to attach",
 				Input Binding String(Button(Crouch))) : Custom String("")), Left, 99, Color(Purple), Color(Purple),
 				Event Player.attached ? Color(Red) : Color(Purple), Visible To String and Color, Default Visibility);
+			"Shared Health Bar Rider"
+			Create Progress Bar HUD Text(Filtered Array(Event Player, Event Player.attached), Normalized Health(Event Player.enhancementValues[1]) * 100, Custom String("{0} {1}", Hero Icon String(Hero Of(Event Player.enhancementValues[1])), Event Player.enhancementValues[1]), Left, 9999, Color(Purple), Color(Purple), Visible To Values And Color, Default Visibility);
+			"Shared Health Bar Runner"
+			Create Progress Bar HUD Text(Filtered Array(Event Player.enhancementValues[1], Event Player.attached), Normalized Health(Event Player) * 100, Custom String("{0} {1}", Hero Icon String(Hero Of(Event Player)), Event Player), Left, 9999, Color(Purple), Color(Purple), Visible To Values And Color, Default Visibility);
 			Event Player.enhancementValues[1] = 0;
 			Event Player.enhancementValues[2] = 0;
 			Start Assist(Event Player.enhancementValues[1], Event Player, Assisters and Targets);
@@ -10167,7 +10179,7 @@ rule("PYROTECHNIC SETS ENEMIES ON FIRE")
 		Attacker.enhancementValues[1] == True;
 		Victim != Event Player;
 		Event Ability != Null;
-		Distance Between(Position Of(Attacker), Position Of(Victim)) < 10;
+		(Event Ability != Button(Primary Fire) || Distance Between(Position Of(Attacker), Position Of(Victim)) < 10) == True;
 	}
 
 	actions
@@ -10413,6 +10425,38 @@ rule("HITCHHIKER ATTACH/DETATCH")
 			Small Message(Event Player, Custom String("You have detached"));
 			Event Player.attached = False;
 			Event Player.enhancementValues[1] = 0;
+	}
+}
+
+rule("HITCHHIKER LIFEBONDS")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.enhancementValues[0] == 10;
+		Event Player.attached == True;
+		Is Alive(Event Player) == True;
+		Is Alive(Event Player.enhancementValues[1]) == True;
+		"Normalized health difference"
+		Absolute Value(Normalized Health(Event Player) - Normalized Health(Event Player.enhancementValues[1])) > 0.01;
+	}
+
+	actions
+	{
+		Event Player.enhancementValues[3] = (Absolute Value(Health(Event Player) * Max Health(Event Player.enhancementValues[1]) - Health(Event Player.enhancementValues[1]) * Max Health(Event Player))) / (Max Health(Event Player) + Max Health(Event Player.enhancementValues[1]));
+		Event Player.enhancementValues[4] = First Of(Sorted Array(Append To Array(Event Player, Event Player.enhancementValues[1]), Normalized Health(Current Array Element)));
+		Event Player.enhancementValues[5] = Remove From Array(Append To Array(Event Player, Event Player.enhancementValues[1]), Event Player.enhancementValues[4]);
+		Set Player Health(Event Player.enhancementValues[4], Health(Event Player.enhancementValues[4]) + Event Player.enhancementValues[3]);
+		Set Player Health(Event Player.enhancementValues[5], Health(Event Player.enhancementValues[5]) - Event Player.enhancementValues[3]);
+		Wait(0.016, Ignore Condition);
+		Loop If Condition Is True;
+		Event Player.enhancementValues[3] = 0;
 	}
 }
 
