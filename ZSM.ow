@@ -276,6 +276,7 @@ variables
 		100: botRespawnCount
 		101: botSpawnPointTimers
 		102: zombieSource
+		103: zombieSourceCounter
 
 	player:
 		0: averagePlayersPos
@@ -368,6 +369,7 @@ variables
 		95: blinded
 		96: updateOutlines
 		97: afk
+		98: teleportModifier
 }
 
 subroutines
@@ -420,7 +422,7 @@ subroutines
 	45: selectTarget
 	46: restoreDefaultFacingMovement
 	47: setPrematchTimer
-	48: useZombieSource
+	48: blockLocation
 }
 
 rule("Fix bot health")
@@ -880,7 +882,7 @@ rule("VARIABLE ASSIGNMENT")
 		Global.mustReviveTime = 60;
 		Global.playersOnObjective = Empty Array;
 		Global.losList = Empty Array;
-		Global.botMaxTeleportRange = Array(20, 30);
+		Global.botMaxTeleportRange = Array(35, 30);
 		Global.supplyDropStatus = True;
 		Global.supplyDropLanding = Null;
 		Global.supplyDropPosition = Null;
@@ -943,7 +945,8 @@ rule("START GAME")
 		Set Objective Description(All Players(All Teams), Global.objectiveDescription, Visible To and String);
 		Wait Until(Count Of(Global.playerTargetList) > 0, 9999);
 		Global.zombieSource = Global.walkCenter;
-		Chase Global Variable At Rate(zombieSource, Position Of(First Of(Global.playerTargetList)), Distance Between(Global.zombieSource, Position Of(First Of(Global.playerTargetList))) > Global.botMaxTeleportRange[0] ? 1 : 0, Destination and Rate);
+		Global.zombieSourceCounter = 0;
+		Chase Global Variable At Rate(zombieSourceCounter, 0, 1, None);
 	}
 }
 
@@ -2553,6 +2556,30 @@ rule("OBJECTIVE COMPLETE")
 	}
 }
 
+rule("MOVE ZOMBIE SOURCE")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global.gameStatus == True;
+	}
+
+	actions
+	{
+		Wait Until(Global.zombieSourceCounter <= 0, 60);
+		Global.zombieSourceCounter = 5;
+		Global.zombieSource = Random Value In Array(Filtered Array(Global.mapGrid, Distance Between(First Of(Global.objectivePositions), Current Array Element) < Global.botMaxTeleportRange[0] + 20 && Distance Between(Global.zombieSource, Current Array Element) > Global.botMaxTeleportRange[0] + 20 && Distance Between(First Of(Global.objectivePositions), Current Array Element) > Global.botMaxTeleportRange[0]));
+		If(!Global.zombieSource);
+			Global.zombieSource = Random Value In Array(Filtered Array(Global.mapGrid, Distance Between(First Of(Global.objectivePositions), Current Array Element) < Global.botMaxTeleportRange[0] + 20 && Distance Between(First Of(Global.objectivePositions), Current Array Element) > Global.botMaxTeleportRange[0]));
+		End;
+		Loop If Condition Is True;
+	}
+}
+
 rule("objectivesManagement")
 {
 	event
@@ -2616,14 +2643,11 @@ rule("objectivesManagement")
 				Modify Global Variable(objectiveTypes, Remove From Array By Index, 0);
 				Global.bosses = Empty Array;
 				Global.survivorToRescue = Null;
+				Global.zombieSourceCounter = 0;
 			"Skips to extraction if mode is elimination only"
 			Else;
 				Global.objectivePositions = Array(Last Of(Global.objectivePositions));
 				Global.objectiveTypes = Array(Last Of(Global.objectiveTypes));
-			End;
-			Global.zombieSource = Random Value In Array(Filtered Array(Global.mapGrid, Distance Between(First Of(Global.objectivePositions), Current Array Element) > 100 && Distance Between(First Of(Global.objectivePositions), Current Array Element) < 120));
-			If(!Global.zombieSource);
-				Global.zombieSource = Last Of(Sorted Array(Global.mapGrid, Distance Between(First Of(Global.objectivePositions), Current Array Element)));
 			End;
 		End;
 		Wait(0.250, Ignore Condition);
@@ -2634,7 +2658,6 @@ rule("objectivesManagement")
 			Chase Global Variable Over Time(extractionZoneRad, 0, 120, Destination and Duration);
 			Global.objectiveRad = 10;
 			Big Message(All Players(All Teams), Custom String("Get to the extraction point!"));
-			Global.zombieSource = Random Value In Array(First Of(Global.objectivePositions));
 		Else;
 			If(First Of(Global.objectiveTypes) == 1);
 				Global.objectiveDescription = Custom String("Secure the capture point");
@@ -5706,9 +5729,11 @@ rule("TELEPORT BOTS WHEN NOT USED FOR TOO LONG")
 	{
 		If(Event Player.successfullyTeleported);
 			Wait(10, Abort When False);
+		Else If(Array Contains(Global.botSpawnPoints, Event Player.telePos));
+			Wait(5, Abort When False);
+			Loop If(Event Player.successfullyTeleported);
 		Else;
-			Wait(0.500, Abort When False);
-			Wait(Max(1, 7 - Distance Between(Position Of(Event Player), Event Player.averagePlayersPos) / 8), Abort When False);
+			Wait(Max(1, 7 - Distance Between(Position Of(Event Player), Position Of(First Of(Sorted Array(Global.playerTargetList, Distance Between(Position Of(Current Array Element), Position Of(Event Player)))))) / 8), Abort When False);
 			Loop If(Event Player.successfullyTeleported);
 		End;
 		Call Subroutine(teleportBots);
@@ -5763,6 +5788,7 @@ rule("UPDATE SUCCESSFUL TELEPORT STATUS")
 		Wait(0.500, Abort When False);
 		If(!Event Player.successfullyTeleported);
 			Event Player.successfullyTeleported = True;
+			Global.zombieSourceCounter += 3;
 		End;
 		If(Distance Between(Event Player.telePos, Event Player.averagePlayersPos) < Global.botMaxTeleportRange[1]);
 			Event Player.waypoint = Position Of(Event Player);
@@ -6226,15 +6252,13 @@ rule("botTeleportCenter")
 	{
 		"Capture Point/Extration Point"
 		If(Global.objectiveTypes[0] == 1);
-			If(Count Of(Global.playersOnObjective) == 0);
+			If(Is True For All(Global.playerTargetList, Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element) > Global.botMaxTeleportRange[0])));
 				Event Player.averagePlayersPos = Position Of(First Of(Sorted Array(Global.playerTargetList, Distance Between(Position Of(
 					Current Array Element), First Of(Global.objectivePositions)))));
-			Else If(Count Of(Global.playersOnObjective) > 0 && Count Of(Filtered Array(Global.playerTargetList, Distance Between(First Of(
-					Global.objectivePositions), Position Of(Current Array Element)) < First Of(Global.botMaxTeleportRange))) < Round To Integer(
-					Count Of(Global.playerTargetList) * 0.750, Up));
-				Event Player.averagePlayersPos = First Of(Global.objectivePositions);
+				Event Player.teleportModifier = First Of(Global.objectivePositions); 
 			Else;
-				Call Subroutine(locateAveragePlayerLocation);
+				Event Player.averagePlayersPos = First Of(Global.objectivePositions);
+				Event Player.teleportModifier = Global.zombieSource;
 			End;
 		"Boss"
 		Else If(Global.objectiveTypes[0] == 3);
@@ -6244,6 +6268,7 @@ rule("botTeleportCenter")
 		Else If(Global.objectiveTypes[0] == 4);
 			Event Player.averagePlayersPos = Position Of(First Of(Sorted Array(Global.playerTargetList, Distance Between(Position Of(
 				Current Array Element), First Of(Global.objectivePositions)))));
+			Event Player.teleportModifier = Global.zombieSource;	
 		"Survivor Rescue"
 		Else If(Global.objectiveTypes[0] == 5);
 			If(Global.survivorToRescue.botFollowTarget == Null);
@@ -6251,6 +6276,7 @@ rule("botTeleportCenter")
 					Current Array Element), Position Of(Global.survivorToRescue)))));
 			Else;
 				Event Player.averagePlayersPos = (Position Of(Global.survivorToRescue) + Position Of(Global.survivorToRescue.botFollowTarget)) / 2;
+				Event Player.teleportModifier = Global.zombieSource;
 			End;
 		"Killzone"
 		Else If(Global.objectiveTypes[0] == 6);
@@ -6259,6 +6285,7 @@ rule("botTeleportCenter")
 				< Global.objectiveRad)) > 0.750 * Count Of(Global.playerTargetList));
 				"Average player positon"
 				Call Subroutine(locateAveragePlayerLocation);
+				Event Player.teleportModifier = Global.zombieSource;
 			Else;
 				"Player closeset to the center of the killzone"
 				Event Player.averagePlayersPos = Position Of(First Of(Sorted Array(Global.playerTargetList, Distance Between(Position Of(
@@ -6268,6 +6295,7 @@ rule("botTeleportCenter")
 		Else If(Global.objectiveTypes[0] == 7);
 			Event Player.averagePlayersPos = Position Of(First Of(Sorted Array(Global.playerTargetList, Distance Between(Position Of(
 				Current Array Element), First Of(Global.objectivePositions)))));
+			Event Player.teleportModifier = First Of(Global.objectivePositions);
 		"Satellite Uplink"
 		Else If(Global.objectiveTypes[0] == 8);
 			"Checks if any players are currently repairing terminals"
@@ -6282,29 +6310,40 @@ rule("botTeleportCenter")
 				Event Player.averagePlayersPos = Position Of(First Of(Sorted Array(Global.playerTargetList, Distance Between(Position Of(
 					Current Array Element), First Of(Global.objectivePositions)))));
 			End;
+			Event Player.teleportModifier = Global.zombieSource;
 		"Graveyard"
 		Else If(Global.objectiveTypes[0] == 9);
 			Event Player.averagePlayersPos = Position Of(First Of(Sorted Array(Global.playerTargetList, Distance Between(Position Of(
 				Current Array Element), First Of(Global.objectivePositions)))));
+			Event Player.teleportModifier = First Of(Global.objectivePositions);
 		"Default"
 		Else;
 			Call Subroutine(locateAveragePlayerLocation);
+			Event Player.teleportModifier = Global.zombieSource;
 		End;
-		Call Subroutine(useZombieSource);
+		If(Event Player.teleportModifier);
+			Call Subroutine(blockLocation);
+		End;
 	}
 }
 
-rule("useZombieSource")
+rule("blockLocation")
 {
 	event
 	{
 		Subroutine;
-		useZombieSource;
+		blockLocation;
 	}
 
 	actions
 	{
-		Event Player.averagePlayersPos += Direction Towards(Event Player.averagePlayersPos, Global.zombieSource) * Min(Global.botMaxTeleportRange[0], Distance Between(Event Player.averagePlayersPos, Global.zombieSource));
+		"If teleport modifier is the zombie source"
+		If(Event Player.teleportModifier == Global.zombieSource);
+			Event Player.averagePlayersPos += Direction Towards(Event Player.averagePlayersPos, Event Player.teleportModifier) * Global.botMaxTeleportRange[0];
+		Else;
+			Event Player.averagePlayersPos += Direction Towards(Event Player.averagePlayersPos, Event Player.teleportModifier) * Min(Global.botMaxTeleportRange[0], Distance Between(Event Player.averagePlayersPos, Event Player.teleportModifier));
+		End;
+		Event Player.teleportModifier = Null;
 	}
 }
 
