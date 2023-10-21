@@ -882,7 +882,7 @@ rule("VARIABLE ASSIGNMENT")
 		Global.mustReviveTime = 60;
 		Global.playersOnObjective = Empty Array;
 		Global.losList = Empty Array;
-		Global.botMaxTeleportRange = Array(30, 30);
+		Global.botMaxTeleportRange = Array(30, 25);
 		Global.supplyDropStatus = True;
 		Global.supplyDropLanding = Null;
 		Global.supplyDropPosition = Null;
@@ -943,10 +943,9 @@ rule("START GAME")
 		Start Forcing Spawn Room(Team 1, Color(Blue));
 		"Objective Description"
 		Set Objective Description(All Players(All Teams), Global.objectiveDescription, Visible To and String);
-		Wait Until(Count Of(Global.playerTargetList) > 0, 9999);
 		Global.zombieSource = Global.walkCenter;
 		Global.zombieSourceCounter = 0;
-		Chase Global Variable At Rate(zombieSourceCounter, 0, 1, None);
+		Chase Global Variable at Rate(zombieSourceCounter, 0, 1, None);
 	}
 }
 
@@ -2387,7 +2386,7 @@ rule("EFFECTS/TEXTS")
 				Default Visibility);
 		End;
 		"Zombie Source Icon"
-		disabled Create Icon(Host Player, Global.zombieSource, Moon,
+		Create Icon(Host Player, Global.zombieSource, Moon,
 			Visible To and Position, Color(Turquoise), True);
 	}
 }
@@ -2572,9 +2571,9 @@ rule("MOVE ZOMBIE SOURCE")
 	{
 		Wait Until(Global.zombieSourceCounter <= 0, 60);
 		Global.zombieSourceCounter = 5;
-		Global.zombieSource = Random Value In Array(Filtered Array(Global.mapGrid, Distance Between(First Of(Global.objectivePositions), Current Array Element) < Global.botMaxTeleportRange[0] + 20 && Distance Between(Global.zombieSource, Current Array Element) > Global.botMaxTeleportRange[0] + 20 && Distance Between(First Of(Global.objectivePositions), Current Array Element) > Global.botMaxTeleportRange[0]));
+		Global.zombieSource = Random Value In Array(Filtered Array(Global.mapGrid, Distance Between(First Of(Global.objectivePositions), Current Array Element) < 60 && Distance Between(Global.zombieSource, Current Array Element) > 60 && Distance Between(First Of(Global.objectivePositions), Current Array Element) > 30));
 		If(!Global.zombieSource);
-			Global.zombieSource = Random Value In Array(Filtered Array(Global.mapGrid, Distance Between(First Of(Global.objectivePositions), Current Array Element) < Global.botMaxTeleportRange[0] + 20 && Distance Between(First Of(Global.objectivePositions), Current Array Element) > Global.botMaxTeleportRange[0]));
+			Global.zombieSource = Random Value In Array(Filtered Array(Global.mapGrid, Distance Between(First Of(Global.objectivePositions), Current Array Element) < 60 && Distance Between(First Of(Global.objectivePositions), Current Array Element) > 30));
 		End;
 		Loop If Condition Is True;
 	}
@@ -6217,7 +6216,7 @@ rule("teleportBots")
 					End;
 					Wait(0.250, Ignore Condition);
 				End;
-				If(Is True For All(Global.playerTargetList, Distance Between(Event Player.telePos, Position Of(Current Array Element)) > 10)
+				If(Is True For All(Global.playerTargetList, Distance Between(Event Player.telePos, Position Of(Current Array Element)) > 15)
 					&& Is True For All(Filtered Array(Global.playerTargetList, Is In View Angle(Current Array Element, Event Player.telePos, 55)),
 					!Is In Line of Sight(Eye Position(Current Array Element), Event Player.telePos + Vector(0, Global.losHeightCheck, 0),
 					Barriers Do Not Block LOS)));
@@ -6256,11 +6255,10 @@ rule("botTeleportCenter")
 			If(Is True For All(Global.playerTargetList, Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element)) > Global.botMaxTeleportRange[1]));
 				Event Player.averagePlayersPos = Position Of(First Of(Sorted Array(Global.playerTargetList, Distance Between(Position Of(
 					Current Array Element), First Of(Global.objectivePositions)))));
-				Event Player.teleportModifier = First Of(Global.objectivePositions); 
 			Else;
 				Event Player.averagePlayersPos = First Of(Global.objectivePositions);
-				Event Player.teleportModifier = Global.zombieSource;
 			End;
+			Event Player.teleportModifier = Global.zombieSource;
 		"Boss"
 		Else If(Global.objectiveTypes[0] == 3);
 			If(First Of(Global.bosses).potentialTargets);
@@ -6290,12 +6288,12 @@ rule("botTeleportCenter")
 				< Global.objectiveRad)) > 0.750 * Count Of(Global.playerTargetList));
 				"Average player positon"
 				Call Subroutine(locateAveragePlayerLocation);
-				Event Player.teleportModifier = Global.zombieSource;
 			Else;
 				"Player closeset to the center of the killzone"
 				Event Player.averagePlayersPos = Position Of(First Of(Sorted Array(Global.playerTargetList, Distance Between(Position Of(
 					Current Array Element), Global.objectiveChase1))));
 			End;
+			Event Player.teleportModifier = Global.zombieSource;
 		"Zombie egg"
 		Else If(Global.objectiveTypes[0] == 7);
 			Event Player.averagePlayersPos = Position Of(First Of(Sorted Array(Global.playerTargetList, Distance Between(Position Of(
