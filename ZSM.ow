@@ -370,6 +370,7 @@ variables
 		96: updateOutlines
 		97: afk
 		98: teleportModifier
+		99: cannotSource
 }
 
 subroutines
@@ -2386,7 +2387,7 @@ rule("EFFECTS/TEXTS")
 				Default Visibility);
 		End;
 		"Zombie Source Icon"
-		disabled Create Icon(Host Player, Global.zombieSource, Moon,
+		Create Icon(Host Player, Global.zombieSource, Moon,
 			Visible To and Position, Color(Turquoise), True);
 	}
 }
@@ -2565,12 +2566,13 @@ rule("MOVE ZOMBIE SOURCE")
 	conditions
 	{
 		Global.gameStatus == True;
+		Global.zombieSourceCounter <= 0;
 	}
 
 	actions
 	{
-		Wait Until(Global.zombieSourceCounter <= 0, 60);
 		Global.zombieSourceCounter = 20;
+		All Players(Team 2).cannotSource = True;
 		Global.zombieSource = Random Value In Array(Filtered Array(Global.mapGrid, Distance Between(First Of(Global.objectivePositions), Current Array Element) < 60 && Distance Between(Global.zombieSource, Current Array Element) > 60 && Distance Between(First Of(Global.objectivePositions), Current Array Element) > 30));
 		If(!Global.zombieSource);
 			Global.zombieSource = Random Value In Array(Filtered Array(Global.mapGrid, Distance Between(First Of(Global.objectivePositions), Current Array Element) < 60 && Distance Between(First Of(Global.objectivePositions), Current Array Element) > 30));
@@ -5670,7 +5672,9 @@ rule("BOT DIES")
 		Else If(Event Was Environment && Distance Between(Position Of(Event Player), Vector(X Component Of(Event Player.telePos),
 				Y Component Of(Position Of(Event Player)), Z Component Of(Event Player.telePos))) < 10);
 			Event Player.successfullyTeleported = False;
-			Global.zombieSourceCounter -= 5;
+			If(!Event Player.cannotSource);
+				Global.zombieSourceCounter -= 5;
+			End;
 		End;
 		Event Player.teleporting = True;
 		Teleport(Event Player, Vector(500, 50, 500));
@@ -5736,7 +5740,9 @@ rule("TELEPORT BOTS WHEN NOT USED FOR TOO LONG")
 				Wait(Max(1, 7 - Distance Between(Position Of(Event Player), Position Of(First Of(Sorted Array(Global.playerTargetList, Distance Between(Position Of(Current Array Element), Position Of(Event Player)))))) / 8), Abort When False);
 			End;
 			Loop If(Event Player.successfullyTeleported);
-			Global.zombieSourceCounter -= 5;
+			If(!Event Player.cannotSource);
+				Global.zombieSourceCounter -= 5;
+			End;
 		End;
 		Call Subroutine(teleportBots);
 		Loop;
@@ -5790,7 +5796,9 @@ rule("UPDATE SUCCESSFUL TELEPORT STATUS")
 		Wait(0.500, Abort When False);
 		If(!Event Player.successfullyTeleported);
 			Event Player.successfullyTeleported = True;
-			Global.zombieSourceCounter += 5;
+			If(!Event Player.cannotSource);
+				Global.zombieSourceCounter += 5;
+			End;
 		End;
 		If(Distance Between(Event Player.telePos, Event Player.averagePlayersPos) < Global.botMaxTeleportRange[1]);
 			Event Player.waypoint = Position Of(Event Player);
