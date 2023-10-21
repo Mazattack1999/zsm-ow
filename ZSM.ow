@@ -2387,7 +2387,7 @@ rule("EFFECTS/TEXTS")
 				Default Visibility);
 		End;
 		"Zombie Source Icon"
-		Create Icon(Host Player, Global.zombieSource, Moon,
+		disabled Create Icon(Host Player, Global.zombieSource, Moon,
 			Visible To and Position, Color(Turquoise), True);
 	}
 }
@@ -4492,6 +4492,7 @@ rule("PLAYERS REPAIR TERMINALS")
 		"All terminals repaired"
 		If(Is True For All(Global.objectiveCaptureValue, Current Array Element >= 100));
 			Wait(1, Ignore Condition);
+			Global.playersOnObjective = Empty Array;
 			Big Message(All Players(All Teams), Custom String("All terminals are back online!"));
 			Play Effect(All Players(All Teams), Ring Explosion Sound, Global.objectiveColor, First Of(Global.objectivePositions), 200);
 			Call Subroutine(fireSatellite);
@@ -6208,8 +6209,7 @@ rule("teleportBots")
 				Event Player.telePos = 0;
 				"Teleport with max distance constraint no view angle constraint"
 				While(Event Player.telePos == 0 || Is True For Any(Global.playerTargetList, Distance Between(Event Player.telePos, Position Of(
-					Current Array Element)) < 15) || Is True For All(Global.playerTargetList, Distance Between(Event Player.telePos, Position Of(
-					Current Array Element)) > Global.botMaxTeleportRange[1]));
+					Current Array Element)) < 15));
 					Event Player.filteredBotSpawnPointGrid = Filtered Array(Global.botSpawnPoints, Distance Between(Current Array Element,
 						Event Player.averagePlayersPos) < Global.botMaxTeleportRange[1]);
 					"Filter out spawn points on cooldown"
