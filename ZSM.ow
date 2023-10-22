@@ -2387,7 +2387,7 @@ rule("EFFECTS/TEXTS")
 				Default Visibility);
 		End;
 		"Zombie Source Icon"
-		disabled Create Icon(Host Player, Global.zombieSource, Moon,
+		Create Icon(Host Player, Global.zombieSource, Moon,
 			Visible To and Position, Color(Turquoise), True);
 	}
 }
@@ -2574,9 +2574,9 @@ rule("MOVE ZOMBIE SOURCE")
 		If(Is True For Any(Global.playerTargetList, Distance Between(Global.zombieSource, Position Of(Current Array Element)) < 15));
 			Wait(1, Abort When False);
 		End;
-		Global.zombieSourceCounter = 20;
+		Global.zombieSourceCounter = 35;
 		All Players(Team 2).canSource = False;
-		Global.zombieSource = Random Value In Array(Filtered Array(Global.mapGrid, Distance Between(First Of(Global.objectivePositions), Current Array Element) < 60 && Distance Between(Global.zombieSource, Current Array Element) > 60 && Distance Between(First Of(Global.objectivePositions), Current Array Element) > 30));
+		Global.zombieSource = Random Value In Array(Filtered Array(Global.mapGrid, Distance Between(First Of(Global.objectivePositions), Current Array Element) < 60 && Absolute Value(Horizontal Angle From Direction(Direction Towards(First Of(Global.objectivePositions), Global.zombieSource)) - Horizontal Angle From Direction(Direction Towards(First Of(Global.objectivePositions), Current Array Element))) > 45 && Distance Between(First Of(Global.objectivePositions), Current Array Element) > 30));
 		If(!Global.zombieSource);
 			Global.zombieSource = Random Value In Array(Filtered Array(Global.mapGrid, Distance Between(First Of(Global.objectivePositions), Current Array Element) < 60 && Distance Between(First Of(Global.objectivePositions), Current Array Element) > 30));
 		End;
@@ -5800,7 +5800,7 @@ rule("UPDATE SUCCESSFUL TELEPORT STATUS")
 		Wait(0.500, Abort When False);
 		If(!Event Player.successfullyTeleported);
 			Event Player.successfullyTeleported = True;
-			If(Event Player.canSource);
+			If(Event Player.canSource && Global.zombieSourceCounter < 150);
 				Global.zombieSourceCounter += 20;
 			End;
 		End;
