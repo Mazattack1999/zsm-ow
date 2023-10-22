@@ -370,7 +370,7 @@ variables
 		96: updateOutlines
 		97: afk
 		98: teleportModifier
-		99: cannotSource
+		99: canSource
 }
 
 subroutines
@@ -2366,7 +2366,7 @@ rule("EFFECTS/TEXTS")
 		"SERVER LOAD"
 		Create HUD Text(String Contains(Custom String("{0}", Local Player), Custom String("Mazattack")) ? Local Player : Empty Array,
 			Custom String("Spawn Array: {0}, {1}, {2}", Global.spawnTimes[0], Global.spawnTimes[1], Global.spawnTimes[2]), Custom String(
-			"SERVER LOAD AVERAGE: {0}, Invisibility: {1}", Server Load Average, Local Player.invisible), Custom String("SERVER LOAD PEAK: {0}", Server Load Peak), Right, 0, Color(
+			"SERVER LOAD AVERAGE: {0}, Source Counter: {1}", Server Load Average, Global.zombieSourceCounter), Custom String("SERVER LOAD PEAK: {0}", Server Load Peak), Right, 0, Color(
 			White), Color(White), Color(White), Visible To and String, Default Visibility);
 		If(Global.difficultySetting == 1);
 			Create HUD Text(All Players(All Teams), Null, Null, Custom String("Difficulty: Beginner | Wave {0}", Global.zombieSetting), Right,
@@ -2566,13 +2566,16 @@ rule("MOVE ZOMBIE SOURCE")
 	conditions
 	{
 		Global.gameStatus == True;
-		Global.zombieSourceCounter <= 0;
+		(Global.zombieSourceCounter <= 0 || Is True For Any(Global.playerTargetList, !Current Array Element.invisible && Distance Between(Global.zombieSource, Position Of(Current Array Element)) < 15)) == True;
 	}
 
 	actions
 	{
+		If(Is True For Any(Global.playerTargetList, Distance Between(Global.zombieSource, Position Of(Current Array Element)) < 15));
+			Wait(1, Abort When False);
+		End;
 		Global.zombieSourceCounter = 20;
-		All Players(Team 2).cannotSource = True;
+		All Players(Team 2).canSource = False;
 		Global.zombieSource = Random Value In Array(Filtered Array(Global.mapGrid, Distance Between(First Of(Global.objectivePositions), Current Array Element) < 60 && Distance Between(Global.zombieSource, Current Array Element) > 60 && Distance Between(First Of(Global.objectivePositions), Current Array Element) > 30));
 		If(!Global.zombieSource);
 			Global.zombieSource = Random Value In Array(Filtered Array(Global.mapGrid, Distance Between(First Of(Global.objectivePositions), Current Array Element) < 60 && Distance Between(First Of(Global.objectivePositions), Current Array Element) > 30));
@@ -5673,8 +5676,8 @@ rule("BOT DIES")
 		Else If(Event Was Environment && Distance Between(Position Of(Event Player), Vector(X Component Of(Event Player.telePos),
 				Y Component Of(Position Of(Event Player)), Z Component Of(Event Player.telePos))) < 10);
 			Event Player.successfullyTeleported = False;
-			If(!Event Player.cannotSource);
-				Global.zombieSourceCounter -= 5;
+			If(Event Player.canSource);
+				Global.zombieSourceCounter -= 20;
 			End;
 		End;
 		Event Player.teleporting = True;
@@ -5741,7 +5744,7 @@ rule("TELEPORT BOTS WHEN NOT USED FOR TOO LONG")
 				Wait(Max(1, 7 - Distance Between(Position Of(Event Player), Position Of(First Of(Sorted Array(Global.playerTargetList, Distance Between(Position Of(Current Array Element), Position Of(Event Player)))))) / 8), Abort When False);
 			End;
 			Loop If(Event Player.successfullyTeleported);
-			If(!Event Player.cannotSource);
+			If(Event Player.canSource);
 				Global.zombieSourceCounter -= 5;
 			End;
 		End;
@@ -5797,8 +5800,8 @@ rule("UPDATE SUCCESSFUL TELEPORT STATUS")
 		Wait(0.500, Abort When False);
 		If(!Event Player.successfullyTeleported);
 			Event Player.successfullyTeleported = True;
-			If(!Event Player.cannotSource);
-				Global.zombieSourceCounter += 5;
+			If(Event Player.canSource);
+				Global.zombieSourceCounter += 20;
 			End;
 		End;
 		If(Distance Between(Event Player.telePos, Event Player.averagePlayersPos) < Global.botMaxTeleportRange[1]);
@@ -6198,6 +6201,7 @@ rule("teleportBots")
 	actions
 	{
 		Event Player.teleporting = True;
+		Event Player.canSource = True;
 		Call Subroutine(updateBotSpawnPoints);
 		Call Subroutine(enterExitTeleport);
 		Event Player.successfullyTeleported = False;
@@ -6216,7 +6220,7 @@ rule("teleportBots")
 					Event Player.filteredBotSpawnPointGrid = Filtered Array(Event Player.filteredBotSpawnPointGrid,
 						Global.botSpawnPointTimers[Index Of Array Value(Global.botSpawnPoints, Current Array Element)] < 15);
 					"Bots utilize saved spawn points"
-					If(Count Of(Global.botSpawnPoints) > 0 && Count Of(Event Player.filteredBotSpawnPointGrid) > 0);
+					If(Count Of(Event Player.filteredBotSpawnPointGrid) > 0);
 						Event Player.telePos = Random Value In Array(Event Player.filteredBotSpawnPointGrid);
 						Global.botSpawnPointTimers[Index Of Array Value(Global.botSpawnPoints, Event Player.telePos)] += 5;
 						Break;
