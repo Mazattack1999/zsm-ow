@@ -2387,7 +2387,7 @@ rule("EFFECTS/TEXTS")
 				Default Visibility);
 		End;
 		"Zombie Source Icon"
-		disabled Create Icon(Host Player, Global.zombieSource, Moon,
+		Create Icon(Filtered Array(All Players(All Teams), Global.zombieSourceCounter > 0), Global.zombieSource, Moon,
 			Visible To and Position, Color(Turquoise), True);
 	}
 }
@@ -2573,13 +2573,14 @@ rule("MOVE ZOMBIE SOURCE")
 	{
 		If(Is True For Any(Global.playerTargetList, Distance Between(Global.zombieSource, Position Of(Current Array Element)) < 15));
 			Wait(1, Abort When False);
+			Global.zombieSourceCounter = 0;
+		Else If(!Global.zombieSource);
+			Global.zombieSource = First Of(Global.objectivePositions);
 		End;
-		Global.zombieSourceCounter = 35;
+		Wait Until(Is True For Any(All Players(Team 2), Current Array Element.successfullyTeleported), 9999);
+		Global.zombieSource = First Of(Filtered Array(All Players(Team 2), Current Array Element.successfullyTeleported)).telePos;
 		All Players(Team 2).canSource = False;
-		Global.zombieSource = Random Value In Array(Filtered Array(Global.mapGrid, Distance Between(First Of(Global.objectivePositions), Current Array Element) < 60 && Absolute Value(Horizontal Angle From Direction(Direction Towards(First Of(Global.objectivePositions), Global.zombieSource)) - Horizontal Angle From Direction(Direction Towards(First Of(Global.objectivePositions), Current Array Element))) > 45 && Distance Between(First Of(Global.objectivePositions), Current Array Element) > 30));
-		If(!Global.zombieSource);
-			Global.zombieSource = Random Value In Array(Filtered Array(Global.mapGrid, Distance Between(First Of(Global.objectivePositions), Current Array Element) < 60 && Distance Between(First Of(Global.objectivePositions), Current Array Element) > 30));
-		End;
+		Global.zombieSourceCounter = 35;
 		Loop If Condition Is True;
 	}
 }
@@ -5744,7 +5745,7 @@ rule("TELEPORT BOTS WHEN NOT USED FOR TOO LONG")
 				Wait(Max(1, 7 - Distance Between(Position Of(Event Player), Position Of(First Of(Sorted Array(Global.playerTargetList, Distance Between(Position Of(Current Array Element), Position Of(Event Player)))))) / 8), Abort When False);
 			End;
 			Loop If(Event Player.successfullyTeleported);
-			If(Event Player.canSource);
+			If(Event Player.canSource && Global.zombieSourceCounter > 0);
 				Global.zombieSourceCounter -= 5;
 			End;
 		End;
@@ -5804,10 +5805,8 @@ rule("UPDATE SUCCESSFUL TELEPORT STATUS")
 				Global.zombieSourceCounter += 20;
 			End;
 		End;
-		If(Distance Between(Event Player.telePos, Event Player.averagePlayersPos) < Global.botMaxTeleportRange[1]);
-			Event Player.waypoint = Position Of(Event Player);
-			Call Subroutine(updateBotSpawnPoints);
-		End;
+		Event Player.waypoint = Position Of(Event Player);
+		Call Subroutine(updateBotSpawnPoints);
 	}
 }
 
@@ -6208,12 +6207,12 @@ rule("teleportBots")
 		Wait Until(!Event Player.initializing && Event Player.canTeleport, 99999);
 		If(Event Player.customTelePos == Null);
 			While(Event Player.teleporting);
-				Call Subroutine(botTeleportCenter);
 				Wait(0.016, Ignore Condition);
 				Event Player.telePos = 0;
 				"Teleport with max distance constraint no view angle constraint"
 				While(Event Player.telePos == 0 || Is True For Any(Global.playerTargetList, Distance Between(Event Player.telePos, Position Of(
 					Current Array Element)) < 15));
+					Call Subroutine(botTeleportCenter);
 					Event Player.filteredBotSpawnPointGrid = Filtered Array(Global.botSpawnPoints, Distance Between(Current Array Element,
 						Event Player.averagePlayersPos) < Global.botMaxTeleportRange[1]);
 					"Filter out spawn points on cooldown"
@@ -6355,9 +6354,9 @@ rule("blockLocation")
 	actions
 	{
 		"If teleport modifier is the zombie source"
-		If(Event Player.teleportModifier == Global.zombieSource);
+		If(Event Player.teleportModifier == Global.zombieSource && Global.zombieSourceCounter > 0);
 			Event Player.averagePlayersPos += Direction Towards(Event Player.averagePlayersPos, Event Player.teleportModifier) * Global.botMaxTeleportRange[0];
-		Else;
+		Else If(Event Player.teleportModifier != Global.zombieSource);
 			Event Player.averagePlayersPos += Direction Towards(Event Player.averagePlayersPos, Event Player.teleportModifier) * Min(Global.botMaxTeleportRange[0], Distance Between(Event Player.averagePlayersPos, Event Player.teleportModifier));
 		End;
 		Event Player.teleportModifier = Null;
