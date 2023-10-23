@@ -2577,9 +2577,8 @@ rule("MOVE ZOMBIE SOURCE")
 		Else If(!Global.zombieSource);
 			Global.zombieSource = First Of(Global.objectivePositions);
 		End;
-		Wait Until(Is True For Any(All Players(Team 2), Current Array Element.successfullyTeleported), 9999);
-		Global.zombieSource = First Of(Filtered Array(All Players(Team 2), Current Array Element.successfullyTeleported)).telePos;
-		All Players(Team 2).canSource = False;
+		Wait Until(Is True For Any(All Living Players(Team 2), Current Array Element.successfullyTeleported), 9999);
+		Global.zombieSource = First Of(Filtered Array(All Living Players(Team 2), Current Array Element.successfullyTeleported)).telePos;
 		Global.zombieSourceCounter = 35;
 		Loop If Condition Is True;
 	}
@@ -5678,7 +5677,7 @@ rule("BOT DIES")
 				Y Component Of(Position Of(Event Player)), Z Component Of(Event Player.telePos))) < 10);
 			Event Player.successfullyTeleported = False;
 			If(Event Player.canSource);
-				Global.zombieSourceCounter -= 20;
+				Global.zombieSourceCounter -= 15;
 			End;
 		End;
 		Event Player.teleporting = True;
@@ -5802,7 +5801,7 @@ rule("UPDATE SUCCESSFUL TELEPORT STATUS")
 		If(!Event Player.successfullyTeleported);
 			Event Player.successfullyTeleported = True;
 			If(Event Player.canSource && Global.zombieSourceCounter < 150);
-				Global.zombieSourceCounter += 20;
+				Global.zombieSourceCounter += 10;
 			End;
 		End;
 		Event Player.waypoint = Position Of(Event Player);
@@ -6200,7 +6199,6 @@ rule("teleportBots")
 	actions
 	{
 		Event Player.teleporting = True;
-		Event Player.canSource = True;
 		Call Subroutine(updateBotSpawnPoints);
 		Call Subroutine(enterExitTeleport);
 		Event Player.successfullyTeleported = False;
@@ -6225,7 +6223,7 @@ rule("teleportBots")
 						Break;
 					Else;
 						Event Player.telePos = Nearest Walkable Position(Event Player.averagePlayersPos + Direction From Angles(Random Real(0, 360),
-							Random Real(-20, 20)) * Random Real(0, Global.botMaxTeleportRange[1]));
+							Random Real(-20, 10)) * Random Real(0, Global.botMaxTeleportRange[1]));
 					End;
 					Wait(0.250, Ignore Condition);
 				End;
@@ -6353,9 +6351,12 @@ rule("blockLocation")
 
 	actions
 	{
+		Event Player.canSource = False;
 		"If teleport modifier is the zombie source"
 		If(Event Player.teleportModifier == Global.zombieSource && Global.zombieSourceCounter > 0);
 			Event Player.averagePlayersPos += Direction Towards(Event Player.averagePlayersPos, Event Player.teleportModifier) * Global.botMaxTeleportRange[0];
+			"Event Player can affect source timer"
+			Event Player.canSource = True;
 		Else If(Event Player.teleportModifier != Global.zombieSource);
 			Event Player.averagePlayersPos += Direction Towards(Event Player.averagePlayersPos, Event Player.teleportModifier) * Min(Global.botMaxTeleportRange[0], Distance Between(Event Player.averagePlayersPos, Event Player.teleportModifier));
 		End;
@@ -6374,17 +6375,8 @@ rule("locateAveragePlayerLocation")
 	actions
 	{
 		Event Player.averagePlayersPos = Vector(0, 0, 0);
-		If(Count Of(Global.playersOnObjective) == 0 && Is True For Any(Global.playerTargetList, Throttle Of(Current Array Element)
-			!= Vector(0, 0, 0)));
-			For Player Variable(Event Player, pPowerUpCount_bTeleCount, 0, Count Of(Filtered Array(Global.playerTargetList, Throttle Of(
-				Current Array Element) != Vector(0, 0, 0))), 1);
-				Event Player.averagePlayersPos += Position Of(Filtered Array(Global.playerTargetList, Throttle Of(Current Array Element) != Vector(
-					0, 0, 0))[Event Player.pPowerUpCount_bTeleCount]);
-			End;
-		Else;
-			For Player Variable(Event Player, pPowerUpCount_bTeleCount, 0, Count Of(Global.playerTargetList), 1);
-				Event Player.averagePlayersPos += Position Of(Global.playerTargetList[Event Player.pPowerUpCount_bTeleCount]);
-			End;
+		For Player Variable(Event Player, pPowerUpCount_bTeleCount, 0, Count Of(Global.playerTargetList), 1);
+			Event Player.averagePlayersPos += Position Of(Global.playerTargetList[Event Player.pPowerUpCount_bTeleCount]);
 		End;
 		Event Player.averagePlayersPos /= Event Player.pPowerUpCount_bTeleCount;
 	}
