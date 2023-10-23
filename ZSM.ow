@@ -2387,7 +2387,7 @@ rule("EFFECTS/TEXTS")
 				Default Visibility);
 		End;
 		"Zombie Source Icon"
-		Create Icon(Host Player, Global.zombieSource, Moon,
+		disabled Create Icon(Host Player, Global.zombieSource, Moon,
 			Visible To and Position, Color(Turquoise), True);
 	}
 }
@@ -6218,7 +6218,7 @@ rule("teleportBots")
 						Event Player.averagePlayersPos) < Global.botMaxTeleportRange[1]);
 					"Filter out spawn points on cooldown"
 					Event Player.filteredBotSpawnPointGrid = Filtered Array(Event Player.filteredBotSpawnPointGrid,
-						Global.botSpawnPointTimers[Index Of Array Value(Global.botSpawnPoints, Current Array Element)] < 15);
+						Global.botSpawnPointTimers[Index Of Array Value(Global.botSpawnPoints, Current Array Element)] <= 0);
 					"Bots utilize saved spawn points"
 					If(Count Of(Event Player.filteredBotSpawnPointGrid) > 0);
 						Event Player.telePos = Random Value In Array(Event Player.filteredBotSpawnPointGrid);
@@ -6226,7 +6226,7 @@ rule("teleportBots")
 						Break;
 					Else;
 						Event Player.telePos = Nearest Walkable Position(Event Player.averagePlayersPos + Direction From Angles(Random Real(0, 360),
-							Random Real(-20, 10)) * Random Real(0, Global.botMaxTeleportRange[1]));
+							Random Real(-20, 20)) * Random Real(0, Global.botMaxTeleportRange[1]));
 					End;
 					Wait(0.250, Ignore Condition);
 				End;
