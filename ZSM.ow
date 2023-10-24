@@ -5444,6 +5444,7 @@ rule("SOMBRA INVISIBLE")
 	{
 		Is Game In Progress == True;
 		Event Player.damageOverTimeDuration == 0;
+		Global.gameStatus == True;
 	}
 
 	actions
