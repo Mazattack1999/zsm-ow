@@ -5347,11 +5347,6 @@ rule("SOMBRA INITIALIZE")
 		Sombra;
 	}
 
-	conditions
-	{
-		Is Game In Progress == True;
-	}
-
 	actions
 	{
 		Event Player.invisible = 0;
@@ -5392,7 +5387,6 @@ rule("SOMBRA IN COMBAT (BUTTON PRESSES)")
 
 	conditions
 	{
-		Is Game In Progress == True;
 		Event Player.damageOverTimeDuration < 3.5;
 		Is Alive(Event Player) == True;
 		(Is True For Any(Array(Button(Primary Fire), Button(Secondary Fire), Button(Ability 1), Button(Melee)), Is Button Held(Event Player, Current Array Element) && Ability Cooldown(Event Player, Current Array Element) == 0)) == True;
@@ -5417,7 +5411,6 @@ rule("SOMBRA USES TRANSLOCATOR")
 
 	conditions
 	{
-		Is Game In Progress == True;
 		Ability Cooldown(Event Player, Button(Ability 2)) > 0;
 	}
 
@@ -5442,7 +5435,6 @@ rule("SOMBRA INVISIBLE")
 
 	conditions
 	{
-		Is Game In Progress == True;
 		Event Player.damageOverTimeDuration == 0;
 		Global.gameStatus == True;
 	}
@@ -5466,7 +5458,7 @@ rule("DOOMFIST INVIS WHILE ULTING")
 
 	conditions
 	{
-		Is Game In Progress == True;
+		Global.gameStatus == True;
 		Is Using Ultimate(Event Player) == True;
 	}
 
@@ -5489,7 +5481,7 @@ rule("MOIRA INVIS WHILE FADING")
 
 	conditions
 	{
-		Is Game In Progress == True;
+		Global.gameStatus == True;
 		Is Using Ability 1(Event Player) == True;
 	}
 
@@ -5512,7 +5504,7 @@ rule("TRACER INVIS WHILE RECALLING")
 
 	conditions
 	{
-		Is Game In Progress == True;
+		Global.gameStatus == True;
 		Is Using Ability 2(Event Player) == True;
 	}
 
