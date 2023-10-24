@@ -6217,7 +6217,7 @@ rule("teleportBots")
 					"Bots utilize saved spawn points"
 					If(Count Of(Event Player.filteredBotSpawnPointGrid) > 0);
 						Event Player.telePos = Random Value In Array(Event Player.filteredBotSpawnPointGrid);
-						Global.botSpawnPointTimers[Index Of Array Value(Global.botSpawnPoints, Event Player.telePos)] += 5;
+						Global.botSpawnPointTimers[Index Of Array Value(Global.botSpawnPoints, Event Player.telePos)] += 2;
 						Break;
 					Else;
 						Event Player.telePos = Nearest Walkable Position(Event Player.averagePlayersPos + Direction From Angles(Random Real(0, 360),
