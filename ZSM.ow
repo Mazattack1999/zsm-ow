@@ -925,7 +925,6 @@ rule("START GAME")
 	actions
 	{
 		Pause Match Time;
-		Global.walkCenter = Nearest Walkable Position(Global.walkCenter);
 		Global.specialGameModeSetup = False;
 		Enable Built-In Game Mode Music;
 		Disable Built-In Game Mode Scoring;
@@ -979,8 +978,15 @@ rule("generateMapGrid")
 			End;
 			Wait(0.016, Ignore Condition);
 		End;
-		"0: Consecutive, 1: Minimum"
-		Global.objectiveSpacing = Array(Min(60, Count Of(Global.mapGrid) / 11), Min(30, Count Of(Global.mapGrid) / 20));
+		"Set walk center to nearest walkable position"
+		Global.walkCenter = Nearest Walkable Position(Global.walkCenter);
+		"Find farthest point from walk center"
+		Global.objectiveSpacing = Last Of(Sorted Array(Global.mapGrid, Distance Between(Global.walkCenter, Current Array Element)));
+		"Find farthest distance across the map"
+		Global.objectiveSpacing = Distance Between(Global.objectiveSpacing, Last Of(Sorted Array(Global.mapGrid, Distance Between(Global.objectiveSpacing, Current Array Element))));
+		"0: Consecutive, 1: Minimum, 2: Maximum, 3: Absolute Maximum"
+		Global.objectiveSpacing = Array(0.3 * Global.objectiveSpacing, 0.1 * Global.objectiveSpacing, 0.5 * Global.objectiveSpacing, Global.objectiveSpacing);
+		disabled Small Message(Host Player, Custom String("{0}", Global.objectiveSpacing[3]));
 	}
 }
 
@@ -1273,9 +1279,8 @@ rule("setObjectiveType")
 			While(Count Of(Global.objectivePositions) < Count Of(Global.objectiveTypes));
 				"Limits possible map grid points to set min and max range from last created objective position"
 				Global.testPos = Random Value In Array(Count Of(Global.objectivePositions) == 0 ? Global.mapGrid : Filtered Array(Global.mapGrid,
-					Distance Between(Current Array Element, Last Of(Global.objectivePositions)) > First Of(Global.objectiveSpacing)
-					&& Distance Between(Current Array Element, Last Of(Global.objectivePositions)) < Min(100, First Of(Global.objectiveSpacing)
-					* 3)));
+					Distance Between(Current Array Element, Last Of(Global.objectivePositions)) > Global.objectiveSpacing[0]
+					&& Distance Between(Current Array Element, Last Of(Global.objectivePositions)) < Global.objectiveSpacing[2]));
 				Global.testPos += Vector(0, 1, 0);
 				Wait(0.016, Ignore Condition);
 				"Minimum objective spacing"
@@ -1290,7 +1295,7 @@ rule("setObjectiveType")
 				End;
 				Global.objectiveCount1 += 1;
 				"If Too many attempts"
-				If(Global.objectiveCount1 > 50);
+				If(Global.objectiveCount1 > 10);
 					Modify Global Variable(objectivePositions, Remove From Array By Index, Count Of(Global.objectivePositions) - 1);
 					Modify Global Variable(objectivePositions, Remove From Array By Index, Count Of(Global.objectivePositions) - 1);
 					Global.objectiveCount1 = 0;
