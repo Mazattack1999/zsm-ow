@@ -6598,10 +6598,6 @@ rule("botEntityManagement")
 				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, True), Bad Aura, Color(Purple), Eye Position(Local Player)
 					+ Facing Direction Of(Local Player) * (30 + Evaluate Once(Random Real(-0.500, 0.500))), 200, Visible To Position and Radius);
 				Modify Player Variable(Event Player, generalPlayerBotEntities, Append To Array, Last Created Entity);
-				"Illusion aura"
-				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, Is Alive(Event Player)), Good Aura, Color(
-					Purple), Eye Position(Event Player), 0.250 * Event Player.size, Visible To Position and Radius);
-				Modify Player Variable(Event Player, generalPlayerBotEntities, Append To Array, Last Created Entity);
 			End;
 		End;
 	}
@@ -8571,7 +8567,7 @@ rule("ILLUISONIST USES EMP")
 		Event Player.botTarget != Null;
 		((Array Contains(Global.bosses, Event Player) && Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget))
 			< 20) || (Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget))
-			> 7.5 && Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget)) < 17.5)) == True;
+			<= 4 * Event Player.size)) == True;
 	}
 
 	actions
@@ -8583,42 +8579,20 @@ rule("ILLUISONIST USES EMP")
 			Apply Impulse(Event Player, Vector(0, 1, 0), 4 * Event Player.size, To World, Cancel Contrary Motion);
 			Wait(0.125, Ignore Condition);
 			Wait Until(Y Component Of(Velocity Of(Event Player)) <= 0, 5);
-		Else;
-			Event Player.specialFacing = True;
-			Stop Facing(Event Player);
-			Set Facing(Event Player, Direction Towards(Eye Position(Event Player), Eye Position(Event Player.lastTarget) + Vector(0, 10, 0)),
-				To World);
+		End;
+		Event Player.damageDealt = 0.010;
+		Set Damage Dealt(Event Player, Event Player.damageDealt * 100);
+		While(Ultimate Charge Percent(Event Player) >= 100);
+			Press Button(Event Player, Button(Ultimate));
 			Wait(0.125, Ignore Condition);
-			While(!Is Using Ability 2(Event Player));
-				Press Button(Event Player, Button(Ability 2));
-				Wait Until(Is Using Ability 2(Event Player), 0.125);
-			End;
-			Event Player.specialFacing = False;
-			Start Rule(restoreDefaultFacingMovement, Do Nothing);
-			Event Player.botTempValue = Position Of(Event Player);
-			Wait Until(!Is Using Ability 2(Event Player), 2);
-			Set Invisible(Event Player, All);
 		End;
-		"Is boss or translocator has not been destroyed"
-		If(Array Contains(Global.bosses, Event Player) || Distance Between(Position Of(Event Player), Event Player.botTempValue) > 1);
-			Event Player.damageDealt = 0.010;
-			Set Damage Dealt(Event Player, Event Player.damageDealt * 100);
-			While(Ultimate Charge Percent(Event Player) >= 100);
-				Press Button(Event Player, Button(Ultimate));
-				Wait(0.125, Ignore Condition);
-			End;
-			"EMP Cast"
-			Wait(0.360, Ignore Condition);
-			"Restore normal damage"
-			Event Player.damageDealt = Global.damageDealt[Index Of Array Value(Global.botHeros, Hero Of(Event Player))] / 100;
-			Set Damage Dealt(Event Player, Event Player.damageDealt * 100);
-		End;
+		"EMP Cast"
+		Wait(0.360, Ignore Condition);
+		"Restore normal damage"
+		Event Player.damageDealt = Global.damageDealt[Index Of Array Value(Global.botHeros, Hero Of(Event Player))] / 100;
+		Set Damage Dealt(Event Player, Event Player.damageDealt * 100);
 		If(!Array Contains(Global.bosses, Event Player));
-			Wait(0.125, Ignore Condition);
-			Teleport(Event Player, Event Player.botTempValue);
-			Set Invisible(Event Player, None);
 			Event Player.pForceFieldCount2_bCount1 = 5;
-			Set Ability Cooldown(Event Player, Button(Ability 1), 0);
 		Else;
 			Event Player.pForceFieldCount2_bCount1 = 10;
 		End;
