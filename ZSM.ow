@@ -4239,7 +4239,7 @@ rule("MODIFY KILL ZONE SCORE")
 			If(Global.objectiveCaptureValue >= Global.eliminationsNeededPerObjective);
 				Global.objectiveComplete = True;
 				"Give all bots a long respawn time"
-				All Players(Team 2).reviveTimer = 3;
+				All Players(Team 2).reviveTimer = 7;
 				Global.spawnTimes = Mapped Array(Global.spawnTimes, 7);
 			End;
 		End;
@@ -4596,7 +4596,7 @@ rule("fireSatellite")
 					Break;
 				Else;
 					"Give all bots a long respawn time"
-					All Players(Team 2).reviveTimer = 3;
+					All Players(Team 2).reviveTimer = 5;
 					Global.spawnTimes = Mapped Array(Global.spawnTimes, 5);
 				End;
 			End;
