@@ -2392,7 +2392,7 @@ rule("EFFECTS/TEXTS")
 				Default Visibility);
 		End;
 		"Zombie Source Icon"
-		disabled Create Icon(Filtered Array(All Players(All Teams), Global.zombieSourceCounter > 0), Global.zombieSource, Moon,
+		Create Icon(Filtered Array(All Players(All Teams), Global.zombieSourceCounter > 0), Global.zombieSource, Moon,
 			Visible To and Position, Color(Turquoise), True);
 	}
 }
@@ -5743,7 +5743,7 @@ rule("TELEPORT BOTS WHEN NOT USED FOR TOO LONG")
 			End;
 			Loop If(Event Player.successfullyTeleported);
 			If(Event Player.canSource && Global.zombieSourceCounter > 0);
-				Global.zombieSourceCounter -= 5;
+				Global.zombieSourceCounter -= 10;
 			End;
 		End;
 		Call Subroutine(teleportBots);
@@ -5798,7 +5798,7 @@ rule("UPDATE SUCCESSFUL TELEPORT STATUS")
 		Wait(0.500, Abort When False);
 		If(!Event Player.successfullyTeleported);
 			Event Player.successfullyTeleported = True;
-			If(Event Player.canSource && Global.zombieSourceCounter < 150);
+			If(Event Player.canSource && Global.zombieSourceCounter < 80);
 				Global.zombieSourceCounter += 10;
 			End;
 		End;
