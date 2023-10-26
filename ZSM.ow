@@ -371,6 +371,7 @@ variables
 		97: afk
 		98: teleportModifier
 		99: canSource
+		100: maxTeleDistance
 }
 
 subroutines
@@ -883,7 +884,8 @@ rule("VARIABLE ASSIGNMENT")
 		Global.mustReviveTime = 60;
 		Global.playersOnObjective = Empty Array;
 		Global.losList = Empty Array;
-		Global.botMaxTeleportRange = Array(30, 30);
+		"0: Offset distance, 1: Offset tp distance, 2: No offset tp distance"
+		Global.botMaxTeleportRange = Array(30, 30, 40);
 		Global.supplyDropStatus = True;
 		Global.supplyDropLanding = Null;
 		Global.supplyDropPosition = Null;
@@ -2392,7 +2394,7 @@ rule("EFFECTS/TEXTS")
 				Default Visibility);
 		End;
 		"Zombie Source Icon"
-		Create Icon(Filtered Array(All Players(All Teams), Global.zombieSourceCounter > 0), Global.zombieSource, Moon,
+		disabled Create Icon(Filtered Array(All Players(All Teams), Global.zombieSourceCounter > 0), Global.zombieSource, Moon,
 			Visible To and Position, Color(Turquoise), True);
 	}
 }
@@ -2584,7 +2586,7 @@ rule("MOVE ZOMBIE SOURCE")
 		End;
 		Wait Until(Is True For Any(All Living Players(Team 2), Current Array Element.successfullyTeleported), 9999);
 		Global.zombieSource = First Of(Filtered Array(All Living Players(Team 2), Current Array Element.successfullyTeleported)).telePos;
-		Global.zombieSourceCounter = 35;
+		Global.zombieSourceCounter = 65;
 		Loop If Condition Is True;
 	}
 }
@@ -6210,7 +6212,7 @@ rule("teleportBots")
 					Current Array Element)) < 15));
 					Call Subroutine(botTeleportCenter);
 					Event Player.filteredBotSpawnPointGrid = Filtered Array(Global.botSpawnPoints, Distance Between(Current Array Element,
-						Event Player.averagePlayersPos) < Global.botMaxTeleportRange[1]);
+						Event Player.averagePlayersPos) < Event Player.maxTeleDistance);
 					"Filter out spawn points on cooldown"
 					Event Player.filteredBotSpawnPointGrid = Filtered Array(Event Player.filteredBotSpawnPointGrid,
 						Global.botSpawnPointTimers[Index Of Array Value(Global.botSpawnPoints, Current Array Element)] <= 0);
@@ -6221,7 +6223,7 @@ rule("teleportBots")
 						Break;
 					Else;
 						Event Player.telePos = Nearest Walkable Position(Event Player.averagePlayersPos + Direction From Angles(Random Real(0, 360),
-							Random Real(-20, 10)) * Random Real(0, Global.botMaxTeleportRange[1]));
+							Random Real(-20, 10)) * Random Real(0, Event Player.maxTeleDistance));
 					End;
 					Wait(0.250, Ignore Condition);
 				End;
@@ -6259,6 +6261,8 @@ rule("botTeleportCenter")
 
 	actions
 	{
+		"Use non offset tp range by default"
+		Event Player.maxTeleDistance = Global.botMaxTeleportRange[2];
 		"Default tele center is closest player to the current objective position"
 		Event Player.averagePlayersPos = Position Of(First Of(Sorted Array(Global.playerTargetList, Distance Between(Position Of(
 					Current Array Element), First Of(Global.objectivePositions)))));
@@ -6336,6 +6340,8 @@ rule("botTeleportCenter")
 			Event Player.teleportModifier = Global.zombieSource;
 		End;
 		If(Event Player.teleportModifier);
+			"If using a teleport modifier, use offset tp range"
+			Event Player.maxTeleDistance = Global.botMaxTeleportRange[1];
 			Call Subroutine(blockLocation);
 		End;
 	}
