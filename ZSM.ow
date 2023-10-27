@@ -3171,9 +3171,8 @@ rule("nukeMap")
 			Wait(0.016, Ignore Condition);
 		End;
 		For Global Variable(count2, 0, 400, 1);
-			Play Effect(All Players(All Teams), Bad Explosion, Custom Color(255, Random Real(100, 255), 0, 255),
-				Global.walkCenter + Direction From Angles(Random Real(0, 360), 0) * Random Integer(0, (Global.count2 / 20) ^ 2 + 1), (
-				Global.count2 / 18) ^ 2);
+			Play Effect(All Players(All Teams), Bad Explosion, Custom Color(255, Random Real(60, 255), 0, 255),
+				Global.walkCenter + Direction From Angles(Random Real(0, 360), 0) * Random Integer(0, Global.count2), Global.count2);
 			Wait(0.016, Ignore Condition);
 		End;
 	}
