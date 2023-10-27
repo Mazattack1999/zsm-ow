@@ -2580,13 +2580,11 @@ rule("MOVE ZOMBIE SOURCE")
 	{
 		If(Is True For Any(Global.playerTargetList, Distance Between(Global.zombieSource, Position Of(Current Array Element)) < 15));
 			Wait(1, Abort When False);
-			Global.zombieSourceCounter = 0;
-		Else If(!Global.zombieSource);
-			Global.zombieSource = First Of(Global.objectivePositions);
 		End;
+		Global.zombieSourceCounter = 0;
 		Wait Until(Is True For Any(All Living Players(Team 2), Current Array Element.successfullyTeleported), 9999);
 		Global.zombieSource = First Of(Filtered Array(All Living Players(Team 2), Current Array Element.successfullyTeleported)).telePos;
-		Global.zombieSourceCounter = 35;
+		Global.zombieSourceCounter = 10;
 		Loop If Condition Is True;
 	}
 }
@@ -5677,7 +5675,7 @@ rule("BOT DIES")
 				Y Component Of(Position Of(Event Player)), Z Component Of(Event Player.telePos))) < 10);
 			Event Player.successfullyTeleported = False;
 			If(Event Player.canSource);
-				Global.zombieSourceCounter -= 15;
+				Global.zombieSourceCounter -= 5;
 			End;
 		End;
 		Event Player.teleporting = True;
@@ -5745,7 +5743,7 @@ rule("TELEPORT BOTS WHEN NOT USED FOR TOO LONG")
 			End;
 			Loop If(Event Player.successfullyTeleported);
 			If(Event Player.canSource && Global.zombieSourceCounter > 0);
-				Global.zombieSourceCounter -= 10;
+				Global.zombieSourceCounter -= 5;
 			End;
 		End;
 		Call Subroutine(teleportBots);
@@ -5800,8 +5798,8 @@ rule("UPDATE SUCCESSFUL TELEPORT STATUS")
 		Wait(0.500, Abort When False);
 		If(!Event Player.successfullyTeleported);
 			Event Player.successfullyTeleported = True;
-			If(Event Player.canSource && Global.zombieSourceCounter < 80);
-				Global.zombieSourceCounter += 10;
+			If(Event Player.canSource && Global.zombieSourceCounter < 30);
+				Global.zombieSourceCounter += 5;
 			End;
 		End;
 		Event Player.waypoint = Position Of(Event Player);
@@ -6219,7 +6217,7 @@ rule("teleportBots")
 					"Bots utilize saved spawn points"
 					If(Count Of(Event Player.filteredBotSpawnPointGrid) > 0);
 						Event Player.telePos = Random Value In Array(Event Player.filteredBotSpawnPointGrid);
-						Global.botSpawnPointTimers[Index Of Array Value(Global.botSpawnPoints, Event Player.telePos)] += 2;
+						Global.botSpawnPointTimers[Index Of Array Value(Global.botSpawnPoints, Event Player.telePos)] += 4;
 						Break;
 					Else;
 						Event Player.telePos = Nearest Walkable Position(Event Player.averagePlayersPos + Direction From Angles(Random Real(0, 360),
