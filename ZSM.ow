@@ -2573,13 +2573,13 @@ rule("MOVE ZOMBIE SOURCE")
 	conditions
 	{
 		Global.gameStatus == True;
-		(Global.zombieSourceCounter <= 0 || Is True For Any(Global.playerTargetList, !Current Array Element.invisible && Distance Between(Global.zombieSource, Position Of(Current Array Element)) < 15)) == True;
+		(Global.zombieSourceCounter <= 0 || Is True For Any(Global.playerTargetList, !Current Array Element.invisible && Distance Between(Global.zombieSource, Position Of(Current Array Element)) < 5)) == True;
 	}
 
 	actions
 	{
-		If(Is True For Any(Global.playerTargetList, Distance Between(Global.zombieSource, Position Of(Current Array Element)) < 15));
-			Wait(0.032, Abort When False);
+		If(Is True For Any(Global.playerTargetList, Distance Between(Global.zombieSource, Position Of(Current Array Element)) < 5));
+			Wait(0.25, Abort When False);
 		End;
 		Global.zombieSourceCounter = 0;
 		Global.zombieSource = Null;
@@ -6222,6 +6222,13 @@ rule("teleportBots")
 					Else;
 						Event Player.telePos = Nearest Walkable Position(Event Player.averagePlayersPos + Direction From Angles(Random Real(0, 360),
 							Random Real(-20, 10)) * Random Real(0, Event Player.maxTeleDistance));
+						Event Player.filteredBotSpawnPointGrid = Filtered Array(Global.botSpawnPoints, Distance Between(Current Array Element, Event Player.telePos) < 5);
+						If(Count Of(Event Player.filteredBotSpawnPointGrid) > 0);
+							Event Player.telePos = Random Value In Array(Event Player.filteredBotSpawnPointGrid);
+							If(Event Player.canSource);
+								Global.zombieSourceCounter -= 5;
+							End;
+						End;
 					End;
 					Wait(0.250, Ignore Condition);
 				End;
