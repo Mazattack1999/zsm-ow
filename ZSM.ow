@@ -2394,7 +2394,7 @@ rule("EFFECTS/TEXTS")
 				Default Visibility);
 		End;
 		"Zombie Source Icon"
-		disabled Create Icon(Filtered Array(All Players(All Teams), Global.zombieSourceCounter > 0), Global.zombieSource, Moon,
+		Create Icon(Filtered Array(All Players(All Teams), Global.zombieSourceCounter > 0), Global.zombieSource, Moon,
 			Visible To and Position, Color(Turquoise), True);
 	}
 }
@@ -2579,12 +2579,14 @@ rule("MOVE ZOMBIE SOURCE")
 	actions
 	{
 		If(Is True For Any(Global.playerTargetList, Distance Between(Global.zombieSource, Position Of(Current Array Element)) < 15));
-			Wait(1, Abort When False);
+			Wait(0.032, Abort When False);
 		End;
 		Global.zombieSourceCounter = 0;
+		Global.zombieSource = Null;
+		All Players(Team 2).canSource = False;
 		Wait Until(Is True For Any(All Living Players(Team 2), Current Array Element.successfullyTeleported), 9999);
 		Global.zombieSource = First Of(Filtered Array(All Living Players(Team 2), Current Array Element.successfullyTeleported)).telePos;
-		Global.zombieSourceCounter = 10;
+		Global.zombieSourceCounter = 25;
 		Loop If Condition Is True;
 	}
 }
@@ -5670,8 +5672,7 @@ rule("BOT DIES")
 			Call Subroutine(updateBotSpawnPoints);
 			Destroy Dummy Bot(Team 2, Slot Of(Event Player));
 			Abort;
-		Else If(Event Was Environment && Distance Between(Position Of(Event Player), Vector(X Component Of(Event Player.telePos),
-				Y Component Of(Position Of(Event Player)), Z Component Of(Event Player.telePos))) < 10);
+		Else If(Event Was Environment);
 			Event Player.successfullyTeleported = False;
 			If(Event Player.canSource);
 				Global.zombieSourceCounter -= 5;
@@ -6337,8 +6338,6 @@ rule("botTeleportCenter")
 			Event Player.teleportModifier = Global.zombieSource;
 		End;
 		If(Event Player.teleportModifier);
-			"If using a teleport modifier, use offset tp range"
-			Event Player.maxTeleDistance = Global.botMaxTeleportRange[1];
 			Call Subroutine(blockLocation);
 		End;
 	}
@@ -6354,14 +6353,17 @@ rule("blockLocation")
 
 	actions
 	{
+		"If using a teleport modifier, use offset tp range"
+		Event Player.maxTeleDistance = Global.botMaxTeleportRange[1];
+		"Modify teleport location"
+		Event Player.averagePlayersPos += Direction Towards(Event Player.averagePlayersPos, Event Player.teleportModifier) * Min(Global.botMaxTeleportRange[0], Distance Between
+			(Event Player.averagePlayersPos, Event Player.teleportModifier));
+		"Bots cannot affect zombie source by default"
 		Event Player.canSource = False;
 		"If teleport modifier is the zombie source"
-		If(Event Player.teleportModifier == Global.zombieSource && Global.zombieSourceCounter > 0);
-			Event Player.averagePlayersPos += Direction Towards(Event Player.averagePlayersPos, Event Player.teleportModifier) * Global.botMaxTeleportRange[0];
+		If(Event Player.teleportModifier == Global.zombieSource);
 			"Event Player can affect source timer"
 			Event Player.canSource = True;
-		Else If(Event Player.teleportModifier != Global.zombieSource);
-			Event Player.averagePlayersPos += Direction Towards(Event Player.averagePlayersPos, Event Player.teleportModifier) * Min(Global.botMaxTeleportRange[0], Distance Between(Event Player.averagePlayersPos, Event Player.teleportModifier));
 		End;
 		Event Player.teleportModifier = Null;
 	}
