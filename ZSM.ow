@@ -2584,9 +2584,9 @@ rule("MOVE ZOMBIE SOURCE")
 		Global.zombieSourceCounter = 0;
 		Global.zombieSource = Null;
 		All Players(Team 2).canSource = False;
-		Wait Until(Is True For Any(All Living Players(Team 2), Current Array Element.successfullyTeleported), 9999);
-		Global.zombieSource = First Of(Filtered Array(All Living Players(Team 2), Current Array Element.successfullyTeleported)).telePos;
-		Global.zombieSourceCounter = 25;
+		Wait Until(Is True For Any(All Players(Team 2), Current Array Element.successfullyTeleported), 9999);
+		Global.zombieSource = First Of(Filtered Array(All Players(Team 2), Current Array Element.successfullyTeleported)).telePos;
+		Global.zombieSourceCounter = 15;
 		Loop If Condition Is True;
 	}
 }
