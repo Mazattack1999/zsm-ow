@@ -987,7 +987,7 @@ rule("generateMapGrid")
 		"Find farthest distance across the map"
 		Global.objectiveSpacing = Distance Between(Global.objectiveSpacing, Last Of(Sorted Array(Global.mapGrid, Distance Between(Global.objectiveSpacing, Current Array Element))));
 		"0: Consecutive, 1: Minimum, 2: Maximum, 3: Absolute Maximum"
-		Global.objectiveSpacing = Array(0.3 * Global.objectiveSpacing, 0.1 * Global.objectiveSpacing, 0.5 * Global.objectiveSpacing, Global.objectiveSpacing);
+		Global.objectiveSpacing = Array(0.25 * Global.objectiveSpacing, 0.15 * Global.objectiveSpacing, 0.3 * Global.objectiveSpacing, Global.objectiveSpacing);
 		disabled Small Message(Host Player, Custom String("{0}", Global.objectiveSpacing[3]));
 	}
 }
