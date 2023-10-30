@@ -6299,15 +6299,15 @@ rule("botTeleportCenter")
 			Else;
 				Event Player.averagePlayersPos = (Position Of(Global.survivorToRescue) + Position Of(Global.survivorToRescue.botFollowTarget)) / 2;
 			End;
-		"Killzone"
+		"Kill Zone"
 		Else If(Global.objectiveTypes[0] == 6);
-			"If 75% of living players are in the killzone"
-			If(Count Of(Filtered Array(Global.playerTargetList, Distance Between(Position Of(Current Array Element), Global.objectiveChase1)
-				< Global.objectiveRad)) > 0.750 * Count Of(Global.playerTargetList));
+			"If all living players are in the kill zone"
+			If(Is True For All(Global.playerTargetList, Distance Between(Position Of(Current Array Element), Global.objectiveChase1)
+				< Global.objectiveRad));
 				"Average player positon"
 				Call Subroutine(locateAveragePlayerLocation);
 			Else;
-				"Player closeset to the center of the killzone"
+				"Player closeset to the center of the kill zone"
 				Event Player.averagePlayersPos = Position Of(First Of(Sorted Array(Global.playerTargetList, Distance Between(Position Of(
 					Current Array Element), Global.objectiveChase1))));
 			End;
