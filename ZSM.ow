@@ -711,61 +711,49 @@ rule("setAvailableObjectives")
 		"Set objective type votes empty"
 		Global.objectiveTypeVotes[0] = Array(Null, True);
 		"Set objective type votes empty"
-		Global.objectiveTypeVotes[1] = Array(Null, Workshop Setting Toggle(Custom String("Available Objective Types"), Custom String(
-			"Capture Points"), True, 0));
+		Global.objectiveTypeVotes[1] = Array(Null, Workshop Setting Toggle(Custom String("Available Missions"), Custom String(
+			"Survival"), True, 0));
 		"Set objective type votes empty"
-		Global.objectiveTypeVotes[2] = Array(Null, Workshop Setting Toggle(Custom String("Available Objective Types"), Custom String(
-			"Eliminations"), True, 1));
+		Global.objectiveTypeVotes[2] = Array(Null, Workshop Setting Toggle(Custom String("Available Missions"), Custom String(
+			"Supply Run"), True, 1));
 		"Set objective type votes empty"
-		Global.objectiveTypeVotes[3] = Array(Null, Workshop Setting Toggle(Custom String("Available Objective Types"), Custom String(
-			"Bosses"), True, 2));
+		Global.objectiveTypeVotes[3] = Array(Null, Workshop Setting Toggle(Custom String("Available Missions"), Custom String(
+			"Secure The Area"), True, 2));
 		"Set objective type votes empty"
-		Global.objectiveTypeVotes[4] = Array(Null, Workshop Setting Toggle(Custom String("Available Objective Types"), Custom String(
-			"Resource Collection"), True, 4));
+		Global.objectiveTypeVotes[4] = Array(Null, Workshop Setting Toggle(Custom String("Available Missions"), Custom String(
+			"Rescue Mission"), True, 4));
 		"Set objective type votes empty"
-		Global.objectiveTypeVotes[5] = Array(Null, Workshop Setting Toggle(Custom String("Available Objective Types"), Custom String(
-			"Survivor Rescue"), True, 5));
+		Global.objectiveTypeVotes[5] = Array(Null, Workshop Setting Toggle(Custom String("Available Missions"), Custom String(
+			"Infestation"), True, 5));
 		"Set objective type votes empty"
-		Global.objectiveTypeVotes[6] = Array(Null, Workshop Setting Toggle(Custom String("Available Objective Types"), Custom String(
-			"Kill Zone"), True, 6));
-		"Set objective type votes empty"
-		Global.objectiveTypeVotes[7] = Array(Null, Workshop Setting Toggle(Custom String("Available Objective Types"), Custom String(
-			"Zombie Egg"), True, 7));
-		"Set objective type votes empty"
-		Global.objectiveTypeVotes[8] = Array(Null, Workshop Setting Toggle(Custom String("Available Objective Types"), Custom String(
-			"Satellite Uplink"), True, 8));
-		"Set objective type votes empty"
-		Global.objectiveTypeVotes[9] = Array(Null, Workshop Setting Toggle(Custom String("Available Objective Types"), Custom String(
-			"Graveyard"), True, 9));
-		"Set objective type votes empty"
-		Global.objectiveTypeVotes[10] = Array(Null, Workshop Setting Toggle(Custom String("Available Objective Types"), Custom String(
-			"Mixed Objectives"), True, 10));
+		Global.objectiveTypeVotes[6] = Array(Null, Workshop Setting Toggle(Custom String("Available Missions"), Custom String(
+			"Mixed Objectives (Whatever It Takes)"), True, 6));
 		"Mixed Objectives pool"
-		Global.mixedObjectivesPool[0] = Workshop Setting Toggle(Custom String("Mixed Objectives Pool"), Custom String("Capture Points."),
+		Global.mixedObjectivesPool[0] = Workshop Setting Toggle(Custom String("Mixed Objectives Pool"), Custom String("Capture Points"),
 			True, 1) ? 1 : 0;
 		"Mixed Objectives pool"
-		Global.mixedObjectivesPool[1] = Workshop Setting Toggle(Custom String("Mixed Objectives Pool"), Custom String("Eliminations."),
+		Global.mixedObjectivesPool[1] = Workshop Setting Toggle(Custom String("Mixed Objectives Pool"), Custom String("Eliminations"),
 			False, 2) ? 2 : 0;
 		"Mixed Objectives pool"
-		Global.mixedObjectivesPool[2] = Workshop Setting Toggle(Custom String("Mixed Objectives Pool"), Custom String("Bosses."), True, 3)
+		Global.mixedObjectivesPool[2] = Workshop Setting Toggle(Custom String("Mixed Objectives Pool"), Custom String("Bosses"), True, 3)
 			? 3 : 0;
 		"Mixed Objectives pool"
 		Global.mixedObjectivesPool[3] = Workshop Setting Toggle(Custom String("Mixed Objectives Pool"), Custom String(
-			"Resource Collection."), True, 4) ? 4 : 0;
+			"Resource Collection"), True, 4) ? 4 : 0;
 		"Mixed Objectives pool"
-		Global.mixedObjectivesPool[4] = Workshop Setting Toggle(Custom String("Mixed Objectives Pool"), Custom String("Survivor Rescue."),
+		Global.mixedObjectivesPool[4] = Workshop Setting Toggle(Custom String("Mixed Objectives Pool"), Custom String("Survivor Rescue"),
 			True, 5) ? 5 : 0;
 		"Mixed Objectives pool"
-		Global.mixedObjectivesPool[5] = Workshop Setting Toggle(Custom String("Mixed Objectives Pool"), Custom String("Kill Zone."), True,
+		Global.mixedObjectivesPool[5] = Workshop Setting Toggle(Custom String("Mixed Objectives Pool"), Custom String("Kill Zone"), True,
 			6) ? 6 : 0;
 		"Mixed Objectives pool"
-		Global.mixedObjectivesPool[6] = Workshop Setting Toggle(Custom String("Mixed Objectives Pool"), Custom String("Zombie Egg."), True,
+		Global.mixedObjectivesPool[6] = Workshop Setting Toggle(Custom String("Mixed Objectives Pool"), Custom String("Zombie Egg"), True,
 			7) ? 7 : 0;
 		"Mixed Objectives pool"
-		Global.mixedObjectivesPool[7] = Workshop Setting Toggle(Custom String("Mixed Objectives Pool"), Custom String("Satellite Uplink."),
+		Global.mixedObjectivesPool[7] = Workshop Setting Toggle(Custom String("Mixed Objectives Pool"), Custom String("Satellite Uplink"),
 			True, 8) ? 8 : 0;
 		"Mixed Objectives pool"
-		Global.mixedObjectivesPool[8] = Workshop Setting Toggle(Custom String("Mixed Objectives Pool"), Custom String("Graveyard."), True,
+		Global.mixedObjectivesPool[8] = Workshop Setting Toggle(Custom String("Mixed Objectives Pool"), Custom String("Graveyard"), True,
 			9) ? 9 : 0;
 		"Removed disabled objectives"
 		Modify Global Variable(mixedObjectivesPool, Remove From Array By Value, 0);
@@ -1539,64 +1527,38 @@ rule("EFFECTS/TEXTS")
 			Global.voting ? Custom String("Change Vote (Press [{0}])", Input Binding String(Button(Ability 1))) : Custom String(""), Left,
 			1, Global.specialEffectsTiming ? Color(White) : Color(Turquoise), Color(White), Global.specialEffectsTiming ? Color(White)
 			: Color(Turquoise), Visible To String and Color, Default Visibility);
-		"Vote objective type text: No preference"
+		"Vote mission text: No preference"
 		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 0), Custom String(
-			"Objective Type: No Preference"), Null, Custom String("Change Vote (Press [{0}])", Input Binding String(Button(Ability 2))),
+			"Mission: No Preference"), Null, Custom String("Change Vote (Press [{0}])", Input Binding String(Button(Ability 2))),
 			Left, 2, Color(Aqua), Color(Aqua), Color(Aqua), Visible To and String, Default Visibility);
-		"Vote objective type text: Capture Points Only"
+		"Vote mission text: Survival"
 		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 1), Custom String(
-			"Objective Type: Capture Points {0}", Icon String(Flag)), Custom String(
-			"Players must secure and capture locations around the map"), Global.voting ? Custom String("Change Vote (Press [{0}])",
-			Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Color(Orange), Color(Orange), Color(Orange),
+			"Mission: Survival {0}", Icon String(Skull)), Null, Global.voting ? Custom String("Change Vote (Press [{0}])",
+			Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Color(Blue), Color(Blue), Color(Blue),
 			Visible To and String, Default Visibility);
-		"Vote objective type text: Eliminations"
+		"Vote mission text: Supply Run"
 		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 2), Custom String(
-			"Objective Type: Eliminations {0}", Icon String(Skull)), Custom String("Players must eliminate a set number of zombies"),
-			Global.voting ? Custom String("Change Vote (Press [{0}])", Input Binding String(Button(Ability 2))) : Custom String(""), Left,
-			2, Color(Blue), Color(Blue), Color(Blue), Visible To and String, Default Visibility);
-		"Vote objective type text: Boss Objectives"
-		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 3), Custom String(
-			"Objective Type: Bosses {0}", Icon String(Warning)), Custom String("Spawns giant versions of zombies"),
-			Global.voting ? Custom String("Change Vote (Press [{0}])", Input Binding String(Button(Ability 2))) : Custom String(""), Left,
-			2, Color(Red), Color(Red), Color(Red), Visible To and String, Default Visibility);
-		"Vote objective type text: Resource Collection Objectives"
-		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 4), Custom String(
-			"Objective Type: Resource Collection {0}", Icon String(Plus)), Custom String(
-			"Find scattered resources and bring them to a collection site"), Global.voting ? Custom String("Change Vote (Press [{0}])",
+			"Mission: Supply Run {0}", Icon String(Recycle)), Null, Global.voting ? Custom String("Change Vote (Press [{0}])",
 			Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Color(Green), Color(Green), Color(Green),
 			Visible To and String, Default Visibility);
-		"Vote objective type text: Survivor Rescue Objectives"
+		"Vote mission text: Secure The Area"
+		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 3), Custom String(
+			"Mission: Secure The Area {0}", Icon String(Flag)), Null, Global.voting ? Custom String("Change Vote (Press [{0}])",
+			Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Color(Orange), Color(Orange), Color(Orange),
+			Visible To and String, Default Visibility);
+		"Vote mission text: Rescue Mission"
+		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 4), Custom String(
+			"Mission: Rescue Mission {0}", Icon String(Halo)), Null, Global.voting ? Custom String("Change Vote (Press [{0}])",
+			Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Color(Violet), Color(Violet), Color(Violet),
+			Visible To and String, Default Visibility);
+		"Vote mission text: Infestation"
 		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 5), Custom String(
-			"Objective Type: Survivor Rescue {0}", Icon String(Halo)), Custom String("Lead a survivor to an extraction site"),
-			Global.voting ? Custom String("Change Vote (Press [{0}])", Input Binding String(Button(Ability 2))) : Custom String(""), Left,
-			2, Color(Violet), Color(Violet), Color(Violet), Visible To and String, Default Visibility);
-		"Vote objective type text: Kill Zone Objectives"
-		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 6), Custom String(
-			"Objective Type: Kill Zone {0}", Round To Integer(Total Time Elapsed * 1.250, Up) % 2 == 0 ? Icon String(Ring Thick)
-			: Icon String(Ring Thin)), Custom String("Clear zombies from a designated area"), Global.voting ? Custom String(
-			"Change Vote (Press [{0}])", Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Color(Red), Color(Red),
-			Color(Red), Visible To and String, Default Visibility);
-		"Vote objective type text: Zombie Egg Objectives"
-		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 7), Custom String(
-			"Objective Type: Zombie Egg {0}", Icon String(Radioactive)), Custom String(
-			"Survivors must destroy an object that is spawning zombies"), Global.voting ? Custom String("Change Vote (Press [{0}])",
+			"Mission: Infestation {0}", Icon String(Warning)), Null, Global.voting ? Custom String("Change Vote (Press [{0}])",
 			Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Color(Lime Green), Color(Lime Green), Color(Lime Green),
 			Visible To and String, Default Visibility);
-		"Vote objective type text: Satellite Uplink Objectives"
-		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 8), Custom String(
-			"Objective Type: Satellite Uplink {0}", Icon String(Moon)), Custom String(
-			"Survivors must repair terminals to communicate with a satellite"), Global.voting ? Custom String("Change Vote (Press [{0}])",
-			Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Custom Color(12, 129, 132, 255), Custom Color(12, 129,
-			132, 255), Custom Color(12, 129, 132, 255), Visible To and String, Default Visibility);
-		"Vote objective type text: Graveyard Objectives"
-		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 9), Custom String(
-			"Objective Type: Graveyard {0}", Icon String(Skull)), Custom String(
-			"Survivors must clear an area where zombies are coming out of the ground"), Global.voting ? Custom String(
-			"Change Vote (Press [{0}])", Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Color(Turquoise), Color(
-			Turquoise), Color(Turquoise), Visible To and String, Default Visibility);
-		"Vote objective type text: Mixed Objectives"
+		"Vote mission text: Whatever It Takes"
 		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == Count Of(
-			Global.objectiveTypeVotes) - 1), Custom String("Objective Type: Mixed Objectives {0}", Icon String(Spiral)), Custom String(
+			Global.objectiveTypeVotes) - 1), Custom String("Mission: Whatever It Takes {0}", Icon String(Spiral)), Custom String(
 			"Randomly assigns all types of objectives"), Global.voting ? Custom String("Change Vote (Press [{0}])", Input Binding String(
 			Button(Ability 2))) : Custom String(""), Left, 2, Color(Purple), Color(Purple), Color(Purple), Visible To and String,
 			Default Visibility);
