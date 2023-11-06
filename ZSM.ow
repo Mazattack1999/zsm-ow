@@ -1263,19 +1263,31 @@ rule("setObjectiveType")
 
 	actions
 	{
+		"Survival"
+		If(Global.objectiveTypeSetting == 1);
+			Global.mixedObjectivesPool = Array(2);
+		"Supply Run"
+		Else If(Global.objectiveTypeSetting == 2);
+			Global.mixedObjectivesPool = Array(1, 4, 8);
+		"Secure the Area"
+		Else If(Global.objectiveTypeSetting == 3);
+			Global.mixedObjectivesPool = Array(1, 6, 8);
+		"Rescue Mission"
+		Else If(Global.objectiveTypeSetting == 4);
+			Global.mixedObjectivesPool = Array(3, 4, 5);
+		"Infestation"
+		Else If(Global.objectiveTypeSetting == 5);
+			Global.mixedObjectivesPool = Array(3, 6, 7, 9);
+		End;
 		"Wait until game begins"
 		Wait Until(Is Game In Progress && !Global.specialGameModeSetup, 99999);
 		"Create objective positions"
 		While(Count Of(Global.objectiveTypes) < Workshop Setting Integer(Custom String("General"), Custom String("Number of Objectives"),
 			5, 0, 100, 0) + 1);
-			If(Global.objectiveTypeSetting != Count Of(Global.objectiveTypeVotes) - 1);
-				Modify Global Variable(objectiveTypes, Append To Array, Global.objectiveTypeSetting);
-			Else;
-				"Mixed objective assignment"
-				Modify Global Variable(objectiveTypes, Append To Array, Random Value In Array(Remove From Array(Global.mixedObjectivesPool,
-					Filtered Array(Global.objectiveTypes, Current Array Index > Count Of(Global.objectiveTypes) - 1 - (Count Of(
-					Global.mixedObjectivesPool) - 1)))));
-			End;
+			"Mixed objective assignment"
+			Modify Global Variable(objectiveTypes, Append To Array, Random Value In Array(Remove From Array(Global.mixedObjectivesPool,
+				Filtered Array(Global.objectiveTypes, Current Array Index > Count Of(Global.objectiveTypes) - 1 - (Count Of(
+				Global.mixedObjectivesPool) - 1)))));
 			Global.objectiveCount1 = 0;
 			While(Count Of(Global.objectivePositions) < Count Of(Global.objectiveTypes));
 				"Limits possible map grid points to set min and max range from last created objective position"
