@@ -2660,7 +2660,7 @@ rule("objectivesManagement")
 			End;
 			Wait(0.016, Ignore Condition);
 			"Checks if current objective type is elimination only"
-			If(Global.objectiveTypeSetting != 2);
+			If(Global.objectiveTypeSetting != 1);
 				Modify Global Variable(objectivePositions, Remove From Array By Index, 0);
 				Modify Global Variable(objectiveTypes, Remove From Array By Index, 0);
 				Global.bosses = Empty Array;
@@ -2693,9 +2693,9 @@ rule("objectivesManagement")
 			Else If(First Of(Global.objectiveTypes) == 2);
 				Global.objectiveDescription = Custom String("Eliminate zombies");
 				Global.objectiveCaptureValue = 0;
-				Global.eliminationsNeededPerObjective = 40;
+				Global.eliminationsNeededPerObjective = 1;
 				Big Message(All Players(All Teams), Custom String("Eliminate {0} zombies!",
-					Global.objectiveTypeSetting != 2 ? Global.eliminationsNeededPerObjective : Global.eliminationsNeededPerObjective * (Count Of(
+					Global.objectiveTypeSetting != 1 ? Global.eliminationsNeededPerObjective : Global.eliminationsNeededPerObjective * (Count Of(
 					Global.objectivePositions) - 1)));
 			Else If(First Of(Global.objectiveTypes) == 3);
 				Global.objectiveDescription = Custom String("Eliminate the boss");
@@ -2888,12 +2888,12 @@ rule("globalObjectiveEntityManagement")
 		Else If(Global.objectiveValue == 2);
 			"Elimination Progress Bar"
 			Create Progress Bar HUD Text(All Players(All Teams), Global.objectiveCaptureValue / (
-				Global.objectiveTypeSetting != 2 ? Global.eliminationsNeededPerObjective : Global.eliminationsNeededPerObjective * (Count Of(
+				Global.objectiveTypeSetting != 1 ? Global.eliminationsNeededPerObjective : Global.eliminationsNeededPerObjective * (Count Of(
 				Global.objectivePositions) - 1)) * 100, Custom String("Zombie Elimination Progress"), Top, 2, Custom Color(3, 98, 252, 255),
 				Custom Color(3, 98, 252, 255), Visible To and Values, Default Visibility);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Text ID);
 			"Elimination Hud Text"
-			Create HUD Text(All Players(All Teams), Null, Global.objectiveTypeSetting != 2 ? Custom String("Objectives Remaining: {0}",
+			Create HUD Text(All Players(All Teams), Null, Global.objectiveTypeSetting != 1 ? Custom String("Objectives Remaining: {0}",
 				Count Of(Global.objectivePositions) - 1) : Custom String(""), Null, Top, 1, Color(Blue), Color(Blue), Color(Blue), Visible To,
 				Default Visibility);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Text ID);
@@ -3452,7 +3452,7 @@ rule("MODIFY ZOMBIE ELIMINATION SCORE")
 	actions
 	{
 		Global.objectiveCaptureValue += 1;
-		If(Global.objectiveCaptureValue >= (Global.objectiveTypeSetting == 2 ? Global.eliminationsNeededPerObjective * (Count Of(
+		If(Global.objectiveCaptureValue >= (Global.objectiveTypeSetting == 1 ? Global.eliminationsNeededPerObjective * (Count Of(
 			Global.objectivePositions) - 1) : Global.eliminationsNeededPerObjective));
 			Global.objectiveComplete = True;
 		End;
