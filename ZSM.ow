@@ -6262,7 +6262,7 @@ rule("botTeleportCenter")
 			End;
 		"Resource Collection"
 		Else If(Global.objectiveTypes[0] == 4);
-			Event Player.teleportModifier = Global.zombieSource;	
+			Event Player.teleportModifier = First Of(Global.objectivePositions);
 		"Survivor Rescue"
 		Else If(Global.objectiveTypes[0] == 5);
 			If(Global.survivorToRescue.botFollowTarget == Null);
