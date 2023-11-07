@@ -2656,7 +2656,7 @@ rule("objectivesManagement")
 			Else If(First Of(Global.objectiveTypes) == 2);
 				Global.objectiveDescription = Custom String("Eliminate zombies");
 				Global.objectiveCaptureValue = 0;
-				Global.eliminationsNeededPerObjective = 1;
+				Global.eliminationsNeededPerObjective = 40;
 				Big Message(All Players(All Teams), Custom String("Eliminate {0} zombies!",
 					Global.objectiveTypeSetting != 1 ? Global.eliminationsNeededPerObjective : Global.eliminationsNeededPerObjective * (Count Of(
 					Global.objectivePositions) - 1)));
