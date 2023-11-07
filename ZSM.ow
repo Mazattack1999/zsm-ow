@@ -6270,7 +6270,8 @@ rule("botTeleportCenter")
 					Current Array Element), Position Of(Global.survivorToRescue)))));
 				Event Player.teleportModifier = Position Of(Global.survivorToRescue);
 			Else;
-				Event Player.teleCenter = (Position Of(Global.survivorToRescue) + Position Of(Global.survivorToRescue.botFollowTarget)) / 2;
+				Event Player.teleCenter = Position Of(Global.survivorToRescue);
+				Event Player.teleportModifier = Position Of(First Of(Global.objectivePositions));
 			End;
 		"Kill Zone"
 		Else If(Global.objectiveTypes[0] == 6);
