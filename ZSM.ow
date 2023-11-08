@@ -6305,7 +6305,7 @@ rule("botTeleportCenter")
 					Global.objectiveCaptureValue[Index Of Array Value(Global.objectiveResourcePositions, Current Array Element)]));
 				Event Player.teleportModifier = Global.zombieSource;
 			Else;
-				If(Is True For Any(Global.playerTargetList, Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element)) < 50));
+				If(Is True For Any(Global.playerTargetList, Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element)) < 60));
 					Event Player.teleportModifier = Global.zombieSource;
 				Else;
 					Event Player.teleportModifier = First Of(Global.objectivePositions);
