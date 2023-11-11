@@ -5741,7 +5741,7 @@ rule("UPDATE SUCCESSFUL TELEPORT STATUS")
 		Wait(0.500, Abort When False);
 		If(!Event Player.successfullyTeleported);
 			Event Player.successfullyTeleported = True;
-			If(Global.zombieSourceCounter < 7.5);
+			If(Global.zombieSourceCounter < 5.5);
 				If(Global.zombieSourceCounter <= 0);
 					Global.zombieSourceCounter = 7.5;
 					Global.zombieSource = Event Player.telePos;
@@ -6172,7 +6172,7 @@ rule("teleportBots")
 						Break;
 					Else;
 						Event Player.telePos = Nearest Walkable Position(Event Player.teleCenter + Direction From Angles(Random Real(0, 360),
-							Random Real(-20, 10)) * Random Real(0, Event Player.maxTeleDistance));
+							Random Real(-20, 10)) * Random Real(Event Player.teleportModifier ? 0 : 15, Event Player.maxTeleDistance));
 						Event Player.filteredBotSpawnPointGrid = Filtered Array(Global.botSpawnPoints, Distance Between(Current Array Element, Event Player.telePos) < 5);
 						If(Count Of(Event Player.filteredBotSpawnPointGrid) > 0);
 							Event Player.telePos = Random Value In Array(Event Player.filteredBotSpawnPointGrid);
@@ -6249,8 +6249,12 @@ rule("botTeleportCenter")
 					Current Array Element), Position Of(Global.survivorToRescue)))));
 				Event Player.teleportModifier = Position Of(Global.survivorToRescue);
 			Else;
-				Event Player.teleCenter = Position Of(Global.survivorToRescue);
-				Event Player.teleportModifier = Position Of(First Of(Global.objectivePositions));
+				Event Player.teleCenter = Position Of(Global.survivorToRescue.botFollowTarget);
+				If(Global.zombieSourceCounter > 0);
+					Event Player.teleportModifier = Global.zombieSource;
+				Else;
+					Event Player.teleportModifier = Position Of(First Of(Global.objectivePositions));
+				End;
 			End;
 		"Kill Zone"
 		Else If(Global.objectiveTypes[0] == 6);
