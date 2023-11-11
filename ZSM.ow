@@ -5620,7 +5620,7 @@ rule("BOT DIES")
 		Else If(Event Was Environment);
 			Event Player.successfullyTeleported = False;
 			If(Event Player.canSource);
-				Global.zombieSourceCounter -= 5;
+				Global.zombieSourceCounter -= 2;
 			End;
 		End;
 		Event Player.teleporting = True;
@@ -5688,9 +5688,6 @@ rule("TELEPORT BOTS WHEN NOT USED FOR TOO LONG")
 				Wait(Max(1, 7 - Distance Between(Position Of(Event Player), Event Player.teleReference) / 8), Abort When False);
 			End;
 			Loop If(Event Player.successfullyTeleported);
-			If(Event Player.canSource && Global.zombieSourceCounter > 0);
-				Global.zombieSourceCounter -= 5;
-			End;
 		End;
 		Call Subroutine(teleportBots);
 		Loop;
@@ -5744,12 +5741,12 @@ rule("UPDATE SUCCESSFUL TELEPORT STATUS")
 		Wait(0.500, Abort When False);
 		If(!Event Player.successfullyTeleported);
 			Event Player.successfullyTeleported = True;
-			If(Global.zombieSourceCounter < 30);
+			If(Global.zombieSourceCounter < 7.5);
 				If(Global.zombieSourceCounter <= 0);
-					Global.zombieSourceCounter = 15;
+					Global.zombieSourceCounter = 7.5;
 					Global.zombieSource = Event Player.telePos;
 				Else If(Event Player.canSource);
-					Global.zombieSourceCounter += 5;
+					Global.zombieSourceCounter += 2;
 				End;
 			End;
 			If(Event Player.canSource);
@@ -6179,9 +6176,6 @@ rule("teleportBots")
 						Event Player.filteredBotSpawnPointGrid = Filtered Array(Global.botSpawnPoints, Distance Between(Current Array Element, Event Player.telePos) < 5);
 						If(Count Of(Event Player.filteredBotSpawnPointGrid) > 0);
 							Event Player.telePos = Random Value In Array(Event Player.filteredBotSpawnPointGrid);
-							If(Event Player.canSource);
-								Global.zombieSourceCounter -= 5;
-							End;
 						End;
 					End;
 					Wait(0.250, Ignore Condition);
