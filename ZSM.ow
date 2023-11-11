@@ -2368,7 +2368,7 @@ rule("EFFECTS/TEXTS")
 				Default Visibility);
 		End;
 		"Zombie Source Icon"
-		Create Icon(Filtered Array(All Players(All Teams), Global.zombieSourceCounter > 0), Global.zombieSource, Moon,
+		disabled Create Icon(Filtered Array(All Players(All Teams), Global.zombieSourceCounter > 0), Global.zombieSource, Moon,
 			Visible To and Position, Color(Turquoise), True);
 	}
 }
