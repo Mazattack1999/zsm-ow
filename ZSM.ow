@@ -3958,7 +3958,7 @@ rule("SURVIVOR FOLLOW TARGET")
 
 	actions
 	{
-		Global.survivorToRescue.botThrottleSpeed = Normalized Health(Global.survivorToRescue) * 0.400;
+		Global.survivorToRescue.botThrottleSpeed = Max(0.3, Normalized Health(Global.survivorToRescue) * 0.6);
 		Global.survivorToRescue.potentialTargets = Filtered Array(Global.playerTargetList,
 			Current Array Element != Global.survivorToRescue && !Current Array Element.invisible && Distance Between(Position Of(
 			Global.survivorToRescue), Position Of(Current Array Element)) < Global.objectiveRad);
