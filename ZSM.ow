@@ -6250,7 +6250,7 @@ rule("botTeleportCenter")
 				Event Player.teleportModifier = Position Of(Global.survivorToRescue);
 			Else;
 				Event Player.teleCenter = Position Of(Global.survivorToRescue.botFollowTarget);
-				If(Global.zombieSourceCounter > 0);
+				If((Global.zombieSourceCounter > 0 && Distance Between(Global.zombieSource, First Of(Global.objectivePositions)) < Distance Between(Position Of(Global.survivorToRescue), First Of(Global.objectivePositions))) || Distance Between(Position Of(Global.survivorToRescue), First Of(Global.objectivePositions)) < 15);
 					Event Player.teleportModifier = Global.zombieSource;
 				Else;
 					Event Player.teleportModifier = Position Of(First Of(Global.objectivePositions));
