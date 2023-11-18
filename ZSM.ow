@@ -6264,8 +6264,14 @@ rule("botTeleportCenter")
 			"If all living players are in the kill zone"
 			If(Is True For All(Global.playerTargetList, Distance Between(Position Of(Current Array Element), Global.objectiveChase1)
 				< Global.objectiveRad));
-				"Average player positon"
-				Call Subroutine(locateAveragePlayerLocation);
+				If(Global.zombieSourceCounter > 0);
+					"Default tele center is closest player to the current objective position"
+					Event Player.teleCenter = Position Of(First Of(Sorted Array(Global.playerTargetList, Distance Between(Position Of(
+					Current Array Element), First Of(Global.zombieSource)))));
+				Else;
+					"Average player positon"
+					Call Subroutine(locateAveragePlayerLocation);
+				End;
 			Else;
 				"Player closeset to the center of the kill zone"
 				Event Player.teleCenter = Position Of(First Of(Sorted Array(Global.playerTargetList, Distance Between(Position Of(
