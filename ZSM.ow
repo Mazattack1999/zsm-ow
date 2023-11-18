@@ -715,18 +715,21 @@ rule("setAvailableObjectives")
 			"Survival"), True, 0));
 		"Set objective type votes empty"
 		Global.objectiveTypeVotes[2] = Array(Null, Workshop Setting Toggle(Custom String("Available Missions"), Custom String(
-			"Supply Run"), True, 1));
+			"Titan Takedown"), True, 1));
 		"Set objective type votes empty"
 		Global.objectiveTypeVotes[3] = Array(Null, Workshop Setting Toggle(Custom String("Available Missions"), Custom String(
-			"Secure The Area"), True, 2));
+			"Supply Run"), True, 2));
 		"Set objective type votes empty"
 		Global.objectiveTypeVotes[4] = Array(Null, Workshop Setting Toggle(Custom String("Available Missions"), Custom String(
-			"Rescue Mission"), True, 4));
+			"Secure The Area"), True, 3));
 		"Set objective type votes empty"
 		Global.objectiveTypeVotes[5] = Array(Null, Workshop Setting Toggle(Custom String("Available Missions"), Custom String(
-			"Infestation"), True, 5));
+			"Rescue Mission"), True, 4));
 		"Set objective type votes empty"
 		Global.objectiveTypeVotes[6] = Array(Null, Workshop Setting Toggle(Custom String("Available Missions"), Custom String(
+			"Infestation"), True, 5));
+		"Set objective type votes empty"
+		Global.objectiveTypeVotes[7] = Array(Null, Workshop Setting Toggle(Custom String("Available Missions"), Custom String(
 			"Mixed Objectives (Whatever It Takes)"), True, 6));
 		"Mixed Objectives pool"
 		Global.mixedObjectivesPool[0] = Workshop Setting Toggle(Custom String("Mixed Objectives Pool"), Custom String("Capture Points"),
@@ -1254,17 +1257,20 @@ rule("setObjectiveType")
 		"Survival"
 		If(Global.objectiveTypeSetting == 1);
 			Global.mixedObjectivesPool = Array(2);
-		"Supply Run"
+		"Titan Takedown"
 		Else If(Global.objectiveTypeSetting == 2);
+			Global.mixedObjectivesPool = Array(3);
+		"Supply Run"
+		Else If(Global.objectiveTypeSetting == 3);
 			Global.mixedObjectivesPool = Array(1, 4, 8);
 		"Secure the Area"
-		Else If(Global.objectiveTypeSetting == 3);
+		Else If(Global.objectiveTypeSetting == 4);
 			Global.mixedObjectivesPool = Array(1, 6, 8);
 		"Rescue Mission"
-		Else If(Global.objectiveTypeSetting == 4);
+		Else If(Global.objectiveTypeSetting == 5);
 			Global.mixedObjectivesPool = Array(3, 4, 5);
 		"Infestation"
-		Else If(Global.objectiveTypeSetting == 5);
+		Else If(Global.objectiveTypeSetting == 6);
 			Global.mixedObjectivesPool = Array(3, 6, 7, 9);
 		End;
 		"Wait until game begins"
@@ -1536,23 +1542,28 @@ rule("EFFECTS/TEXTS")
 			"Mission: Survival {0}", Icon String(Skull)), Null, Global.voting ? Custom String("Change Vote (Press [{0}])",
 			Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Color(Blue), Color(Blue), Color(Blue),
 			Visible To and String, Default Visibility);
-		"Vote mission text: Supply Run"
+		"Vote mission text: Titan Takedown"
 		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 2), Custom String(
+			"Mission: Titan Takedown {0}", Icon String(Warning)), Null, Global.voting ? Custom String("Change Vote (Press [{0}])",
+			Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Color(Red), Color(Red), Color(Red),
+			Visible To and String, Default Visibility);
+		"Vote mission text: Supply Run"
+		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 3), Custom String(
 			"Mission: Supply Run {0}", Icon String(Recycle)), Null, Global.voting ? Custom String("Change Vote (Press [{0}])",
 			Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Color(Green), Color(Green), Color(Green),
 			Visible To and String, Default Visibility);
 		"Vote mission text: Secure The Area"
-		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 3), Custom String(
+		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 4), Custom String(
 			"Mission: Secure The Area {0}", Icon String(Flag)), Null, Global.voting ? Custom String("Change Vote (Press [{0}])",
 			Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Color(Orange), Color(Orange), Color(Orange),
 			Visible To and String, Default Visibility);
 		"Vote mission text: Rescue Mission"
-		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 4), Custom String(
+		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 5), Custom String(
 			"Mission: Rescue Mission {0}", Icon String(Halo)), Null, Global.voting ? Custom String("Change Vote (Press [{0}])",
 			Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Color(Violet), Color(Violet), Color(Violet),
 			Visible To and String, Default Visibility);
 		"Vote mission text: Infestation"
-		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 5), Custom String(
+		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 6), Custom String(
 			"Mission: Infestation {0}", Icon String(Warning)), Null, Global.voting ? Custom String("Change Vote (Press [{0}])",
 			Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Color(Lime Green), Color(Lime Green), Color(Lime Green),
 			Visible To and String, Default Visibility);
@@ -2839,7 +2850,7 @@ rule("globalObjectiveEntityManagement")
 				Red), Color(Red), Visible To Values and Color, Default Visibility);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Text ID);
 			"Objectives remaining hud text"
-			Create HUD Text(All Players(All Teams), Null, Global.objectiveTypeSetting != 3 ? Custom String("Objectives Remaining: {0}",
+			Create HUD Text(All Players(All Teams), Null, Global.objectiveTypeSetting != 2 ? Custom String("Objectives Remaining: {0}",
 				Count Of(Global.objectivePositions) - 1) : Custom String("Giant Zombies Remaining: {0}", Count Of(Global.objectivePositions)
 				- 1), Null, Top, 1, Color(Red), Color(Red), Color(Red), Visible To, Default Visibility);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Text ID);
