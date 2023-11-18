@@ -536,20 +536,23 @@ rule("SPAWN BOTS")
 		Global.gameStatus == True;
 		Server Load Average <= Workshop Setting Integer(Custom String("General"), Custom String(
 			"Spawn Zombies When Server Load Average is Less Than"), 180, 100, 255, 2);
-		disabled Number Of Players(Team 2) < Global.numberOfBots;
 		Number Of Players(All Teams) < 24;
-		((Count Of(Global.spawnTimes) > 0 && First Of(Global.spawnTimes) <= 0) || (Count Of(Global.spawnTimes) + Number Of Players(Team 2)
-			< Global.numberOfBots)) == True;
+		((Count Of(Global.spawnTimes) > 0 && First Of(Global.spawnTimes) <= 0) || (Count Of(Global.spawnTimes) == 0 && Number Of Players(Team 2) == 0)) == True;
 	}
 
 	actions
 	{
-		Call Subroutine(botHeroRandomization);
 		If(Count Of(Global.spawnTimes) > 0 && First Of(Global.spawnTimes) <= 0);
+			Call Subroutine(botHeroRandomization);
 			Modify Global Variable(spawnTimes, Remove From Array By Index, 0);
 			Wait(0.250, Ignore Condition);
 		Else;
-			Wait(3, Ignore Condition);
+			Global.botRespawnCount = -1;
+			Global.spawnTimes = Empty Array;
+			While(Global.botRespawnCount < Global.numberOfBots);
+				Global.botRespawnCount += 1;
+				Modify Global Variable(spawnTimes, Append To Array, Global.botRespawnCount * 3);
+			End;
 		End;
 		Loop If Condition Is True;
 		Wait(Last Of(Sorted Array(Global.spawnTimes, Current Array Element)), Restart When True);
