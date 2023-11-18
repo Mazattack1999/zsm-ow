@@ -7035,14 +7035,13 @@ rule("BEHEMOTH (ROAD) TOXIC CLOUD")
 		Set Ability Resource(Event Player, Button(Secondary Fire), 100);
 		Start Holding Button(Event Player, Button(Secondary Fire));
 		Event Player.chase2 = 1.5;
-		Wait(0.5, Ignore Condition);
+		Wait Until(Ability Cooldown(Event Player, Button(Secondary Fire)) > 0, 0.5);
 		Chase Player Variable At Rate(Event Player, chase2, 0, 1, None);
 		While(Event Player.chase2 > 0 && Ability Cooldown(Event Player, Button(Secondary Fire)) <= 0);
 			If(Array Contains(Global.bosses, Event Player));
 				"Charge Ultimate For Boss Gas Attack"
 				Set Ultimate Charge(Event Player, Ultimate Charge Percent(Event Player) + 10);
 				Set Status(Event Player, Event Player, Rooted, 0.260);
-				Set Ability Cooldown(Event Player, Button(Ability 1), 3);
 			Else;
 				"Gas Attack"
 				Start Damage Over Time(Filtered Array(Global.playerTargetList, Is In Line of Sight(Eye Position(Event Player), Eye Position(
@@ -7053,10 +7052,11 @@ rule("BEHEMOTH (ROAD) TOXIC CLOUD")
 				If(Event Player.damageOverTimeDuration < 2.500);
 					Event Player.damageOverTimeDuration = 2.500;
 				End;
-				Set Ability Cooldown(Event Player, Button(Ability 1), 8);
 			End;
 			Wait Until(Ability Cooldown(Event Player, Button(Secondary Fire)) > 0, 0.25);
 		End;
+		"Cooldown"
+		Set Ability Cooldown(Event Player, Button(Ability 1), Array Contains(Global.bosses, Event Player) ? 3 : 8);
 		Event Player.chase2 = 0;
 		Stop Chasing Player Variable(Event Player, chase2);
 		Stop Holding Button(Event Player, Button(Secondary Fire));
