@@ -1262,7 +1262,7 @@ rule("setObjectiveType")
 			Global.mixedObjectivesPool = Array(3);
 		"Supply Run"
 		Else If(Global.objectiveTypeSetting == 3);
-			Global.mixedObjectivesPool = Array(1, 4, 8);
+			Global.mixedObjectivesPool = Array(2, 4);
 		"Secure the Area"
 		Else If(Global.objectiveTypeSetting == 4);
 			Global.mixedObjectivesPool = Array(1, 6, 8);
