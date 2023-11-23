@@ -2706,8 +2706,7 @@ rule("objectivesManagement")
 						Current Array Element)) < 15);
 					Wait(0.016, Ignore Condition);
 				End;
-				Global.objectiveCaptureValue = Sorted Array(Global.objectiveCaptureValue, Distance Between(Global.testPos2, Vector(X Component Of(
-					Current Array Element), Y Component Of(Global.testPos2), Z Component Of(Current Array Element))));
+				Global.objectiveCaptureValue = Sorted Array(Global.objectiveCaptureValue, Distance Between(Global.testPos2, Current Array Element));
 				Global.objectiveCaptureValue = Filtered Array(Global.objectiveCaptureValue,
 					Current Array Index < Global.eliminationsNeededPerObjective);
 				"Active Grave Locations"
