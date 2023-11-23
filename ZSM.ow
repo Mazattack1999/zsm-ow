@@ -716,18 +716,21 @@ rule("setAvailableObjectives")
 			"Survival"), True, 0));
 		"Set objective type votes empty"
 		Global.objectiveTypeVotes[2] = Array(Null, Workshop Setting Toggle(Custom String("Available Missions"), Custom String(
-			"Supply Run"), True, 1));
+			"Titan Takedown"), True, 1));
 		"Set objective type votes empty"
 		Global.objectiveTypeVotes[3] = Array(Null, Workshop Setting Toggle(Custom String("Available Missions"), Custom String(
-			"Secure The Area"), True, 2));
+			"Supply Run"), True, 2));
 		"Set objective type votes empty"
 		Global.objectiveTypeVotes[4] = Array(Null, Workshop Setting Toggle(Custom String("Available Missions"), Custom String(
-			"Rescue Mission"), True, 4));
+			"Secure The Area"), True, 3));
 		"Set objective type votes empty"
 		Global.objectiveTypeVotes[5] = Array(Null, Workshop Setting Toggle(Custom String("Available Missions"), Custom String(
-			"Infestation"), True, 5));
+			"Rescue Mission"), True, 4));
 		"Set objective type votes empty"
 		Global.objectiveTypeVotes[6] = Array(Null, Workshop Setting Toggle(Custom String("Available Missions"), Custom String(
+			"Infestation"), True, 5));
+		"Set objective type votes empty"
+		Global.objectiveTypeVotes[7] = Array(Null, Workshop Setting Toggle(Custom String("Available Missions"), Custom String(
 			"Mixed Objectives (Whatever It Takes)"), True, 6));
 		"Mixed Objectives pool"
 		Global.mixedObjectivesPool[0] = Workshop Setting Toggle(Custom String("Mixed Objectives Pool"), Custom String("Capture Points"),
@@ -1055,7 +1058,7 @@ rule("setZombieMode")
 			Global.botSpawnRates = Array(1, 5, 5, 4, 2, 25, 2, 7, 2, 7, 18, 3, 12, 4, 3);
 		End;
 		"TESTING ONLY"
-		disabled Global.botSpawnRates = Array(0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		disabled Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0);
 	}
 }
 
@@ -1255,17 +1258,20 @@ rule("setObjectiveType")
 		"Survival"
 		If(Global.objectiveTypeSetting == 1);
 			Global.mixedObjectivesPool = Array(2);
-		"Supply Run"
+		"Titan Takedown"
 		Else If(Global.objectiveTypeSetting == 2);
-			Global.mixedObjectivesPool = Array(1, 4, 8);
-		"Secure the Area"
+			Global.mixedObjectivesPool = Array(3);
+		"Supply Run"
 		Else If(Global.objectiveTypeSetting == 3);
+			Global.mixedObjectivesPool = Array(2, 4);
+		"Secure the Area"
+		Else If(Global.objectiveTypeSetting == 4);
 			Global.mixedObjectivesPool = Array(1, 6, 8);
 		"Rescue Mission"
-		Else If(Global.objectiveTypeSetting == 4);
+		Else If(Global.objectiveTypeSetting == 5);
 			Global.mixedObjectivesPool = Array(3, 4, 5);
 		"Infestation"
-		Else If(Global.objectiveTypeSetting == 5);
+		Else If(Global.objectiveTypeSetting == 6);
 			Global.mixedObjectivesPool = Array(3, 6, 7, 9);
 		End;
 		"Wait until game begins"
@@ -1537,23 +1543,28 @@ rule("EFFECTS/TEXTS")
 			"Mission: Survival {0}", Icon String(Skull)), Null, Global.voting ? Custom String("Change Vote (Press [{0}])",
 			Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Color(Blue), Color(Blue), Color(Blue),
 			Visible To and String, Default Visibility);
-		"Vote mission text: Supply Run"
+		"Vote mission text: Titan Takedown"
 		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 2), Custom String(
+			"Mission: Titan Takedown {0}", Icon String(Warning)), Null, Global.voting ? Custom String("Change Vote (Press [{0}])",
+			Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Color(Red), Color(Red), Color(Red),
+			Visible To and String, Default Visibility);
+		"Vote mission text: Supply Run"
+		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 3), Custom String(
 			"Mission: Supply Run {0}", Icon String(Recycle)), Null, Global.voting ? Custom String("Change Vote (Press [{0}])",
 			Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Color(Green), Color(Green), Color(Green),
 			Visible To and String, Default Visibility);
 		"Vote mission text: Secure The Area"
-		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 3), Custom String(
+		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 4), Custom String(
 			"Mission: Secure The Area {0}", Icon String(Flag)), Null, Global.voting ? Custom String("Change Vote (Press [{0}])",
 			Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Color(Orange), Color(Orange), Color(Orange),
 			Visible To and String, Default Visibility);
 		"Vote mission text: Rescue Mission"
-		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 4), Custom String(
+		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 5), Custom String(
 			"Mission: Rescue Mission {0}", Icon String(Halo)), Null, Global.voting ? Custom String("Change Vote (Press [{0}])",
 			Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Color(Violet), Color(Violet), Color(Violet),
 			Visible To and String, Default Visibility);
 		"Vote mission text: Infestation"
-		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 5), Custom String(
+		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.playerMenuStatus[4] == 6), Custom String(
 			"Mission: Infestation {0}", Icon String(Warning)), Null, Global.voting ? Custom String("Change Vote (Press [{0}])",
 			Input Binding String(Button(Ability 2))) : Custom String(""), Left, 2, Color(Lime Green), Color(Lime Green), Color(Lime Green),
 			Visible To and String, Default Visibility);
@@ -2840,7 +2851,7 @@ rule("globalObjectiveEntityManagement")
 				Red), Color(Red), Visible To Values and Color, Default Visibility);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Text ID);
 			"Objectives remaining hud text"
-			Create HUD Text(All Players(All Teams), Null, Global.objectiveTypeSetting != 3 ? Custom String("Objectives Remaining: {0}",
+			Create HUD Text(All Players(All Teams), Null, Global.objectiveTypeSetting != 2 ? Custom String("Objectives Remaining: {0}",
 				Count Of(Global.objectivePositions) - 1) : Custom String("Giant Zombies Remaining: {0}", Count Of(Global.objectivePositions)
 				- 1), Null, Top, 1, Color(Red), Color(Red), Color(Red), Visible To, Default Visibility);
 			Modify Global Variable(objectiveEntities, Append To Array, Last Text ID);
@@ -6052,9 +6063,7 @@ rule("BOTS INFLICT DAMAGE OVER TIME (INFECTION LEVEL MANAGEMENT)")
 	actions
 	{
 		Start Damage Over Time(Victim, Event Player, Event Player.biteDuration, Event Player.biteDamage);
-		If(Event Player.damageOverTimeDuration < Event Player.biteDuration);
-			Event Player.damageOverTimeDuration = Event Player.biteDuration;
-		End;
+		Event Player.damageOverTimeDuration = Max(Event Player.damageOverTimeDuration, Event Player.biteDuration);
 		If(Workshop Setting Toggle(Custom String("Infection"), Custom String("Melee Infection Enabled"), True, 0) && !Has Status(
 			Event Player, Hacked) && !Is Dummy Bot(Victim) && Health(Victim) <= Victim.initialMaxHealth);
 			If(Victim.infected);
@@ -6842,9 +6851,7 @@ rule("BOMBER (JUNKRAT) SELF DESTRUCT")
 			Set Status(Event Player.botSpecialPotentialTargets, Event Player, Burning, 3);
 			"Not scaled damage"
 			Start Damage Over Time(Event Player.botSpecialPotentialTargets, Event Player, 3, Event Player.biteDamage * 2);
-			If(Event Player.damageOverTimeDuration < 3);
-				Event Player.damageOverTimeDuration = 3;
-			End;
+			Event Player.damageOverTimeDuration = Max(Event Player.damageOverTimeDuration, 3);
 			Play Effect(All Players(All Teams), Bad Explosion, Color(Orange), Position Of(Event Player), 6 * Event Player.size);
 			Play Effect(All Players(All Teams), Bad Explosion, Color(Yellow), Position Of(Event Player), 3 * Event Player.size);
 			"Scaled"
@@ -7036,14 +7043,13 @@ rule("BEHEMOTH (ROAD) TOXIC CLOUD")
 		Set Ability Resource(Event Player, Button(Secondary Fire), 100);
 		Start Holding Button(Event Player, Button(Secondary Fire));
 		Event Player.chase2 = 1.5;
-		Wait(0.5, Ignore Condition);
+		Wait Until(Ability Cooldown(Event Player, Button(Secondary Fire)) > 0, 0.5);
 		Chase Player Variable At Rate(Event Player, chase2, 0, 1, None);
 		While(Event Player.chase2 > 0 && Ability Cooldown(Event Player, Button(Secondary Fire)) <= 0);
 			If(Array Contains(Global.bosses, Event Player));
 				"Charge Ultimate For Boss Gas Attack"
 				Set Ultimate Charge(Event Player, Ultimate Charge Percent(Event Player) + 10);
 				Set Status(Event Player, Event Player, Rooted, 0.260);
-				Set Ability Cooldown(Event Player, Button(Ability 1), 3);
 			Else;
 				"Gas Attack"
 				Start Damage Over Time(Filtered Array(Global.playerTargetList, Is In Line of Sight(Eye Position(Event Player), Eye Position(
@@ -7051,13 +7057,12 @@ rule("BEHEMOTH (ROAD) TOXIC CLOUD")
 					Current Array Element)) < 10 * Event Player.size && Y Component Of(Eye Position(Current Array Element)) - Y Component Of(
 					Position Of(Event Player)) > 0 && Y Component Of(Position Of(Current Array Element)) - Y Component Of(Position Of(
 					Event Player)) < 2 * Event Player.size), Event Player, 2.500, Event Player.biteDamage * 0.231);
-				If(Event Player.damageOverTimeDuration < 2.500);
-					Event Player.damageOverTimeDuration = 2.500;
-				End;
-				Set Ability Cooldown(Event Player, Button(Ability 1), 8);
+				Event Player.damageOverTimeDuration = Max(Event Player.damageOverTimeDuration, 2.5);
 			End;
 			Wait Until(Ability Cooldown(Event Player, Button(Secondary Fire)) > 0, 0.25);
 		End;
+		"Cooldown"
+		Set Ability Cooldown(Event Player, Button(Ability 1), Array Contains(Global.bosses, Event Player) ? 3 : 8);
 		Event Player.chase2 = 0;
 		Stop Chasing Player Variable(Event Player, chase2);
 		Stop Holding Button(Event Player, Button(Secondary Fire));
@@ -7143,9 +7148,7 @@ rule("BEHEMOTH GAS STREAM (BOSSES ONLY)")
 				Current Array Element))) < Event Player.abilityArray2[Event Player.pForceFieldCount2_bCount1] / 5));
 		End;
 		Start Damage Over Time(Event Player.botSpecialPotentialTargets, Event Player, 2.500, Event Player.biteDamage * 0.100);
-		If(Event Player.damageOverTimeDuration < 2.500 && Count Of(Event Player.botSpecialPotentialTargets) > 0);
-			Event Player.damageOverTimeDuration = 2.500;
-		End;
+		Event Player.damageOverTimeDuration = Max(Event Player.damageOverTimeDuration, 2.5);
 		Wait(0.250, Ignore Condition);
 		Loop If Condition Is True;
 	}
@@ -8403,15 +8406,11 @@ rule("BLASTER ROCKET HITS TARGET")
 		If(Event Ability == Button(Ultimate));
 			Start Damage Over Time(Victim, Event Player, 2, Event Player.biteDamage * 0.500);
 			Set Status(Victim, Event Player, Burning, 2);
-			If(Event Player.damageOverTimeDuration < 2);
-				Event Player.damageOverTimeDuration = 2;
-			End;
+			Event Player.damageOverTimeDuration = Max(Event Player.damageOverTimeDuration, 2);
 		Else If(Event Ability == Button(Primary Fire));
 			Start Damage Over Time(Victim, Event Player, 1, Event Player.biteDamage);
 			Set Status(Victim, Event Player, Burning, 1);
-			If(Event Player.damageOverTimeDuration < 1);
-				Event Player.damageOverTimeDuration = 1;
-			End;
+			Event Player.damageOverTimeDuration = Max(Event Player.damageOverTimeDuration, 1);
 		End;
 	}
 }
@@ -8452,6 +8451,7 @@ rule("NANOMANCER (RAMATTRA) FIRES NANITE SWARM")
 		Wait Until(Event Player.botTarget == Null || Is Using Ability 1(Event Player), 1);
 		Loop If Condition Is True;
 		Stop Holding Button(Event Player, Button(Primary Fire));
+		Event Player.damageOverTimeDuration = Max(Event Player.damageOverTimeDuration, 10);
 		Event Player.specialThrottling = False;
 		Event Player.specialFacing = False;
 		Start Rule(restoreDefaultFacingMovement, Do Nothing);
@@ -8582,7 +8582,7 @@ rule("ILLUISONIST USES EMP")
 		Else;
 			Event Player.pForceFieldCount2_bCount1 = 10;
 		End;
-		Event Player.damageOverTimeDuration = Event Player.pForceFieldCount2_bCount1 + 0.500;
+		Event Player.damageOverTimeDuration = Max(Event Player.damageOverTimeDuration, Event Player.pForceFieldCount2_bCount1 + 0.500);
 		While(Event Player.pForceFieldCount2_bCount1 > 0);
 			Event Player.botSpecialPotentialTargets.blinded = True;
 			Event Player.botSpecialPotentialTargets.updateOutlines = True;
