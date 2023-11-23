@@ -6134,8 +6134,7 @@ rule("enterExitTeleport")
 						Global.botSpawnPoints, Event Player.telePos)]), Event Player.botThrottleSpeed, To World, Replace existing throttle, None);
 				Else;
 					Start Throttle In Direction(Event Player, Direction From Angles(Random Integer(-90, 90) + Horizontal Angle From Direction(
-						Direction Towards(Position Of(Event Player), Position Of(First Of(Sorted Array(Filtered Array(All Living Players(Team 1),
-						Has Spawned(Current Array Element)), Distance Between(Position Of(Event Player), Position Of(Current Array Element))))))), 0),
+						Direction Towards(Position Of(Event Player), Event Player.teleReference)), 0),
 						Event Player.botThrottleSpeed, To World, Replace existing throttle, None);
 				End;
 			Else If(Event Player.botTarget != Null);
