@@ -4190,7 +4190,7 @@ rule("MODIFY KILL ZONE SCORE")
 		If(Distance Between(Position Of(Event Player), Global.objectiveChase1) < Global.objectiveRad || Distance Between(Position Of(
 			Victim), Global.objectiveChase1) < Global.objectiveRad);
 			Victim.reviveTimer = 3 - 4.500 * (Global.objectiveCaptureValue / Global.eliminationsNeededPerObjective);
-			Global.objectiveCaptureValue += Round To Integer(Victim.health / 400, Up);
+			Global.objectiveCaptureValue += Victim.health / 300;
 			If(Global.objectiveCaptureValue >= Global.eliminationsNeededPerObjective);
 				Global.objectiveComplete = True;
 				"Give all bots a long respawn time"
