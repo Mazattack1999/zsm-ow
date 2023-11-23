@@ -546,8 +546,9 @@ rule("SPAWN BOTS")
 			Call Subroutine(botHeroRandomization);
 			Modify Global Variable(spawnTimes, Remove From Array By Index, 0);
 			Wait(0.250, Ignore Condition);
-		Else;
-			Wait(3, Ignore Condition);
+		End;
+		If(Count Of(Global.spawnTimes) + Number Of Players(Team 2) < Global.numberOfBots);
+			Wait(Global.startTime - Match Time < 30 ? 3 : 0.25, Ignore Condition);
 			Modify Global Variable(spawnTimes, Append To Array, 0);
 		End;
 		Loop If Condition Is True;
