@@ -6265,13 +6265,14 @@ rule("botTeleportCenter")
 			End;
 		"Kill Zone"
 		Else If(Global.objectiveTypes[0] == 6);
-			"If all living players are in the kill zone"
+			"If any living players are in the kill zone"
 			If(Is True For Any(Global.playerTargetList, Distance Between(Position Of(Current Array Element), Global.objectiveChase1)
 				< Global.objectiveRad));
 				If(Global.zombieSourceCounter > 0);
 					"Closest player to zombie source that is in the kill zone"
 					Event Player.teleCenter = Position Of(First Of(Sorted Array(Filtered Array(Global.playerTargetList, Distance Between(Global.objectiveChase1, Position Of(Current Array Element)) < Global.objectiveRad), Distance Between(Position Of(
 					Current Array Element), Global.zombieSource))));
+					Event Player.teleportModifier = Global.zombieSource;
 				Else;
 					"Average player positon"
 					Call Subroutine(locateAveragePlayerLocation);
@@ -6280,10 +6281,6 @@ rule("botTeleportCenter")
 				"Player closeset to the center of the kill zone"
 				Event Player.teleCenter = Position Of(First Of(Sorted Array(Global.playerTargetList, Distance Between(Position Of(
 					Current Array Element), Global.objectiveChase1))));
-			End;
-			If(Is True For Any(Global.playerTargetList, Distance Between(Global.objectiveChase1, Position Of(Current Array Element)) < 30));
-				Event Player.teleportModifier = Global.zombieSource;
-			Else;
 				Event Player.teleportModifier = Global.objectiveChase1;
 			End;
 		"Zombie egg"
