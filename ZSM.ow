@@ -6281,7 +6281,7 @@ rule("botTeleportCenter")
 				Event Player.teleCenter = Position Of(First Of(Sorted Array(Global.playerTargetList, Distance Between(Position Of(
 					Current Array Element), Global.objectiveChase1))));
 			End;
-			If(Is True For Any(Global.playerTargetList, Distance Between(First Of(Global.objectivePositions), Position Of(Current Array Element)) < 30));
+			If(Is True For Any(Global.playerTargetList, Distance Between(Global.objectiveChase1, Position Of(Current Array Element)) < 30));
 				Event Player.teleportModifier = Global.zombieSource;
 			Else;
 				Event Player.teleportModifier = Global.objectiveChase1;
