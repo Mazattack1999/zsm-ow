@@ -1272,7 +1272,7 @@ rule("setObjectiveType")
 			Global.mixedObjectivesPool = Array(3, 4, 5);
 		"Infestation"
 		Else If(Global.objectiveTypeSetting == 6);
-			Global.mixedObjectivesPool = Array(3, 6, 7, 9);
+			Global.mixedObjectivesPool = Array(6, 7, 9);
 		End;
 		"Wait until game begins"
 		Wait Until(Is Game In Progress && !Global.specialGameModeSetup, 99999);
