@@ -6274,8 +6274,7 @@ rule("botTeleportCenter")
 					Current Array Element), Global.zombieSource))));
 					Event Player.teleportModifier = Global.zombieSource;
 				Else;
-					"Average player positon"
-					Call Subroutine(locateAveragePlayerLocation);
+					Event Player.teleCenter = Position Of(Random Value In Array(Filtered Array(Global.playerTargetList, Distance Between(Global.objectiveChase1, Position Of(Current Array Element)) < Global.objectiveRad)));
 				End;
 			Else;
 				"Player closeset to the center of the kill zone"
