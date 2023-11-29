@@ -1043,22 +1043,22 @@ rule("setZombieMode")
 		Global.nonBossZombies = Array(Hero(Genji), Hero(Widowmaker), Hero(D.Va), Hero(Ramattra), Hero(Brigitte));
 		"Wave 1"
 		If(Global.zombieSetting == 1);
-			Global.botSpawnRates = Array(60, 10, 8, 0, 0, 5, 4, 0, 3, 0, 3, 0, 4, 0, 3);
+			Global.botSpawnRates = Array(58, 10, 8, 0, 0, 5, 4, 0, 3, 0, 3, 0, 4, 0, 3, 2);
 		"Wave 2"
 		Else If(Global.zombieSetting == 2);
-			Global.botSpawnRates = Array(50, 10, 8, 3, 2, 5, 3, 2, 3, 1, 5, 1, 2, 2, 3);
+			Global.botSpawnRates = Array(47, 10, 8, 3, 2, 5, 3, 2, 3, 1, 5, 1, 2, 2, 3, 3);
 		"Wave 3"
 		Else If(Global.zombieSetting == 3);
-			Global.botSpawnRates = Array(5, 50, 8, 3, 2, 5, 4, 3, 3, 2, 5, 2, 3, 2, 3);
+			Global.botSpawnRates = Array(5, 47, 8, 3, 2, 5, 4, 3, 3, 2, 5, 2, 3, 2, 3, 3);
 		"Wave 4"
 		Else If(Global.zombieSetting == 4);
-			Global.botSpawnRates = Array(3, 5, 52, 3, 2, 7, 2, 4, 2, 3, 6, 3, 3, 2, 3);
+			Global.botSpawnRates = Array(3, 5, 48, 3, 2, 7, 2, 4, 2, 3, 6, 3, 3, 2, 3, 4);
 		"Wave 5"
 		Else If(Global.zombieSetting == 5);
-			Global.botSpawnRates = Array(1, 5, 5, 4, 2, 25, 2, 14, 2, 7, 12, 3, 12, 4, 3);
+			Global.botSpawnRates = Array(1, 4, 4, 4, 2, 25, 2, 13, 2, 7, 12, 3, 10, 3, 3, 5);
 		End;
 		"TESTING ONLY"
-		Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100);
+		disabled Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100);
 	}
 }
 
