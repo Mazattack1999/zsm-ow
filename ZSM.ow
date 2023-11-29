@@ -1038,9 +1038,9 @@ rule("setZombieMode")
 	{
 		"Bot available hero list"
 		Global.botHeros = Array(Hero(Reaper), Hero(Junkrat), Hero(Torbjörn), Hero(Roadhog), Hero(Reinhardt), Hero(Genji), Hero(Widowmaker),
-			Hero(Orisa), Hero(Mercy), Hero(Wrecking Ball), Hero(Moira), Hero(D.Va), Hero(Pharah), Hero(Ramattra), Hero(Sombra));
+			Hero(Orisa), Hero(Mercy), Hero(Wrecking Ball), Hero(Moira), Hero(D.Va), Hero(Pharah), Hero(Ramattra), Hero(Sombra), Hero(Brigitte));
 		"Zombie types without a boss variation"
-		Global.nonBossZombies = Array(Hero(Genji), Hero(Widowmaker), Hero(D.Va), Hero(Ramattra));
+		Global.nonBossZombies = Array(Hero(Genji), Hero(Widowmaker), Hero(D.Va), Hero(Ramattra), Hero(Brigitte));
 		"Wave 1"
 		If(Global.zombieSetting == 1);
 			Global.botSpawnRates = Array(60, 10, 8, 0, 0, 5, 4, 0, 3, 0, 3, 0, 4, 0, 3);
@@ -1058,7 +1058,7 @@ rule("setZombieMode")
 			Global.botSpawnRates = Array(1, 5, 5, 4, 2, 25, 2, 14, 2, 7, 12, 3, 12, 4, 3);
 		End;
 		"TESTING ONLY"
-		disabled Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0);
+		Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100);
 	}
 }
 
@@ -1135,16 +1135,15 @@ rule("setDifficulty")
 		If(Global.difficultySetting == 1);
 			Global.startTime = 600;
 			"Bot Health Values"
-			Global.botHealthValues = Array(213, 130, 75, 750, 1250, 100, 110, 500, 125, 450, 100, 400, 200, 250, 100);
+			Global.botHealthValues = Array(213, 130, 75, 750, 1250, 100, 110, 500, 125, 450, 100, 400, 200, 250, 100, 200);
 			"Bot bite damage"
-			Global.biteDamages = Array(5, 2.500, 2, 20, 0, 5, 2, 7.500, 5, 10, 10, 5, 30, 0, 3);
+			Global.biteDamages = Array(5, 2.500, 2, 20, 0, 5, 2, 7.500, 5, 10, 10, 5, 30, 0, 3, 0);
 			"Bot bite durations"
-			Global.biteDurations = Array(2, 2, 2.500, 2.500, 0, 1.500, 3.500, 2, 2, 1.500, 1, 1, 0, 0, 3);
+			Global.biteDurations = Array(2, 2, 2.500, 2.500, 0, 1.500, 3.500, 2, 2, 1.500, 1, 1, 0, 0, 3, 0);
 			"Bot throttle speeds"
-			Global.throttleSpeeds = Array(0.550, 0.600, 0.750, 0.400, 0.500, 0.600, 0.300, 0.550, 0.450, 0.500, 0.750, 0.550, 0.400, 0.500,
-				0.300);
+			Global.throttleSpeeds = Array(0.550, 0.600, 0.750, 0.400, 0.500, 0.600, 0.300, 0.550, 0.450, 0.500, 0.750, 0.550, 0.400, 0.500, 0.300, 0.5);
 			"Bot damage dealt"
-			Global.damageDealt = Array(8.500, 60, 1, 1, 50, 75, 1, 25, 1, 50, 1, 50, 75, 50, 5);
+			Global.damageDealt = Array(8.500, 60, 1, 1, 50, 75, 1, 25, 1, 50, 1, 50, 75, 50, 5, 50);
 		"Difficulty: Normal"
 		Else If(Global.difficultySetting == 2);
 			Global.startTime = 600;
@@ -6581,6 +6580,11 @@ rule("botEntityManagement")
 				Create Effect(Filtered Array(Event Player.botSpecialPotentialTargets, True), Bad Aura, Color(Purple), Eye Position(Local Player)
 					+ Facing Direction Of(Local Player) * (30 + Evaluate Once(Random Real(-0.500, 0.500))), 200, Visible To Position and Radius);
 				Modify Player Variable(Event Player, generalPlayerBotEntities, Append To Array, Last Created Entity);
+			Else If(Hero Of(Event Player) == Hero(Brigitte));
+				"Charging attack effect"
+				Create Effect(Filtered Array(All Players(All Teams), Event Player.chase1 > 0), Good Aura, Color(Orange), Event Player,
+					Event Player.chase1 * Event Player.size, Visible To Position and Radius);
+				Modify Player Variable(Event Player, generalPlayerBotEntities, Append To Array, Last Created Entity);
 			End;
 		End;
 	}
@@ -8608,6 +8612,125 @@ rule("ILLUSIONIST HITS TARGET WITH EMP")
 	actions
 	{
 		Modify Player Variable(Attacker, botSpecialPotentialTargets, Append To Array, Victim);
+	}
+}
+
+rule("BRAWLER (BRIGITTE) USES SHEILD BASH")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		Brigitte;
+	}
+
+	conditions
+	{
+		Event Player.botTarget != Null;
+		Event Player.specialThrottling != True;
+		Ability Cooldown(Event Player, Button(Primary Fire)) <= 0;
+		Ability Cooldown(Event Player, Button(Secondary Fire)) <= 0;
+		Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget)) < 20;
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Button(Secondary Fire));
+		Event Player.specialThrottling = True;
+		Stop Throttle In Direction(Event Player);
+		Event Player.specialFacing = True;
+		Start Facing(Event Player, Direction Towards(Eye Position(Event Player), Eye Position(Event Player.lastTarget)),
+			Event Player.crowdControlled || Event Player.botTarget == Null ? 0 : 1500, To World,
+			Direction and Turn Rate);
+		Event Player.movementSpeed *= 3;
+		Set Move Speed(Event Player, Event Player.movementSpeed * 100);
+		Event Player.chase1 = 0;
+		"charge up attack"
+		Chase Player Variable Over Time(Event Player, chase1, 2, 2, None);
+		Wait Until(!Is Firing Secondary(Event Player) || Event Player.chase1 >= 2, 99999);
+		Stop Chasing Player Variable(Event Player, chase1);
+		"Shield is still up"
+		If(Is Firing Secondary(Event Player));
+			Stop Facing(Event Player);
+			Chase Player Variable Over Time(Event Player, chase1, 0, 0.25, None);
+			Wait Until(!Is Firing Secondary(Event Player) || Event Player.chase1 <= 0, 99999);
+			"Shield is still up and ready to bash"
+			If(Is Firing Secondary(Event Player));
+				Press Button(Event Player, Button(Primary Fire));
+				Wait Until(!Is Firing Primary(Event Player), 0.5);
+				"Shield broke during bash"
+				If(!Is Firing Secondary(Event Player));
+					Set Status(Event Player, Null, Knocked Down, 1);
+					Apply Impulse(Event Player, Vector(0, 1, -2), 30 / Event Player.size, To Player, Cancel Contrary Motion);
+				End;
+			Else; 
+				Set Status(Event Player, Null, Stunned, 0.75);
+			End;
+		Else;
+			Set Status(Event Player, Null, Stunned, 0.75);
+		End;
+		Set Ability Cooldown(Event Player, Button(Primary Fire), Is Firing Secondary(Event Player) ? 2 : 10);
+		Stop Holding Button(Event Player, Button(Secondary Fire));
+		Event Player.chase1 = 0;
+		Event Player.movementSpeed /= 3;
+		Set Move Speed(Event Player, Event Player.movementSpeed * 100);
+		Event Player.specialFacing = False;
+		Event Player.specialThrottling = False;
+		Start Rule(restoreDefaultFacingMovement, Do Nothing);
+	}
+}
+
+rule("BRAWLER FLAIL CONTROL AND STRAFING")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		Brigitte;
+	}
+
+	conditions
+	{
+		Event Player.botTarget != Null;
+		Event Player.specialThrottling != True;
+		Distance Between(Eye Position(Event Player), Eye Position(Event Player.botTarget)) < 6 * Event Player.size;
+	}
+
+	actions
+	{
+		If(!Event Player.specialThrottling);
+			Set Primary Fire Enabled(Event Player, True);
+			Start Holding Button(Event Player, Button(Primary Fire));
+			Event Player.specialThrottling = True;
+			Start Throttle In Direction(Event Player, Vector(Evaluate Once(Random Value In Array(Array(-1, 1))), 0, 0), Event Player.botThrottleSpeed, To Player, Replace Existing Throttle, Direction And Magnitude);
+		End;
+		Wait(0.5, Ignore Condition);
+		Loop If Condition Is True;
+		Stop Holding Button(Event Player, Button(Primary Fire));
+		Event Player.specialThrottling = False;
+		Start Rule(restoreDefaultFacingMovement, Do Nothing);
+	}
+}
+
+rule("BRAWLER HITS TARGET WITH SHIELD BASH")
+{
+	event
+	{
+		Player Dealt Damage;
+		Team 2;
+		Brigitte;
+	}
+
+	conditions
+	{
+		Event Ability == Button(Primary Fire);
+		Is Firing Secondary(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Status(Victim, Attacker, Knocked Down, 0.5);
+		Apply Impulse(Victim, Direction From Angles(Horizontal Angle From Direction(Event Direction), -20), 30 * Attacker.size, To World, Cancel Contrary Motion);
 	}
 }
 
