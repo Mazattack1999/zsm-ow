@@ -6631,6 +6631,8 @@ rule("botStatManagement")
 				Event Player.movementSpeed = 1.500;
 				Set Move Speed(Event Player, Event Player.movementSpeed * 100);
 			End;
+		Else If(Hero Of(Event Player) == Hero(Brigitte));
+			Set Healing Dealt(Event Player, 0);
 		End;
 	}
 }
@@ -8630,7 +8632,7 @@ rule("BRAWLER (BRIGITTE) USES SHEILD BASH")
 		Event Player.specialThrottling != True;
 		Ability Cooldown(Event Player, Button(Primary Fire)) <= 0;
 		Ability Cooldown(Event Player, Button(Secondary Fire)) <= 0;
-		Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget)) < 20;
+		Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget)) < 20 * Event Player.movementSpeed;
 	}
 
 	actions
@@ -8660,16 +8662,16 @@ rule("BRAWLER (BRIGITTE) USES SHEILD BASH")
 				Wait Until(!Is Firing Primary(Event Player), 0.5);
 				"Shield broke during bash"
 				If(!Is Firing Secondary(Event Player));
-					Set Status(Event Player, Null, Knocked Down, 1);
+					Set Status(Event Player, Null, Knocked Down, 3);
 					Apply Impulse(Event Player, Vector(0, 1, -2), 30 / Event Player.size, To Player, Cancel Contrary Motion);
 				End;
 			Else; 
-				Set Status(Event Player, Null, Stunned, 0.75);
+				Set Status(Event Player, Null, Stunned, 2);
 			End;
 		Else;
-			Set Status(Event Player, Null, Stunned, 0.75);
+			Set Status(Event Player, Null, Stunned, 2);
 		End;
-		Set Ability Cooldown(Event Player, Button(Primary Fire), Is Firing Secondary(Event Player) ? 2 : 10);
+		Set Ability Cooldown(Event Player, Button(Primary Fire), Is Firing Secondary(Event Player) ? 4 : 10);
 		Stop Holding Button(Event Player, Button(Secondary Fire));
 		Event Player.chase1 = 0;
 		Event Player.movementSpeed /= 3;
@@ -8693,22 +8695,20 @@ rule("BRAWLER FLAIL CONTROL AND STRAFING")
 	{
 		Event Player.botTarget != Null;
 		Event Player.specialThrottling != True;
-		Distance Between(Eye Position(Event Player), Eye Position(Event Player.botTarget)) < 6 * Event Player.size;
+		Distance Between(Eye Position(Event Player), Eye Position(Event Player.botTarget)) < 5 * Event Player.size;
 	}
 
 	actions
 	{
-		If(!Event Player.specialThrottling);
-			Set Primary Fire Enabled(Event Player, True);
-			Start Holding Button(Event Player, Button(Primary Fire));
-			Event Player.specialThrottling = True;
-			Start Throttle In Direction(Event Player, Vector(Evaluate Once(Random Value In Array(Array(-1, 1))), 0, 0), Event Player.botThrottleSpeed, To Player, Replace Existing Throttle, Direction And Magnitude);
-		End;
+		Set Primary Fire Enabled(Event Player, True);
+		Start Holding Button(Event Player, Button(Primary Fire));
+		Event Player.specialThrottling = True;
+		Start Throttle In Direction(Event Player, Vector(Evaluate Once(Random Value In Array(Array(-1, 1))), 0, 0), Event Player.botThrottleSpeed, To Player, Replace Existing Throttle, Direction And Magnitude);
 		Wait(0.5, Ignore Condition);
-		Loop If Condition Is True;
 		Stop Holding Button(Event Player, Button(Primary Fire));
 		Event Player.specialThrottling = False;
 		Start Rule(restoreDefaultFacingMovement, Do Nothing);
+		Loop If Condition Is True;
 	}
 }
 
@@ -8731,6 +8731,7 @@ rule("BRAWLER HITS TARGET WITH SHIELD BASH")
 	{
 		Set Status(Victim, Attacker, Knocked Down, 0.5);
 		Apply Impulse(Victim, Direction From Angles(Horizontal Angle From Direction(Event Direction), -20), 30 * Attacker.size, To World, Cancel Contrary Motion);
+		Set Ability Cooldown(Event Player, Button(Primary Fire), 5);
 	}
 }
 
