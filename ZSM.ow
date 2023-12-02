@@ -8757,57 +8757,33 @@ rule("SHINER (ILLARI) USES ULTIMATE")
 		Press Button(Event Player, Button(Ultimate));
 		Wait Until(Is Using Ultimate(Event Player), 0.125);
 		Loop If Condition Is True;
-		Wait(1, Ignore Condition);
+		Wait(1.5, Ignore Condition);
+		Set Projectile Speed(Event Player, 30);
 		Press Button(Event Player, Button(Primary Fire));
-		Wait(5, Ignore Condition);
+		Event Player.damageOverTimeDuration = 10;
+		Wait Until(!Is Using Ultimate(Event Player), 99999);
+		Wait(2, Ignore Condition);
 		Loop If Condition Is True;
 	}
 }
 
-rule("SHINER THROWS HEALING PYLON")
+rule("SHINER MELEES PLAYER")
 {
 	event
 	{
-		Ongoing - Each Player;
+		Player Dealt Damage;
 		Team 2;
 		Illari;
 	}
 
 	conditions
 	{
-		Event Player.botTarget != Null;
-		Ability Cooldown(Event Player, Button(Ability 2)) <= 0;
-		Is Firing Primary(Event Player) == True;
+		Event Ability == Button(Melee);
 	}
 
 	actions
 	{
-		While(!Is Using Ability 2(Event Player));
-			Press Button(Event Player, Button(Ability 2));
-			Wait Until(Is Using Ability 2(Event Player), 0.125);
-		End;
-	}
-}
-
-rule("SHINER HEALING PYLON HEALS")
-{
-	event
-	{
-		Player Dealt Healing;
-		Team 2;
-		Illari;
-	}
-
-	conditions
-	{
-		Event Ability == Button(Ability 2);
-	}
-
-	actions
-	{
-		Healee.size += 0.1;
-		Start Scaling Player(Healee, Healee.size, False);
-
+		Set Status(Victim, Attacker, Burning, 3);
 	}
 }
 
