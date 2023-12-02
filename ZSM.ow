@@ -1135,15 +1135,15 @@ rule("setDifficulty")
 		If(Global.difficultySetting == 1);
 			Global.startTime = 600;
 			"Bot Health Values"
-			Global.botHealthValues = Array(213, 130, 75, 750, 1250, 100, 110, 500, 125, 450, 100, 400, 200, 250, 100, 200);
+			Global.botHealthValues = Array(213, 130, 75, 750, 1250, 100, 110, 500, 125, 450, 100, 400, 200, 250, 100, 200, 175);
 			"Bot bite damage"
-			Global.biteDamages = Array(5, 2.500, 2, 20, 0, 5, 2, 7.500, 5, 10, 10, 5, 30, 0, 3, 0);
+			Global.biteDamages = Array(5, 2.500, 2, 20, 0, 5, 2, 7.500, 5, 10, 10, 5, 30, 0, 3, 0, 4);
 			"Bot bite durations"
-			Global.biteDurations = Array(2, 2, 2.500, 2.500, 0, 1.500, 3.500, 2, 2, 1.500, 1, 1, 0, 0, 3, 0);
+			Global.biteDurations = Array(2, 2, 2.500, 2.500, 0, 1.500, 3.500, 2, 2, 1.500, 1, 1, 0, 0, 3, 0, 3);
 			"Bot throttle speeds"
-			Global.throttleSpeeds = Array(0.550, 0.600, 0.750, 0.400, 0.500, 0.600, 0.300, 0.550, 0.450, 0.500, 0.750, 0.550, 0.400, 0.500, 0.300, 0.5);
+			Global.throttleSpeeds = Array(0.550, 0.600, 0.750, 0.400, 0.500, 0.600, 0.300, 0.550, 0.450, 0.500, 0.750, 0.550, 0.400, 0.500, 0.300, 0.5, 0.55);
 			"Bot damage dealt"
-			Global.damageDealt = Array(8.500, 60, 1, 1, 50, 75, 1, 25, 1, 50, 1, 50, 75, 50, 5, 40);
+			Global.damageDealt = Array(8.500, 60, 1, 1, 50, 75, 1, 25, 1, 50, 1, 50, 75, 50, 5, 40, 60);
 		"Difficulty: Normal"
 		Else If(Global.difficultySetting == 2);
 			Global.startTime = 600;
