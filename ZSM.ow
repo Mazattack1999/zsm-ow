@@ -1038,9 +1038,9 @@ rule("setZombieMode")
 	{
 		"Bot available hero list"
 		Global.botHeros = Array(Hero(Reaper), Hero(Junkrat), Hero(Torbjörn), Hero(Roadhog), Hero(Reinhardt), Hero(Genji), Hero(Widowmaker),
-			Hero(Orisa), Hero(Mercy), Hero(Wrecking Ball), Hero(Moira), Hero(D.Va), Hero(Pharah), Hero(Ramattra), Hero(Sombra), Hero(Brigitte));
+			Hero(Orisa), Hero(Mercy), Hero(Wrecking Ball), Hero(Moira), Hero(D.Va), Hero(Pharah), Hero(Ramattra), Hero(Sombra), Hero(Brigitte), Hero(Illari));
 		"Zombie types without a boss variation"
-		Global.nonBossZombies = Array(Hero(Genji), Hero(Widowmaker), Hero(D.Va), Hero(Ramattra), Hero(Brigitte));
+		Global.nonBossZombies = Array(Hero(Genji), Hero(Widowmaker), Hero(D.Va), Hero(Ramattra), Hero(Brigitte), Hero(Illari));
 		"Wave 1"
 		If(Global.zombieSetting == 1);
 			Global.botSpawnRates = Array(58, 10, 8, 0, 0, 5, 4, 0, 3, 0, 3, 0, 4, 0, 3, 2);
@@ -1058,7 +1058,7 @@ rule("setZombieMode")
 			Global.botSpawnRates = Array(1, 4, 4, 4, 2, 25, 2, 13, 2, 7, 12, 3, 10, 3, 3, 5);
 		End;
 		"TESTING ONLY"
-		disabled Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100);
+		Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100);
 	}
 }
 
@@ -8733,6 +8733,81 @@ rule("BRAWLER HITS TARGET WITH SHIELD BASH")
 		Set Status(Victim, Attacker, Knocked Down, 0.5);
 		Apply Impulse(Victim, Direction From Angles(Horizontal Angle From Direction(Event Direction), -20), 30 * Attacker.size, To World, Cancel Contrary Motion);
 		Set Ability Cooldown(Event Player, Button(Primary Fire), 5);
+	}
+}
+
+rule("SHINER (ILLARI) USES ULTIMATE")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		Illari;
+	}
+
+	conditions
+	{
+		Event Player.botTarget != Null;
+		Is Using Ultimate(Event Player) != True;
+	}
+
+	actions
+	{
+		Set Ultimate Charge(Event Player, 100);
+		Press Button(Event Player, Button(Ultimate));
+		Wait Until(Is Using Ultimate(Event Player), 0.125);
+		Loop If Condition Is True;
+		Wait(1, Ignore Condition);
+		Press Button(Event Player, Button(Primary Fire));
+		Wait(5, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("SHINER THROWS HEALING PYLON")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		Illari;
+	}
+
+	conditions
+	{
+		Event Player.botTarget != Null;
+		Ability Cooldown(Event Player, Button(Ability 2)) <= 0;
+		Is Firing Primary(Event Player) == True;
+	}
+
+	actions
+	{
+		While(!Is Using Ability 2(Event Player));
+			Press Button(Event Player, Button(Ability 2));
+			Wait Until(Is Using Ability 2(Event Player), 0.125);
+		End;
+	}
+}
+
+rule("SHINER HEALING PYLON HEALS")
+{
+	event
+	{
+		Player Dealt Healing;
+		Team 2;
+		Illari;
+	}
+
+	conditions
+	{
+		Event Ability == Button(Ability 2);
+	}
+
+	actions
+	{
+		Healee.size += 0.1;
+		Start Scaling Player(Healee, Healee.size, False);
+
 	}
 }
 
