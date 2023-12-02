@@ -1138,8 +1138,6 @@ rule("setDifficulty")
 			Global.botHealthValues = Array(213, 130, 75, 750, 1250, 100, 110, 500, 125, 450, 100, 400, 200, 250, 100, 200, 175);
 			"Bot bite damage"
 			Global.biteDamages = Array(5, 2.500, 2, 20, 0, 5, 2, 7.500, 5, 10, 10, 5, 30, 0, 3, 0, 4);
-			"Bot bite durations"
-			Global.biteDurations = Array(2, 2, 2.500, 2.500, 0, 1.500, 3.500, 2, 2, 1.500, 1, 1, 0, 0, 3, 0, 3);
 			"Bot throttle speeds"
 			Global.throttleSpeeds = Array(0.550, 0.600, 0.750, 0.400, 0.500, 0.600, 0.300, 0.550, 0.450, 0.500, 0.750, 0.550, 0.400, 0.500, 0.300, 0.5, 0.55);
 			"Bot damage dealt"
@@ -1151,8 +1149,6 @@ rule("setDifficulty")
 			Global.botHealthValues = Array(225, 170, 125, 900, 2000, 140, 140, 700, 160, 650, 135, 600, 275, 400, 150, 225, 210);
 			"Bot bite damage"
 			Global.biteDamages = Array(5, 2.500, 2, 20, 0, 5, 2, 7.500, 5, 10, 10, 5, 30, 0, 3, 0, 4);
-			"Bot bite durations"
-			Global.biteDurations = Array(2, 2, 2.500, 2.500, 0, 1.500, 3.500, 2, 2, 1.500, 1, 1, 0, 0, 3, 0, 3);
 			"Bot throttle speeds"
 			Global.throttleSpeeds = Array(0.850, 0.900, 1, 0.600, 0.700, 0.800, 0.400, 0.750, 0.700, 0.650, 0.900, 0.800, 0.650, 0.700, 0.350, 0.65, 0.75);
 			"Bot damage dealt"
@@ -1163,9 +1159,7 @@ rule("setDifficulty")
 			"Bot Health Values"
 			Global.botHealthValues = Array(225, 170, 125, 900, 2000, 140, 140, 700, 160, 650, 135, 600, 275, 400, 150, 225, 210);
 			"Bot bite damage"
-			Global.biteDamages = Array(25, 15, 20, 65, 0, 20, 17.500, 20, 30, 20, 40, 12.500, 60, 0, 10, 0, 15);
-			"Bot bite durations"
-			Global.biteDurations = Array(3, 3, 3, 3, 0, 1.500, 4, 2, 2, 2, 1, 1.500, 0, 0, 3, 0, 3);
+			Global.biteDamages = Array(25, 15, 20, 65, 0, 20, 17.500, 20, 30, 20, 40, 12.500, 60, 0, 10, 0, 15);;
 			"Bot throttle speeds"
 			Global.throttleSpeeds = Array(0.850, 0.900, 1, 0.600, 0.700, 0.800, 0.400, 0.750, 0.700, 0.650, 0.900, 0.800, 0.650, 0.700, 0.350, 0.65, 0.75);
 			"Bot damage dealt"
@@ -1177,8 +1171,6 @@ rule("setDifficulty")
 			Global.botHealthValues = Array(300, 200, 125, 900, 2000, 160, 150, 800, 200, 750, 175, 600, 300, 400, 200, 300, 280);
 			"Bot bite damage"
 			Global.biteDamages = Array(35, 22, 25, 75, 0, 25, 20, 25, 35, 25, 90, 31, 70, 0, 20, 0, 25);
-			"Bot bite durations"
-			Global.biteDurations = Array(3, 3, 3, 3, 0, 1.500, 4, 2, 2, 2, 1, 1.500, 0, 0, 3, 0, 3);
 			"Bot throttle speeds"
 			Global.throttleSpeeds = Array(0.900, 0.950, 1, 0.750, 0.850, 0.900, 0.700, 0.800, 0.800, 0.750, 0.900, 0.800, 0.650, 0.700, 0.500, 0.8, 0.9);
 			"Bot damage dealt"
@@ -1190,13 +1182,13 @@ rule("setDifficulty")
 			Global.botHealthValues = Array(300, 250, 200, 1200, 2500, 200, 250, 1000, 250, 900, 200, 800, 350, 600, 275, 300, 300);
 			"Bot bite damage"
 			Global.biteDamages = Array(35, 30, 35, 85, 0, 30, 35, 35, 45, 40, 110, 60, 80, 0, 35, 0, 40);
-			"Bot bite durations"
-			Global.biteDurations = Array(3, 3, 3, 3, 0, 1.500, 4, 2, 2, 2, 1, 1.500, 0, 0, 3, 0, 3);
 			"Bot throttle speeds"
 			Global.throttleSpeeds = Array(1, 1, 1, 1, 1, 1, 0.990, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 			"Bot damage dealt"
 			Global.damageDealt = Array(300, 300, 250, 150, 230, 450, 150, 400, 300, 350, 200, 250, 150, 200, 200, 200, 110);
 		End;
+		"Bot bite durations (Same accross all difficulties)"
+		Global.biteDurations = Array(3, 3, 3, 3, 0, 1.500, 4, 2, 2, 2, 1, 1.500, 0, 0, 3, 0, 3);
 	}
 }
 
