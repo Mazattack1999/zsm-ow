@@ -1043,22 +1043,22 @@ rule("setZombieMode")
 		Global.nonBossZombies = Array(Hero(Genji), Hero(Widowmaker), Hero(D.Va), Hero(Ramattra), Hero(Brigitte), Hero(Illari));
 		"Wave 1"
 		If(Global.zombieSetting == 1);
-			Global.botSpawnRates = Array(58, 10, 8, 0, 0, 5, 4, 0, 3, 0, 3, 0, 4, 0, 3, 2);
+			Global.botSpawnRates = Array(57, 10, 8, 0, 0, 5, 4, 0, 3, 0, 3, 0, 4, 0, 3, 2, 1);
 		"Wave 2"
 		Else If(Global.zombieSetting == 2);
-			Global.botSpawnRates = Array(47, 10, 8, 3, 2, 5, 3, 2, 3, 1, 5, 1, 2, 2, 3, 3);
+			Global.botSpawnRates = Array(45, 10, 8, 3, 2, 5, 3, 2, 3, 1, 5, 1, 2, 2, 3, 3, 2);
 		"Wave 3"
 		Else If(Global.zombieSetting == 3);
-			Global.botSpawnRates = Array(5, 47, 8, 3, 2, 5, 4, 3, 3, 2, 5, 2, 3, 2, 3, 3);
+			Global.botSpawnRates = Array(4, 46, 8, 3, 2, 5, 4, 3, 3, 2, 5, 2, 3, 2, 3, 3, 2);
 		"Wave 4"
 		Else If(Global.zombieSetting == 4);
-			Global.botSpawnRates = Array(3, 5, 48, 3, 2, 7, 2, 4, 2, 3, 6, 3, 3, 2, 3, 4);
+			Global.botSpawnRates = Array(1, 4, 48, 3, 2, 7, 2, 4, 2, 3, 6, 3, 3, 2, 3, 4, 3);
 		"Wave 5"
 		Else If(Global.zombieSetting == 5);
-			Global.botSpawnRates = Array(1, 4, 4, 4, 2, 25, 2, 13, 2, 7, 12, 3, 10, 3, 3, 5);
+			Global.botSpawnRates = Array(1, 3, 3, 3, 2, 25, 2, 12, 2, 7, 11, 3, 10, 3, 3, 5, 5);
 		End;
 		"TESTING ONLY"
-		Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100);
+		disabled Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100);
 	}
 }
 
@@ -1148,54 +1148,54 @@ rule("setDifficulty")
 		Else If(Global.difficultySetting == 2);
 			Global.startTime = 600;
 			"Bot Health Values"
-			Global.botHealthValues = Array(225, 170, 125, 900, 2000, 140, 140, 700, 160, 650, 135, 600, 275, 400, 150, 225);
+			Global.botHealthValues = Array(225, 170, 125, 900, 2000, 140, 140, 700, 160, 650, 135, 600, 275, 400, 150, 225, 210);
 			"Bot bite damage"
-			Global.biteDamages = Array(5, 2.500, 2, 20, 0, 5, 2, 7.500, 5, 10, 10, 5, 30, 0, 3, 0);
+			Global.biteDamages = Array(5, 2.500, 2, 20, 0, 5, 2, 7.500, 5, 10, 10, 5, 30, 0, 3, 0, 4);
 			"Bot bite durations"
-			Global.biteDurations = Array(2, 2, 2.500, 2.500, 0, 1.500, 3.500, 2, 2, 1.500, 1, 1, 0, 0, 3, 0);
+			Global.biteDurations = Array(2, 2, 2.500, 2.500, 0, 1.500, 3.500, 2, 2, 1.500, 1, 1, 0, 0, 3, 0, 3);
 			"Bot throttle speeds"
-			Global.throttleSpeeds = Array(0.850, 0.900, 1, 0.600, 0.700, 0.800, 0.400, 0.750, 0.700, 0.650, 0.900, 0.800, 0.650, 0.700, 0.350, 0.65);
+			Global.throttleSpeeds = Array(0.850, 0.900, 1, 0.600, 0.700, 0.800, 0.400, 0.750, 0.700, 0.650, 0.900, 0.800, 0.650, 0.700, 0.350, 0.65, 0.75);
 			"Bot damage dealt"
-			Global.damageDealt = Array(8.500, 60, 1, 1, 50, 75, 1, 25, 1, 50, 1, 50, 75, 50, 5, 40);
+			Global.damageDealt = Array(8.500, 60, 1, 1, 50, 75, 1, 25, 1, 50, 1, 50, 75, 50, 5, 40, 60);
 		"Difficulty: Expert"
 		Else If(Global.difficultySetting == 3);
 			Global.startTime = 450;
 			"Bot Health Values"
-			Global.botHealthValues = Array(225, 170, 125, 900, 2000, 140, 140, 700, 160, 650, 135, 600, 275, 400, 150, 225);
+			Global.botHealthValues = Array(225, 170, 125, 900, 2000, 140, 140, 700, 160, 650, 135, 600, 275, 400, 150, 225, 210);
 			"Bot bite damage"
-			Global.biteDamages = Array(25, 15, 20, 65, 0, 20, 17.500, 20, 30, 20, 40, 12.500, 60, 0, 10, 0);
+			Global.biteDamages = Array(25, 15, 20, 65, 0, 20, 17.500, 20, 30, 20, 40, 12.500, 60, 0, 10, 0, 15);
 			"Bot bite durations"
-			Global.biteDurations = Array(3, 3, 3, 3, 0, 1.500, 4, 2, 2, 2, 1, 1.500, 0, 0, 3, 0);
+			Global.biteDurations = Array(3, 3, 3, 3, 0, 1.500, 4, 2, 2, 2, 1, 1.500, 0, 0, 3, 0, 3);
 			"Bot throttle speeds"
-			Global.throttleSpeeds = Array(0.850, 0.900, 1, 0.600, 0.700, 0.800, 0.400, 0.750, 0.700, 0.650, 0.900, 0.800, 0.650, 0.700, 0.350, 0.65);
+			Global.throttleSpeeds = Array(0.850, 0.900, 1, 0.600, 0.700, 0.800, 0.400, 0.750, 0.700, 0.650, 0.900, 0.800, 0.650, 0.700, 0.350, 0.65, 0.75);
 			"Bot damage dealt"
-			Global.damageDealt = Array(125, 125, 50, 50, 150, 175, 50, 150, 50, 150, 1, 90, 75, 100, 75, 100);
+			Global.damageDealt = Array(125, 125, 50, 50, 150, 175, 50, 150, 50, 150, 1, 90, 75, 100, 75, 100, 100);
 		"Difficulty: Legendary"
 		Else If(Global.difficultySetting == 4);
 			Global.startTime = 450;
 			"Bot Health Values"
-			Global.botHealthValues = Array(300, 200, 125, 900, 2000, 160, 150, 800, 200, 750, 175, 600, 300, 400, 200, 300);
+			Global.botHealthValues = Array(300, 200, 125, 900, 2000, 160, 150, 800, 200, 750, 175, 600, 300, 400, 200, 300, 280);
 			"Bot bite damage"
-			Global.biteDamages = Array(35, 22, 25, 75, 0, 25, 20, 25, 35, 25, 90, 31, 70, 0, 20, 0);
+			Global.biteDamages = Array(35, 22, 25, 75, 0, 25, 20, 25, 35, 25, 90, 31, 70, 0, 20, 0, 25);
 			"Bot bite durations"
-			Global.biteDurations = Array(3, 3, 3, 3, 0, 1.500, 4, 2, 2, 2, 1, 1.500, 0, 0, 3, 0);
+			Global.biteDurations = Array(3, 3, 3, 3, 0, 1.500, 4, 2, 2, 2, 1, 1.500, 0, 0, 3, 0, 3);
 			"Bot throttle speeds"
-			Global.throttleSpeeds = Array(0.900, 0.950, 1, 0.750, 0.850, 0.900, 0.700, 0.800, 0.800, 0.750, 0.900, 0.800, 0.650, 0.700, 0.500, 0.8);
+			Global.throttleSpeeds = Array(0.900, 0.950, 1, 0.750, 0.850, 0.900, 0.700, 0.800, 0.800, 0.750, 0.900, 0.800, 0.650, 0.700, 0.500, 0.8, 0.9);
 			"Bot damage dealt"
-			Global.damageDealt = Array(150, 150, 100, 100, 200, 225, 100, 200, 100, 175, 50, 175, 100, 150, 150, 150);
+			Global.damageDealt = Array(150, 150, 100, 100, 200, 225, 100, 200, 100, 175, 50, 175, 100, 150, 150, 150, 100);
 		"Difficulty: Insanity"
 		Else If(Global.difficultySetting == 5);
 			Global.startTime = 300;
 			"Bot Health Values"
-			Global.botHealthValues = Array(300, 250, 200, 1200, 2500, 200, 250, 1000, 250, 900, 200, 800, 350, 600, 275, 300);
+			Global.botHealthValues = Array(300, 250, 200, 1200, 2500, 200, 250, 1000, 250, 900, 200, 800, 350, 600, 275, 300, 300);
 			"Bot bite damage"
-			Global.biteDamages = Array(35, 30, 35, 85, 0, 30, 35, 35, 45, 40, 110, 60, 80, 0, 35, 0);
+			Global.biteDamages = Array(35, 30, 35, 85, 0, 30, 35, 35, 45, 40, 110, 60, 80, 0, 35, 0, 40);
 			"Bot bite durations"
-			Global.biteDurations = Array(3, 3, 3, 3, 0, 1.500, 4, 2, 2, 2, 1, 1.500, 0, 0, 3, 0);
+			Global.biteDurations = Array(3, 3, 3, 3, 0, 1.500, 4, 2, 2, 2, 1, 1.500, 0, 0, 3, 0, 3);
 			"Bot throttle speeds"
-			Global.throttleSpeeds = Array(1, 1, 1, 1, 1, 1, 0.990, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+			Global.throttleSpeeds = Array(1, 1, 1, 1, 1, 1, 0.990, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 			"Bot damage dealt"
-			Global.damageDealt = Array(300, 300, 250, 150, 230, 450, 150, 400, 300, 350, 200, 250, 150, 200, 200, 200);
+			Global.damageDealt = Array(300, 300, 250, 150, 230, 450, 150, 400, 300, 350, 200, 250, 150, 200, 200, 200, 110);
 		End;
 	}
 }
@@ -8757,12 +8757,16 @@ rule("SHINER (ILLARI) USES ULTIMATE")
 		Press Button(Event Player, Button(Ultimate));
 		Wait Until(Is Using Ultimate(Event Player), 0.125);
 		Loop If Condition Is True;
-		Wait(1.5, Ignore Condition);
-		Set Projectile Speed(Event Player, 30);
-		Press Button(Event Player, Button(Primary Fire));
-		Event Player.damageOverTimeDuration = 10;
-		Wait Until(!Is Using Ultimate(Event Player), 99999);
-		Wait(2, Ignore Condition);
+		Wait Until(!Is Using Ultimate(Event Player), 1.5);
+		If(Is Using Ultimate(Event Player));
+			Set Projectile Speed(Event Player, 30);
+			Press Button(Event Player, Button(Primary Fire));
+			Event Player.damageOverTimeDuration = 10;
+			Wait Until(!Is Using Ultimate(Event Player), 99999);
+			Wait(2, Ignore Condition);
+		Else;
+			Wait(5, Ignore Condition);
+		End;
 		Loop If Condition Is True;
 	}
 }
@@ -8779,6 +8783,7 @@ rule("SHINER MELEES PLAYER")
 	conditions
 	{
 		Event Ability == Button(Melee);
+		Is Using Ultimate(Event Player) == True;
 	}
 
 	actions
