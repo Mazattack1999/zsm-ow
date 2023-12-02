@@ -7032,6 +7032,7 @@ rule("BEHEMOTH (ROAD) TOXIC CLOUD")
 	conditions
 	{
 		Event Player.botTarget != Null;
+		Event Player.crowdControlled != True;
 		Is Alive(Event Player) == True;
 		Ability Cooldown(Event Player, Button(Ability 1)) <= 0;
 		(Array Contains(Global.bosses, Event Player) || Normalized Health(Event Player) < 0.500) == True;
