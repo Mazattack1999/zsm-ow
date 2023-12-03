@@ -1058,7 +1058,7 @@ rule("setZombieMode")
 			Global.botSpawnRates = Array(1, 3, 3, 3, 2, 25, 2, 12, 2, 7, 11, 3, 10, 3, 3, 5, 5);
 		End;
 		"TESTING ONLY"
-		disabled Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0);
+		disabled Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100);
 	}
 }
 
@@ -8641,7 +8641,7 @@ rule("BRAWLER (BRIGITTE) USES SHEILD BASH")
 		Set Move Speed(Event Player, Event Player.movementSpeed * 100);
 		Event Player.chase1 = 0;
 		"charge up attack"
-		Chase Player Variable Over Time(Event Player, chase1, 2, 2, None);
+		Chase Player Variable Over Time(Event Player, chase1, 2, 1.5, None);
 		Wait Until(!Is Firing Secondary(Event Player) || Event Player.chase1 >= 2, 99999);
 		Stop Chasing Player Variable(Event Player, chase1);
 		"Shield is still up"
@@ -8753,7 +8753,7 @@ rule("SHINER (ILLARI) USES ULTIMATE")
 		Press Button(Event Player, Button(Ultimate));
 		Wait Until(Is Using Ultimate(Event Player), 0.125);
 		Loop If Condition Is True;
-		Wait Until(!Is Using Ultimate(Event Player), 1.5);
+		Wait Until(!Is Using Ultimate(Event Player) || Distance Between(Position Of(Event Player), Position Of(Event Player.lastTarget)) < 3.1 * Event Player.size, 4);
 		If(Is Using Ultimate(Event Player));
 			Set Projectile Speed(Event Player, 30);
 			Press Button(Event Player, Button(Primary Fire));
