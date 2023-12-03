@@ -191,6 +191,7 @@ variables
 		13: reviveRadius
 		14: botHeros
 		15: chase1
+		16: globalSpawnTime
 		18: gameStatus
 		19: startTime
 		20: mustReviveTime
@@ -548,8 +549,7 @@ rule("SPAWN BOTS")
 			Wait(0.250, Ignore Condition);
 		End;
 		If(Count Of(Global.spawnTimes) + Number Of Players(Team 2) < Global.numberOfBots);
-			Wait(Global.startTime - Match Time < 30 ? 3 : 0.25, Ignore Condition);
-			Modify Global Variable(spawnTimes, Append To Array, 0);
+			Modify Global Variable(spawnTimes, Append To Array, 3 + Count Of(Global.spawnTimes) * 0.25);
 		End;
 		Loop If Condition Is True;
 		Wait(Last Of(Sorted Array(Global.spawnTimes, Current Array Element)), Restart When True);
@@ -1189,6 +1189,8 @@ rule("setDifficulty")
 		End;
 		"Bot bite durations (Same accross all difficulties)"
 		Global.biteDurations = Array(3, 3, 3, 3, 0, 1.500, 4, 2, 2, 2, 1, 1.500, 0, 0, 3, 0, 3);
+		"Global spawn time start time"
+		Global.globalSpawnTime = Global.startTime / 60;
 	}
 }
 
@@ -2349,7 +2351,7 @@ rule("EFFECTS/TEXTS")
 		"SERVER LOAD"
 		Create HUD Text(String Contains(Custom String("{0}", Local Player), Custom String("Mazattack")) ? Local Player : Empty Array,
 			Custom String("Spawn Array: {0}, {1}, {2}", Global.spawnTimes[0], Global.spawnTimes[1], Global.spawnTimes[2]), Custom String(
-			"SERVER LOAD AVERAGE: {0}, Source Counter: {1}", Server Load Average, Global.zombieSourceCounter), Custom String("SERVER LOAD PEAK: {0}", Server Load Peak), Right, 0, Color(
+			"SERVER LOAD AVERAGE: {0}, Source Counter: {1}", Server Load Average, Global.zombieSourceCounter), Custom String("SERVER LOAD PEAK: {0} | GST: {1}", Server Load Peak, Global.globalSpawnTime), Right, 0, Color(
 			White), Color(White), Color(White), Visible To and String, Default Visibility);
 		If(Global.difficultySetting == 1);
 			Create HUD Text(All Players(All Teams), Null, Null, Custom String("Difficulty: Beginner | Wave {0}", Global.zombieSetting), Right,
@@ -5604,8 +5606,14 @@ rule("BOT DIES")
 			Disable Nameplates(Event Player, All Players(All Teams));
 			"Allow for custom revive times"
 			Wait Until(Event Player.reviveTimer != 0, 0.125);
+			"Modify global spawn time"
+			Global.globalSpawnTime -= 0.02;
+			"Accelerate global spawn time if zombie team is wiped"
 			If(Event Player.reviveTimer == 0);
-				Event Player.reviveTimer = (Match Time + Global.matchEndTime) / 60;
+				If(Count Of(All Living Players(Team 2)) == 0);
+					Global.globalSpawnTime -= 0.5;
+				End;
+				Event Player.reviveTimer = Global.globalSpawnTime;
 			End;
 			If(Count Of(Global.spawnTimes) < Global.numberOfBots);
 				Modify Global Variable(spawnTimes, Append To Array, Event Player.reviveTimer);
