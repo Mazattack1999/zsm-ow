@@ -5611,7 +5611,7 @@ rule("BOT DIES")
 			"Accelerate global spawn time if zombie team is wiped"
 			If(Event Player.reviveTimer == 0);
 				If(Count Of(All Living Players(Team 2)) == 0);
-					Global.globalSpawnTime -= 0.5;
+					Global.globalSpawnTime -= 1;
 				End;
 				Event Player.reviveTimer = Global.globalSpawnTime;
 			End;
