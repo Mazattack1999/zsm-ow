@@ -5613,7 +5613,8 @@ rule("BOT DIES")
 				If(Count Of(All Living Players(Team 2)) == 0);
 					Global.globalSpawnTime -= 1;
 				End;
-				Event Player.reviveTimer = Global.globalSpawnTime;
+				disabled Event Player.reviveTimer = Global.globalSpawnTime;
+				Event Player.reviveTimer = (Match Time + Global.matchEndTime) / 60;
 			End;
 			If(Count Of(Global.spawnTimes) < Global.numberOfBots);
 				Modify Global Variable(spawnTimes, Append To Array, Event Player.reviveTimer);
