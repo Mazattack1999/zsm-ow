@@ -2696,7 +2696,7 @@ rule("objectivesManagement")
 						Current Array Element)));
 					Global.objectiveCaptureValue = Filtered Array(Global.objectiveCaptureValue, Distance Between(Current Array Element,
 						Global.testPos2 + Direction Towards(Global.testPos2, First Of(Global.objectivePositions)) * Distance Between(Global.testPos2,
-						Current Array Element)) < 15);
+						Current Array Element)) < 20);
 					Wait(0.016, Ignore Condition);
 				End;
 				Global.objectiveCaptureValue = Sorted Array(Global.objectiveCaptureValue, Distance Between(Global.testPos2, Current Array Element));
