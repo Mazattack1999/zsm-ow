@@ -2696,12 +2696,11 @@ rule("objectivesManagement")
 						Current Array Element)));
 					Global.objectiveCaptureValue = Filtered Array(Global.objectiveCaptureValue, Distance Between(Current Array Element,
 						Global.testPos2 + Direction Towards(Global.testPos2, First Of(Global.objectivePositions)) * Distance Between(Global.testPos2,
-						Current Array Element)) < 20);
+						Current Array Element)) < 15);
 					Wait(0.016, Ignore Condition);
 				End;
+				Global.objectiveCaptureValue = Filtered Array(Global.objectiveCaptureValue, Current Array Index < Global.eliminationsNeededPerObjective);
 				Global.objectiveCaptureValue = Sorted Array(Global.objectiveCaptureValue, Distance Between(Global.testPos2, Current Array Element));
-				Global.objectiveCaptureValue = Filtered Array(Global.objectiveCaptureValue,
-					Current Array Index < Global.eliminationsNeededPerObjective);
 				"Active Grave Locations"
 				Global.objectiveResourcePositions = Empty Array;
 				"Max number of active graves "
@@ -4593,7 +4592,7 @@ rule("ZOMBIES SPAWN AT GRAVES")
 		Else If(Count Of(Global.objectiveResourcePositions) < Min(Global.survivorToRescue, Count Of(Global.objectiveCaptureValue)));
 			Modify Global Variable(objectiveResourcePositions, Append To Array, Event Player);
 			Event Player.telePos = Global.objectiveCaptureValue[Index Of Array Value(Global.objectiveResourcePositions, Event Player)];
-			Event Player.reviveTimer = 2;
+			Event Player.reviveTimer = -1;
 		Else;
 			Event Player.telePos = Random Value In Array(Array Slice(Global.objectiveCaptureValue, 0, Min(Global.survivorToRescue, Count Of(
 				Global.objectiveCaptureValue))));
