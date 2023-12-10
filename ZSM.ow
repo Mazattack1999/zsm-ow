@@ -1058,7 +1058,7 @@ rule("setZombieMode")
 			Global.botSpawnRates = Array(1, 3, 3, 3, 2, 25, 2, 12, 2, 7, 11, 3, 10, 3, 3, 5, 5);
 		End;
 		"TESTING ONLY"
-		Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100);
+		disabled Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0);
 	}
 }
 
@@ -8632,6 +8632,7 @@ rule("BRAWLER (BRIGITTE) USES SHEILD BASH")
 	{
 		Event Player.botTarget != Null;
 		Event Player.specialThrottling != True;
+		Event Player.crowdControlled != True;
 		Ability Cooldown(Event Player, Button(Primary Fire)) <= 0;
 		Ability Cooldown(Event Player, Button(Secondary Fire)) <= 0;
 		Distance Between(Position Of(Event Player), Position Of(Event Player.botTarget)) < 20 * Event Player.movementSpeed;
