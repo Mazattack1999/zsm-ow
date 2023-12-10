@@ -8753,6 +8753,7 @@ rule("SHINER (ILLARI) USES ULTIMATE")
 	conditions
 	{
 		Event Player.botTarget != Null;
+		Event Player.crowdControlled != True;
 		Is Using Ultimate(Event Player) != True;
 	}
 
@@ -8762,7 +8763,8 @@ rule("SHINER (ILLARI) USES ULTIMATE")
 		Press Button(Event Player, Button(Ultimate));
 		Wait Until(Is Using Ultimate(Event Player), 0.125);
 		Loop If Condition Is True;
-		Wait Until(!Is Using Ultimate(Event Player) || Distance Between(Position Of(Event Player), Position Of(Event Player.lastTarget)) < 3.1 * Event Player.size, 2);
+		Wait(1.1, Ignore Condition);
+		Wait Until(!Is Using Ultimate(Event Player) || Distance Between(Position Of(Event Player), Position Of(Event Player.lastTarget)) < 3.1 * Event Player.size, 0.9);
 		If(Is Using Ultimate(Event Player));
 			Set Projectile Speed(Event Player, 30);
 			Press Button(Event Player, Button(Primary Fire));
