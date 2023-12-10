@@ -1058,7 +1058,7 @@ rule("setZombieMode")
 			Global.botSpawnRates = Array(1, 3, 3, 3, 2, 25, 2, 12, 2, 7, 11, 3, 10, 3, 3, 5, 5);
 		End;
 		"TESTING ONLY"
-		disabled Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100);
+		Global.botSpawnRates = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100);
 	}
 }
 
@@ -8763,8 +8763,7 @@ rule("SHINER (ILLARI) USES ULTIMATE")
 		Press Button(Event Player, Button(Ultimate));
 		Wait Until(Is Using Ultimate(Event Player), 0.125);
 		Loop If Condition Is True;
-		Wait(1.1, Ignore Condition);
-		Wait Until(!Is Using Ultimate(Event Player) || Distance Between(Position Of(Event Player), Position Of(Event Player.lastTarget)) < 3.1 * Event Player.size, 0.9);
+		Wait(2, Ignore Condition);
 		If(Is Using Ultimate(Event Player));
 			Set Projectile Speed(Event Player, 30);
 			Press Button(Event Player, Button(Primary Fire));
