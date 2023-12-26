@@ -938,7 +938,6 @@ rule("START GAME")
 		Set Objective Description(All Players(All Teams), Global.objectiveDescription, Visible To and String);
 		Global.zombieSource = Global.walkCenter;
 		Global.zombieSourceCounter = 0;
-		Chase Global Variable at Rate(zombieSourceCounter, 0, 1, None);
 	}
 }
 
@@ -2604,7 +2603,6 @@ rule("objectivesManagement")
 				Modify Global Variable(objectiveTypes, Remove From Array By Index, 0);
 				Global.bosses = Empty Array;
 				Global.survivorToRescue = Null;
-				Global.zombieSourceCounter = 0;
 			"Skips to extraction if mode is elimination only"
 			Else;
 				Global.objectivePositions = Array(Last Of(Global.objectivePositions));
@@ -5626,7 +5624,7 @@ rule("BOT DIES")
 		Else If(Event Was Environment);
 			Event Player.successfullyTeleported = False;
 			If(Event Player.canSource);
-				Global.zombieSourceCounter -= 2;
+				Global.zombieSourceCounter -= 4;
 			End;
 		End;
 		Event Player.teleporting = True;
@@ -5747,12 +5745,12 @@ rule("UPDATE SUCCESSFUL TELEPORT STATUS")
 		Wait(0.500, Abort When False);
 		If(!Event Player.successfullyTeleported);
 			Event Player.successfullyTeleported = True;
-			If(Global.zombieSourceCounter < 5.5);
+			If(Global.zombieSourceCounter < 6);
 				If(Global.zombieSourceCounter <= 0);
-					Global.zombieSourceCounter = 7.5;
+					Global.zombieSourceCounter = 10;
 					Global.zombieSource = Event Player.telePos;
 				Else If(Event Player.canSource);
-					Global.zombieSourceCounter += 2;
+					Global.zombieSourceCounter += 4;
 				End;
 			End;
 			If(Event Player.canSource);
@@ -6181,6 +6179,7 @@ rule("teleportBots")
 							Event Player.telePos = Random Value In Array(Event Player.filteredBotSpawnPointGrid);
 						End;
 					End;
+					Global.zombieSourceCounter -= 1;
 					Wait(0.250, Ignore Condition);
 				End;
 				If(Is True For All(Global.playerTargetList, Distance Between(Event Player.telePos, Position Of(Current Array Element)) > 15)
