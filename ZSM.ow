@@ -5606,7 +5606,7 @@ rule("BOT DIES")
 			"Allow for custom revive times"
 			Wait Until(Event Player.reviveTimer != 0, 0.125);
 			"Modify global spawn time"
-			Global.globalSpawnTime -= 0.05 * Count Of(Global.playerTargetList) / Number Of Living Players(Team 2);
+			Global.globalSpawnTime -= 0.05 * Count Of(Global.playerTargetList) / (Number Of Living Players(Team 2) + 1);
 			"Accelerate global spawn time if zombie team is wiped"
 			If(Event Player.reviveTimer == 0);
 				Event Player.reviveTimer = Global.globalSpawnTime;
