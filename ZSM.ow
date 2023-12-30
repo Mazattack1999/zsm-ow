@@ -1225,7 +1225,10 @@ rule("determineObjectiveType")
 		End;
 		"If all players choose no preference, randomize"
 		If(Global.objectiveTypeSetting == 0);
-			If(Last Of(Global.objectiveTypeVotes) != -1);
+			"If no one votes and there are few players"
+			If(Count Of(Filtered Array(All Players(Team 1), Current Array Element.playerActiveStatus)) < 3);
+				Global.objectiveTypeSetting = Random Value In Array(Array(3, 4));
+			Else If(Last Of(Global.objectiveTypeVotes) != -1);
 				Global.objectiveTypeSetting = Count Of(Global.objectiveTypeVotes) - 1;
 			Else;
 				While(Global.objectiveTypeSetting == 0 || Global.objectiveTypeVotes[Global.objectiveTypeSetting] == -1);
