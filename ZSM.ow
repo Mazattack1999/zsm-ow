@@ -1190,7 +1190,7 @@ rule("setDifficulty")
 		"Bot bite durations (Same accross all difficulties)"
 		Global.biteDurations = Array(3, 3, 3, 3, 0, 1.500, 4, 2, 2, 2, 1, 1.500, 0, 0, 3, 0, 3);
 		"Global spawn time start time"
-		Global.globalSpawnTime = Global.startTime / 60;
+		Global.globalSpawnTime = Global.startTime / 60 * 1.5;
 	}
 }
 
@@ -5605,7 +5605,7 @@ rule("BOT DIES")
 			"Allow for custom revive times"
 			Wait Until(Event Player.reviveTimer != 0, 0.125);
 			"Modify global spawn time"
-			Global.globalSpawnTime -= 0.05 * Count Of(Global.playerTargetList) / (Number Of Living Players(Team 2) + 1);
+			Global.globalSpawnTime -= 1 / ((Number Of Living Players(Team 2) + 1) ^ 2);
 			"Accelerate global spawn time if zombie team is wiped"
 			If(Event Player.reviveTimer == 0);
 				Event Player.reviveTimer = Global.globalSpawnTime;
