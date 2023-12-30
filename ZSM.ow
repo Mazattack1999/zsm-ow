@@ -5608,7 +5608,7 @@ rule("BOT DIES")
 			"Allow for custom revive times"
 			Wait Until(Event Player.reviveTimer != 0, 0.125);
 			"Modify global spawn time"
-			Global.globalSpawnTime -= 1 / ((Number Of Living Players(Team 2) + 1) ^ 2);
+			Global.globalSpawnTime -= 0.05 * Count Of(Global.playerTargetList) / (Number Of Living Players(Team 2) + 1);
 			"Accelerate global spawn time if zombie team is wiped"
 			If(Event Player.reviveTimer == 0);
 				Event Player.reviveTimer = Global.globalSpawnTime;
@@ -5749,13 +5749,11 @@ rule("UPDATE SUCCESSFUL TELEPORT STATUS")
 		Wait(0.500, Abort When False);
 		If(!Event Player.successfullyTeleported);
 			Event Player.successfullyTeleported = True;
-			If(Global.zombieSourceCounter < 6);
-				If(Global.zombieSourceCounter <= 0);
-					Global.zombieSourceCounter = 10;
-					Global.zombieSource = Event Player.telePos;
-				Else If(Event Player.canSource);
-					Global.zombieSourceCounter += 4;
-				End;
+			If(Global.zombieSourceCounter <= 0);
+				Global.zombieSourceCounter = 10;
+				Global.zombieSource = Event Player.telePos;
+			Else If(Event Player.canSource);
+				Global.zombieSourceCounter = Min(10, Global.zombieSourceCounter + 4);
 			End;
 			If(Event Player.canSource);
 				Global.zombieSource = Event Player.telePos;
@@ -6128,8 +6126,8 @@ rule("enterExitTeleport")
 			Set Gravity(Event Player, 100);
 			If(Event Player.botTarget == Null);
 				If(Array Contains(Global.botSpawnPoints, Event Player.telePos));
-					Start Throttle In Direction(Event Player, Direction Towards(Position Of(Event Player), Global.waypoints[Index Of Array Value(
-						Global.botSpawnPoints, Event Player.telePos)]), Event Player.botThrottleSpeed, To World, Replace existing throttle, None);
+					Event Player.waypoint = Global.waypoints[Index Of Array Value(Global.botSpawnPoints, Event Player.telePos)];
+					Start Throttle In Direction(Event Player, Direction Towards(Position Of(Event Player), Event Player.waypoint), Event Player.botThrottleSpeed, To World, Replace existing throttle, None);
 				Else;
 					Start Throttle In Direction(Event Player, Direction From Angles(Random Integer(-90, 90) + Horizontal Angle From Direction(
 						Direction Towards(Position Of(Event Player), Event Player.teleReference)), 0),
