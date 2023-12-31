@@ -546,8 +546,8 @@ rule("SPAWN BOTS")
 		If(Count Of(Global.spawnTimes) > 0 && First Of(Global.spawnTimes) <= 0);
 			Call Subroutine(botHeroRandomization);
 			Modify Global Variable(spawnTimes, Remove From Array By Index, 0);
-			Wait(0.064, Ignore Condition);
-			Wait Until(Is True For All(All Players(Team 2), !Current Array Element.initializing), 1);
+			Wait Until(Server Load Peak >= 255, 0.25);
+			Wait Until(Server Load Peak < 255, 0.25);
 		End;
 		If(Count Of(Global.spawnTimes) + Number Of Players(Team 2) < Global.numberOfBots);
 			Modify Global Variable(spawnTimes, Append To Array, 1 + Count Of(Global.spawnTimes) * 3);
