@@ -550,7 +550,7 @@ rule("SPAWN BOTS")
 			Wait Until(Is True For All(All Players(Team 2), !Current Array Element.initializing), 1);
 		End;
 		If(Count Of(Global.spawnTimes) + Number Of Players(Team 2) < Global.numberOfBots);
-			Modify Global Variable(spawnTimes, Append To Array, 3 + Count Of(Global.spawnTimes) * 0.25);
+			Modify Global Variable(spawnTimes, Append To Array, 1 + Count Of(Global.spawnTimes) * 3);
 			Wait(0.016, Ignore Condition);
 		End;
 		Loop If Condition Is True;
