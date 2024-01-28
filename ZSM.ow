@@ -1436,7 +1436,7 @@ rule("EFFECTS/TEXTS")
 			Visible To and String, Visible Always);
 		"Discord Promo"
 		Create HUD Text(All Players(All Teams), Null, Null, Round To Integer(Total Time Elapsed * 0.200, Up) % 2 == 0 ? Custom String(
-			"Join The Level Crafter's Discord") : Custom String("Discord Link in the Game Description"), Right, 1, Color(White),
+			"Join The Level Crafters Discord") : Custom String("Discord Link in the Game Description"), Right, 1, Color(White),
 			Color(White), Round To Integer(Total Time Elapsed * 0.200, Up) % 2 == 0 ? Color(Turquoise) : Color(Purple), Visible To String and Color, Visible Always);
 		"Workshop.codes/Github Promo"
 		Create HUD Text(All Players(All Teams), Null, Null, Round To Integer(Total Time Elapsed * 0.200, Up) % 2 == 0 ? Custom String(
