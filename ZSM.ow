@@ -4268,7 +4268,7 @@ rule("BOT BECOMES ZOMBIE EGG")
 		Event Player.botThrottleSpeed = 0;
 		Event Player.health = 15000;
 		Event Player.bossHealth = Event Player.health;
-		Event Player.size = 2.500;
+		Event Player.size = 3;
 		Start Scaling Player(Event Player, Event Player.size, False);
 		Set Player Health(Event Player, Max Health(Event Player));
 		Wait Until(Event Player.wallCollisionEnabled == True, 5);
