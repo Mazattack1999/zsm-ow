@@ -6662,7 +6662,7 @@ rule("mutations")
 	actions
 	{
 		"Zombies have a chance to mutate. Bosses cannot mutate"
-		If(Count Of(Global.availablePowerups) > 0 && !Array Contains(Global.bosses, Event Player) && Random Real(0, 100)
+		If(Count Of(Global.availableMutations) > 0 && !Array Contains(Global.bosses, Event Player) && Random Real(0, 100)
 			< Workshop Setting Real(Custom String("Mutations"), Custom String("Chance to mutate percentage"), 25, 0, 100, -1));
 			Event Player.mutationValue = Random Value In Array(Global.availableMutations);
 			"Speed"
