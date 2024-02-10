@@ -5886,9 +5886,7 @@ rule("DESELECT BOT TARGET")
 	{
 		Event Player.botTarget = Null;
 		If(!Event Player.specialThrottling);
-			Start Throttle In Direction(Event Player, Direction Towards(Position Of(Event Player), Position Of(Event Player.lastTarget)
-				+ Normalize(World Vector Of(Throttle Of(Event Player.lastTarget), Event Player.lastTarget, Rotation)) * -2),
-				Event Player.botThrottleSpeed, To World, Replace existing throttle, None);
+			Start Throttle In Direction(Event Player, Direction Towards(Position Of(Event Player), Position Of(Event Player.lastTarget) + Normalize(Velocity Of(Event Player.lastTarget)) * -2), Event Player.botThrottleSpeed, To World, Replace existing throttle, None);
 		End;
 		If(!Event Player.specialFacing);
 			Start Facing(Event Player, Throttle Of(Event Player), Event Player.crowdControlled ? 0 : 100, To Player, Direction and Turn Rate);
